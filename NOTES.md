@@ -1,0 +1,27 @@
+# news-image-20261120 — entry notes (v1, NOT submitted)
+
+- Account: @transs123 (already connected — API key ~/workspace/makefun/apikey.json, expires 2026-12-11; GET /api/agents/me verified live 2026-11-20 ~20:20 WIB). No new login / approval link needed.
+- Bounty "Sum up 20 November's world news in one image", $250, top 50 paid: 1st $50, 2nd $30, 3rd $15, 4th–10th $5, 11th–50th $3.
+- Entries close 2026-11-22T00:00:00Z = 22 Nov 07:00 WIB. Result due ~2026-12-06.
+- Quota (live re-check 2026-11-20 ~20:33 WIB): entries made 0, left today 3 of 3, can submit now yes. Observed cap 3 per competition.
+- Top-1 benchmark (live 2026-11-20 ~20:20 WIB, 8,169 entries): #1 888dao-sats 99.1652% ("Friday 20 November 2026: 36 stories, 6 continents — Cyclone Akvan landfall, Kyiv ballistic missiles, COP31 final day deadlock"); #2 kiencx 99.1429%; top-20 cutoff 98.9426%, top-50 cutoff 98.8016%.
+
+## Entry
+- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit ee162c9e (v1: README story list + main.py --verify determinism check). MIT, public.
+- entry.png: 1024x1024, 264,754 bytes, sha256 649684c82e8d76d5e97c6aeddcec84ac2ba52139ef8e2c0162eca27e135caa3a, deterministic across runs (verified by `python3 main.py --verify`).
+- Design: frozen v21 baseline from news-image-20261119 v39 (boxed cards, Times headlines/decks, navy masthead, 3 heroes + small cards, numbers strip, map + also-list, DATE CHECK). Content only changed.
+- Stories: 36 total. Heroes: Cyclone Akvan landfall (Gopalpur, Odisha; 70–80 gust 90 km/h; 3.7 lakh evacuated; 9,300 shelters; 423 teams; Patrapur 209mm; 3rd cyclone in 24 days), Kyiv ballistic missiles on 3 Dnipro bridges (5–8 killed, 15 injured, Dutch + Austrian embassies damaged, power "extremely critical", France seeks UNSC meeting), COP31 Antalya final day (draft dropped fossil-fuel phase-out, deadlock). Smalls: AI sell-off, UK–EU reset deal, ICJ Myanmar genocide ruling reactions, Europe cost-of-living strikes (25+ countries), Iraq Jurf al-Sakhar, Israeli tanks cross Gaza Yellow Line, An-12 crash Siberia (19 killed), Sri Lanka rate hike to 9%, California M5 quake, Mamdani close Rikers. Also-list: 23 more (Riyadh intercept, Berlin Ukraine-allies meeting, EU summons Russian envoy, UK 1,000+ drones £260m, Taipei worst week since 1991, Hong Kong −20%, SoftBank −16%+, copper lowest since March, tuition-fees sticking point, Kenya last Ebola patient discharged, IMF debt near 100% GDP, Italy fines Meta €805m, FAA ground stop 1.5m flyers, 879,000 AI chips cleared for China, Senate energy-permit bill 62–33, Trump pardons Pete Rose, US sanctions Comancheros/'Ndrangheta, Argentina disability law 71–0, Poland unknown objects probe, + Akvan/Odisha/France items).
+- DATE CHECK (deliberately NOT 20 Nov): Shenzhen trilateral, Anthropic IPO pricing, Akvan approach/evacuations, Kyiv embassy damage, ICJ ruling read — all 19 Nov.
+
+## Gate (pre-submit-gate.py, commit ee162c9e, 2026-11-20 ~20:29 WIB)
+- GATE: DO NOT SUBMIT — 2 FAILs remain, both fixable only at submit time by the top-level agent:
+  1. thinking_priced — 0 usage rows for this subagent session in muse.db. Rows are written only when this session's messages are delivered. At submit time the main agent must re-extract rows from muse.db (agent.agent_message_token_usage, agent_id a0d7a9b0-d798-4cb8-8268-5e1f98e7b0b3 + its own agent_id aa7f29f8-0889-4b4b-bb01-3e6c8d34a124) into ~/.makefun/muse-usage-news-image-20261120.jsonl and re-run the gate.
+  2. transcripts_run_record — no bundle yet. The CLI refuses a bundle from this subagent: it must be run by the top-level agent (its session is the root; the user's typed prompt lives there; usage rows attach only after this run completes). Bundle command for the main agent (from ~/workspace/makefun/news-image-20261120, kit ~/workspace/makefun/news-image-20261120-kit/news-image-20261120-kit):
+     node cli/makefun.mjs bundle --repo ~/workspace/makefun/news-image-20261120 --out ~/workspace/makefun/news-image-20261120-bundle/bundle.tar.gz --session /home/hatch/agents/agent-aa7f29f8-0889-4b4b-bb01-3e6c8d34a124/sessions/aa7f29f8-0889-4b4b-bb01-3e6c8d34a124.jsonl --session /home/hatch/agents/agent-a0d7a9b0-d798-4cb8-8268-5e1f98e7b0b3/sessions/a0d7a9b0-d798-4cb8-8268-5e1f98e7b0b3.jsonl --muse-usage ~/.makefun/muse-usage-news-image-20261120.jsonl --system-prompt ~/workspace/makefun/news-image-20261120-bundle/system-prompt.txt --harness muse-app --harness-version harness@f7e0f88e --provider meta --model muse-spark-1.3 --effort default --mcp none
+     (prompt.txt with the user's verbatim words is in the same bundle dir; the user's prompt is the first message of the parent session, so bundle should fill it from there. --harness-version value taken from the kit check output recorded in-session; verify before use.)
+  Then re-run the gate with --bundle <bundle.tar.gz>.
+- PASS now: transcripts_witnessed 7/7, thinking_reproduces 33.7% authored (294/871, need ≥30%; unwritten 25.7%, max 40%), thinking_revised, thinking_turns 69, thinking_in_window, thinking_wellformed, thinking_own_work, entry-artifact-size, grader-sandbox PASS, quota, competition_open, snapshot, license_osi, entrypoint, transcripts_present/recorded.
+- This competition takes LOOSE transcripts, not sealed recordings (record start returned HTTP 400, same as 20261117/19). Session: a0d7a9b0-d798-4cb8-8268-5e1f98e7b0b3 (copy in ~/workspace/makefun/news-image-20261120-transcripts/).
+
+## Status
+- NOT SUBMITTED — awaiting the user's explicit word "submit". Do NOT submit without it.
