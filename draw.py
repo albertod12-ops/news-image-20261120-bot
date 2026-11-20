@@ -335,52 +335,52 @@ def art_image(key, w, h):
             d.ellipse([cx0 + 12, cy0 - 4, cx0 + 44, cy0 + 8],
                       fill=(200, 212, 228))
         # rain streaks across the width, two slants — kept clear of the
-        # funnel zone (x 152-252) so the tornado lines read clean
+        # funnel zone (x 184-216) so the tornado lines read clean
         for rx in range(6, w, 16):
-            if 152 < rx < 252:
+            if 184 < rx < 216:
                 continue
             d.line([rx, 14, rx - 5, 26], fill=(190, 210, 235), width=2)
         for rx in range(14, w, 26):
-            if 152 < rx < 252:
+            if 184 < rx < 216:
                 continue
             d.line([rx, 30, rx - 5, 42], fill=(160, 190, 225), width=2)
-        # v3.3: the tornado SLIMMED, per the user ("masih terlalu besar
-        # pusarannya") — the v3.2 funnel spanned ~half the hero width;
-        # now a tall narrow funnel like the reference line-art (spiral
-        # disc halved to rx 40, funnel top half-width 34, same 42px
-        # drop). Original PIL vector lines in white on the navy storm
-        # sky; rain is kept clear of the narrower funnel zone above.
+        # v3.4: the tornado SLIMMED AGAIN, per the user ("lebih Ramping
+        # lagi") — roughly half the v3.3 width again: spiral disc rx
+        # 40→20, funnel top half-width 34→17, same 42px drop, tall and
+        # thin like the reference line-art. Original PIL vector lines
+        # in white on the navy storm sky; rain is kept clear of the
+        # narrower funnel zone above.
         cx = 200
-        # spiral disc: flat concentric ellipses, half the v3.2 width
-        for rx, ry in ((40, 10), (30, 8), (19, 5), (8, 3)):
+        # spiral disc: flat concentric ellipses, half the v3.3 width
+        for rx, ry in ((20, 6), (15, 5), (10, 3), (4, 2)):
             d.ellipse([cx - rx, 16 - ry, cx + rx, 16 + ry],
                       outline="white", width=2)
         # one spiral sweep across the disc, hinting the rotation
-        d.arc([cx - 40, 6, cx + 40, 26], 200, 340,
+        d.arc([cx - 20, 10, cx + 20, 22], 200, 340,
               fill=(190, 215, 240), width=2)
         # funnel edges: two curves from the disc down to a narrow tip
         edge_l, edge_r = [], []
         for i in range(25):
             t = i / 24
             y = 24 + int(42 * t)
-            hw = 34 - int(30 * (t ** 1.3))
+            hw = 17 - int(15 * (t ** 1.3))
             edge_l.append((cx - hw, y))
             edge_r.append((cx + hw, y))
         d.line(edge_l, fill="white", width=2, joint="curve")
         d.line(edge_r, fill="white", width=2, joint="curve")
         # curved horizontal bands inside the funnel, alternating drift
-        for by, bhw, bdx in ((30, 30, -2), (37, 26, 2), (44, 22, -2),
-                             (51, 17, 2), (57, 13, -1), (62, 9, 1)):
+        for by, bhw, bdx in ((30, 15, -1), (37, 13, 1), (44, 11, -1),
+                             (51, 8, 1), (57, 6, -1), (62, 4, 0)):
             d.arc([cx + bdx - bhw, by - 3, cx + bdx + bhw, by + 3],
                   0, 180, fill="white", width=2)
         # dust cloud at the funnel's base, straddling the shoreline —
         # kept right of the AKVAN scrim (which ends ~x166) so no puff
         # crosses the "3.7 LAKH EVACUATED" line
-        for px0, py0, pw, ph in ((180, 62, 16, 9), (192, 65, 18, 8),
-                                 (204, 60, 16, 9), (214, 64, 14, 8)):
+        for px0, py0, pw, ph in ((188, 62, 12, 8), (196, 65, 14, 7),
+                                 (204, 61, 12, 8), (210, 64, 10, 7)):
             d.ellipse([px0, py0, px0 + pw, py0 + ph],
                       outline=(220, 232, 245), width=2)
-        d.ellipse([194, 63, 208, 70], fill=(220, 232, 245))
+        d.ellipse([196, 63, 206, 69], fill=(220, 232, 245))
         # red warning triangle, moved right of the disc (was tucked
         # against the old spiral's upper arm, now in the disc's way)
         d.polygon([(308, 4), (320, 26), (296, 26)], fill=RED,
@@ -705,87 +705,107 @@ def art_image(key, w, h):
         d.ellipse([22, 46, 36, 58], fill=(220, 200, 165))
         d.ellipse([20, 30, 30, 40], fill=(200, 200, 200))
     elif key == "crash":
-        # v3.3: redrawn in the style of the user's reference 2 — a blue
-        # sky with white clouds, a grey cartoon plane nose-diving
-        # diagonally (mirrored to dive right, so the nose and the engine
-        # fire stay clear of the AN-12 DOWN scrim at bottom-left), a grey
-        # smoke trail from the tail, a small orange fire on one engine,
-        # and a green treeline along the bottom. Original PIL vector
-        # code; the reference file (watermarked) is not used anywhere.
+        # v3.4: redrawn AGAIN — the user said v3.3 still did not follow
+        # the reference ("Pesawat nya kenapa ga berubah?"). The v3.3
+        # plane was a thin 6px bar; this one is BIG and unmistakably a
+        # plane: a thick light-grey fuselage with cockpit + cabin
+        # windows and a door, two large wings (near wing darker for
+        # contrast), a big blue tail fin like the reference's, two
+        # engine nacelles with the lower one on fire, grey smoke puffs
+        # trailing from the tail, blue sky, white clouds, green ground
+        # + treeline + lamp post. Dives nose-down to the right so the
+        # nose and fire stay clear of the AN-12 DOWN scrim (bottom-left,
+        # ends ~x97). Original PIL vector code; the reference file
+        # (watermarked) is not used anywhere.
         d.rectangle([0, 0, w, h], fill=(125, 185, 235))
         d.rectangle([0, 0, w, 8], fill=(150, 200, 240))
-        # white clouds across the sky
-        for cx0, cy0, cw in ((8, 6, 30), (66, 2, 36), (130, 8, 28),
-                             (168, 2, 26), (30, 24, 24), (150, 28, 30)):
-            d.ellipse([cx0, cy0, cx0 + cw, cy0 + 10], fill="white")
-            d.ellipse([cx0 + 6, cy0 - 3, cx0 + cw - 6, cy0 + 7],
+        # white clouds across the sky, clear of the fuselage line
+        for cx0, cy0, cw in ((6, 26, 26), (96, 2, 34), (150, 2, 30),
+                             (168, 24, 24)):
+            d.ellipse([cx0, cy0, cx0 + cw, cy0 + 9], fill="white")
+            d.ellipse([cx0 + 6, cy0 - 3, cx0 + cw - 6, cy0 + 6],
                       fill="white")
         # smoke trail from the tail, growing up-left to the corner
-        for ex, ey, er in ((52, 16, 4), (40, 12, 5), (28, 8, 6),
-                           (16, 5, 7), (6, 3, 6)):
+        for ex, ey, er in ((30, 8, 5), (18, 5, 6), (6, 3, 6)):
             d.ellipse([ex - er, ey - er, ex + er, ey + er],
                       fill=(160, 160, 160))
-        for ex, ey, er in ((44, 13, 2), (30, 9, 3), (18, 5, 3)):
+        for ex, ey, er in ((22, 6, 3), (10, 3, 3)):
             d.ellipse([ex - er, ey - er, ex + er, ey + er],
                       fill=(120, 120, 120))
-        # the plane, diving nose-down to the right: a THIN light-grey
-        # fuselage (so it reads as a plane, not a slab), darker swept
-        # wings for contrast, a big blue tail fin, two engines
-        d.polygon([(54, 10), (60, 16), (160, 54), (156, 60), (48, 20)],
-                  fill=(175, 175, 185))
-        d.line([(54, 10), (160, 54)], fill=(110, 110, 120), width=1)
-        d.line([(48, 20), (156, 60)], fill=(110, 110, 120), width=1)
-        # big blue tail fin, like the reference's
-        d.polygon([(48, 14), (36, 0), (56, 4)], fill=(30, 90, 180))
-        d.polygon([(100, 30), (126, 12), (134, 20), (108, 40)],
-                  fill=(110, 110, 125))
-        d.polygon([(110, 44), (134, 60), (126, 64), (102, 48)],
-                  fill=(110, 110, 125))
-        # windows along the fuselage, then the two engine nacelles
-        for ex, ey in ((84, 28), (102, 36), (120, 44), (138, 52)):
-            d.ellipse([ex - 2, ey - 2, ex + 2, ey + 2], fill=(200, 230, 245))
-        d.ellipse([116, 44, 126, 52], fill=(90, 90, 100))
-        d.ellipse([134, 52, 144, 60], fill=(90, 90, 100))
-        # small orange fire on the lower engine, flame spike + yellow core
-        d.ellipse([132, 56, 148, 70], fill=(255, 140, 40))
-        d.ellipse([136, 59, 145, 66], fill=(255, 220, 80))
-        d.polygon([(140, 56), (140, 47), (144, 56)], fill=(255, 140, 40))
+        # far wing (upper, BIG, medium grey) sweeping up-right — v3.4
+        # fix: the first version was mostly hidden behind the fuselage
+        # and read as a grey block; this one sticks well above the body
+        d.polygon([(66, 24), (116, 0), (130, 2), (90, 30)],
+                  fill=(150, 150, 162), outline=(90, 90, 100))
+        # near wing (lower, BIG, darker grey) sweeping down-right —
+        # v3.4 fix: the first version barely cleared the fuselage's lower
+        # edge and read as a blob; this one reaches the ground line
+        d.polygon([(94, 36), (162, 70), (172, 66), (108, 32)],
+                  fill=(125, 125, 138), outline=(80, 80, 90))
+        # thick fuselage, nose-down to the right: light grey with a
+        # dark outline so it reads as a plane body, not a bar
+        d.polygon([(36, 8), (166, 48), (178, 58), (172, 64), (44, 22)],
+                  fill=(222, 224, 232), outline=(90, 90, 100))
+        d.ellipse([168, 52, 180, 64], fill=(222, 224, 232),
+                  outline=(90, 90, 100))
+        # big blue tail fin, like the reference's, plus stabiliser
+        d.polygon([(38, 12), (24, 0), (50, 0), (54, 10)],
+                  fill=(30, 90, 180), outline=(20, 60, 140))
+        d.polygon([(38, 18), (20, 24), (36, 26)],
+                  fill=(150, 150, 162), outline=(90, 90, 100))
+        # cockpit windows near the nose, cabin windows along the body,
+        # and a door near the tail
+        d.polygon([(156, 50), (164, 52), (162, 56), (154, 54)],
+                  fill=(40, 70, 110))
+        d.polygon([(162, 54), (170, 57), (168, 60), (160, 58)],
+                  fill=(40, 70, 110))
+        for ex, ey in ((60, 21), (80, 27), (99, 33), (119, 40),
+                       (139, 46)):
+            d.ellipse([ex - 2, ey - 2, ex + 2, ey + 2], fill=(60, 90, 140))
+        d.rectangle([50, 14, 56, 21], outline=(90, 90, 100), width=1)
+        # two engine nacelles under the wings; the lower one on fire
+        d.ellipse([118, 48, 130, 56], fill=(90, 90, 100))
+        d.ellipse([136, 56, 148, 64], fill=(90, 90, 100))
+        d.ellipse([134, 60, 150, 74], fill=(255, 140, 40))
+        d.ellipse([138, 63, 147, 70], fill=(255, 220, 80))
+        d.polygon([(142, 60), (142, 51), (146, 60)], fill=(255, 140, 40))
         # green ground + treeline along the bottom, and a lamp post
-        d.polygon([(0, 68), (60, 62), (120, 68), (196, 62), (196, 80),
+        d.polygon([(0, 70), (60, 64), (120, 70), (196, 64), (196, 80),
                    (0, 80)], fill=(40, 140, 70))
         for tx, tr in ((10, 5), (30, 6), (52, 5), (78, 6), (104, 5),
                        (128, 6), (150, 5), (176, 6)):
-            d.ellipse([tx - tr, 62 - tr, tx + tr, 62 + 2], fill=(25, 110, 55))
-        d.line([168, 66, 168, 46], fill=(60, 60, 60), width=2)
-        d.line([168, 46, 176, 46], fill=(60, 60, 60), width=2)
-        d.ellipse([174, 44, 178, 48], fill=(255, 220, 80))
+            d.ellipse([tx - tr, 64 - tr, tx + tr, 64 + 2], fill=(25, 110, 55))
+        d.line([190, 68, 190, 48], fill=(60, 60, 60), width=2)
+        d.line([190, 48, 182, 48], fill=(60, 60, 60), width=2)
+        d.ellipse([180, 46, 184, 50], fill=(255, 220, 80))
     elif key == "rates":
-        # v3: DENSITY — a bank scene, not four bars on blank paper. Full
-        # grid, six climbing bars filling the width, a red arrow above
-        # them, a big 9% focal, gold coins along the bottom and bank
-        # columns rising behind the bars.
+        # v3.4: redrawn per the user's new reference (black bars + a
+        # thick zigzag arrow rising to the top-right). The old thin red
+        # arrow and the bank columns are gone: six BLACK bars of
+        # zigzag-rising heights on a light grid, a THICK red zigzag
+        # arrow tracking the bar tops and ending in an arrowhead at the
+        # top-right, clear of the 9% focal. Gold coins + Rs stamp kept
+        # along the bottom; the RATE 9% scrim stays bottom-left.
+        # Original PIL vector code; the reference file (watermarked) is
+        # not used anywhere.
         d.rectangle([0, 0, w, h], fill=(245, 240, 228))
         for gy in range(0, h, 12):
             d.line([0, gy, w, gy], fill=(210, 205, 190), width=1)
         for gx in range(0, w, 24):
             d.line([gx, 0, gx, h], fill=(228, 223, 208), width=1)
-        # bank columns behind the bars, pediment on top
-        d.polygon([(20, 8), (176, 8), (98, 0)], fill=(120, 110, 95))
-        for cx in (28, 62, 96, 130, 164):
-            d.rectangle([cx, 10, cx + 7, 58], fill=(200, 192, 170),
-                        outline=(120, 110, 95))
-        # six climbing bars, all navy — the red 9% focal sits on paper
-        # above the last bar, never red-on-red
-        for i, (bx, top) in enumerate(((8, 40), (38, 34), (68, 28),
-                                       (98, 22), (128, 16), (158, 10))):
-            d.rectangle([bx, top, bx + 24, 62], fill=NAVY)
+        # six black bars, heights zigzag-rising like the reference
+        for i, (bx, top) in enumerate(((8, 44), (38, 34), (68, 42),
+                                       (98, 28), (128, 36), (158, 16))):
+            d.rectangle([bx, top, bx + 24, 62], fill=(30, 30, 35))
             d.rectangle([bx + 3, top + 3, bx + 8, top + 6], fill="white")
-        # red arrow ABOVE the bars, ending well clear of the 9% focal
-        d.line([(6, 34), (134, 13)], fill=RED, width=2)
-        d.polygon([(134, 13), (124, 11), (128, 21)], fill=RED)
-        # big 9% focal, top-right, on the grid — v3.1: was drawn at x=192,
-        # its ink ending 3px from the art's right edge and reading as
-        # clipped; now at x=184, 12px clear of the edge, clear of the arrow
+        # thick red zigzag arrow above the bar tops, rising to the
+        # top-right — the reference's shape, ending clear of the 9%
+        # focal (ink starts ~x154) and of the last bar
+        d.line([(2, 42), (20, 36), (50, 28), (80, 36), (110, 20),
+                (140, 28), (146, 10)], fill=RED, width=5, joint="curve")
+        d.polygon([(148, 4), (132, 6), (140, 20)], fill=RED)
+        # big 9% focal, top-right, on the grid — v3.1: at x=184, 12px
+        # clear of the edge, clear of the arrow (ends x=148)
         d.text((184, 0), "9%", font=F_ART2, fill=RED, anchor="ra",
                stroke_width=1, stroke_fill="white")
         # gold coins along the bottom, one stamped Rs (right of the scrim)
@@ -801,10 +821,10 @@ def art_image(key, w, h):
         # green top surface split by a thick orange zigzag fault crack,
         # two small houses (one tilted, one with a collapsed roof), thin
         # white concentric epicentre rings on the crack, debris, and
-        # orange block sides at the bottom. The red seismograph trace
-        # stays across the top; the rings are centred right of the QUAKE
-        # M5 scrim (bottom-left) so the label stays clear. Original PIL
-        # vector code; the reference file is not used anywhere.
+        # orange block sides at the bottom. v3.4: the crack runs TOP to
+        # BOTTOM (was sideways), per the user. The red seismograph trace
+        # stays across the top. Original PIL vector code; the reference
+        # file is not used anywhere.
         d.rectangle([0, 0, w, h], fill=(205, 220, 200))
         # the seismograph trace on a white strip across the top
         d.rectangle([0, 0, w, 14], fill="white")
@@ -820,35 +840,43 @@ def art_image(key, w, h):
                   fill=(240, 120, 50))
         d.polygon([(98, 58), (188, 38), (188, 56), (98, 76)],
                   fill=(215, 100, 40))
-        # thick orange fault crack zigzagging across the top face,
-        # dark-edged ribbon
-        crack = [(16, 36), (44, 28), (66, 35), (96, 25), (124, 34),
-                 (152, 27), (182, 35)]
-        d.line(crack, fill=(180, 60, 20), width=7, joint="curve")
-        d.line(crack, fill=(250, 125, 50), width=4, joint="curve")
-        # two houses: one tilted left, one with a collapsed roof right
+        # v3.4: the crack now runs TOP to BOTTOM, per the user — a thick
+        # orange zigzag ribbon down the middle of the top face and on
+        # down the block's front, right of the QUAKE M5 scrim (which ends
+        # ~x105) so the whole crack stays visible. A thin dark seam line
+        # beside it reads as the split between the two halves.
+        # v3.4 fix: the first version drew the white rings OVER the crack
+        # and hid its middle, and the lower half blended into the orange
+        # side — rings now go UNDER the crack and the ribbon is wider.
+        for rr in (5, 8, 11, 14):
+            d.ellipse([135 - rr, 38 - rr, 135 + rr, 38 + rr],
+                      outline="white", width=1)
+        d.ellipse([133, 36, 137, 40], fill="white")
+        crack = [(135, 27), (130, 34), (140, 40), (132, 46),
+                 (138, 52), (134, 58), (140, 66)]
+        d.line(crack, fill=(180, 60, 20), width=9, joint="curve")
+        d.line(crack, fill=(250, 125, 50), width=6, joint="curve")
+        d.line([(139, 27), (134, 34), (144, 40), (136, 46),
+                (142, 52), (138, 58), (144, 66)], fill=(120, 40, 15),
+               width=1, joint="curve")
+        # two houses: one tilted left, one with a collapsed roof right,
+        # on either side of the vertical crack
         d.polygon([(28, 30), (52, 26), (52, 40), (28, 44)],
                   fill=(240, 240, 235))
         d.polygon([(26, 30), (54, 26), (40, 18)], fill=(40, 110, 200))
         d.rectangle([34, 32, 38, 38], fill=(255, 180, 90))
         d.rectangle([44, 30, 48, 36], fill=(255, 180, 90))
-        d.polygon([(150, 30), (174, 26), (174, 40), (150, 44)],
+        d.polygon([(152, 28), (176, 24), (176, 38), (152, 42)],
                   fill=(240, 240, 235))
-        d.polygon([(148, 30), (162, 20), (176, 28), (168, 32),
-                   (156, 30)], fill=(40, 110, 200))
-        d.rectangle([156, 32, 160, 38], fill=(255, 180, 90))
-        d.rectangle([166, 30, 170, 36], fill=(255, 180, 90))
+        d.polygon([(150, 28), (164, 18), (178, 26), (170, 30),
+                   (158, 28)], fill=(40, 110, 200))
+        d.rectangle([158, 30, 162, 36], fill=(255, 180, 90))
+        d.rectangle([168, 28, 172, 34], fill=(255, 180, 90))
         # debris on the top face, clear of the scrim
-        d.rectangle([108, 40, 116, 44], fill=(250, 125, 50))
-        d.rectangle([136, 42, 142, 45], fill=(40, 110, 200))
-        d.rectangle([164, 44, 172, 47], fill=(250, 125, 50))
-        d.rectangle([84, 40, 90, 43], fill=(40, 110, 200))
-        # thin white epicentre rings centred on the crack, right side —
-        # drawn last, like the reference's rings over the whole scene
-        for rr in (7, 12, 17, 22):
-            d.ellipse([132 - rr, 29 - rr, 132 + rr, 29 + rr],
-                      outline="white", width=1)
-        d.ellipse([130, 27, 134, 31], fill="white")
+        d.rectangle([120, 44, 128, 48], fill=(250, 125, 50))
+        d.rectangle([146, 48, 152, 51], fill=(40, 110, 200))
+        d.rectangle([122, 54, 130, 57], fill=(250, 125, 50))
+        d.rectangle([150, 54, 156, 57], fill=(40, 110, 200))
     elif key == "rikers":
         # v3: DENSITY — a full cell block, not bars on a grey wall. Brick
         # texture top and bottom, bars across the whole frame, the RIKERS
