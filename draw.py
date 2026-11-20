@@ -324,8 +324,8 @@ def art_image(key, w, h):
     if key == "akvan":
         # v3: DENSITY like 19 Nov — the whole frame is the storm, not a
         # spiral on plain blue. Storm sky + rain across the full width, a
-        # big spiral cyclone, churning sea along the bottom, a coast with
-        # lit houses and bending palms. The AKVAN scrim sits on top,
+        # line-art tornado (v3.2), churning sea along the bottom, a coast
+        # with lit houses and bending palms. The AKVAN scrim sits on top,
         # bottom-left, like 19 Nov's labels.
         d.rectangle([0, 0, w, h], fill=(10, 58, 138))
         d.rectangle([0, 0, w, 14], fill=(8, 46, 112))
@@ -334,29 +334,59 @@ def art_image(key, w, h):
             d.ellipse([cx0, cy0, cx0 + 34, cy0 + 12], fill=(180, 195, 215))
             d.ellipse([cx0 + 12, cy0 - 4, cx0 + 44, cy0 + 8],
                       fill=(200, 212, 228))
-        # rain streaks across the WHOLE width, two slants
+        # rain streaks across the width, two slants — kept clear of the
+        # funnel zone (x 118-292) so the tornado lines read clean
         for rx in range(6, w, 16):
+            if 118 < rx < 292:
+                continue
             d.line([rx, 14, rx - 5, 26], fill=(190, 210, 235), width=2)
         for rx in range(14, w, 26):
+            if 118 < rx < 292:
+                continue
             d.line([rx, 30, rx - 5, 42], fill=(160, 190, 225), width=2)
-        # the cyclone, big and centred: spiral arms + calm eye
-        cx, cy = 205, 42
-        for r, a0, a1 in ((10, 30, 270), (17, 120, 360), (17, 0, 90),
-                          (24, 210, 360), (24, 0, 90), (31, 300, 360),
-                          (31, 0, 180), (38, 150, 330)):
-            d.arc([cx - r, cy - r, cx + r, cy + r], a0, a1,
-                  fill="white", width=3)
-        d.ellipse([cx - 7, cy - 7, cx + 7, cy + 7], fill="white")
-        d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(10, 58, 138))
-        # rain bands curling off the spiral, left and right
-        for bx, by, br in ((150, 30, 14), (140, 52, 10), (262, 28, 12),
-                           (272, 52, 10)):
-            d.arc([bx - br, by - br, bx + br, by + br], 200, 340,
-                  fill=(220, 232, 245), width=2)
-        # red warning triangle tucked against the spiral's upper arm
-        d.polygon([(252, 2), (266, 24), (238, 24)], fill=RED,
+        # v3.2: the cyclone redrawn as a thin line-art tornado, in the
+        # style of the user's reference — a wide flat spiral disc on top,
+        # a funnel tapering to the ground with curved horizontal bands,
+        # and a dust cloud at its base. Original PIL vector lines in
+        # white on the navy storm sky (the reference file itself is not
+        # used anywhere); rain is kept clear of the funnel zone above.
+        cx = 200
+        # spiral disc: flat concentric ellipses, wide and low
+        for rx, ry in ((74, 12), (56, 10), (34, 7), (14, 4)):
+            d.ellipse([cx - rx, 18 - ry, cx + rx, 18 + ry],
+                      outline="white", width=2)
+        # one spiral sweep across the disc, hinting the rotation
+        d.arc([cx - 74, 6, cx + 74, 30], 200, 340,
+              fill=(190, 215, 240), width=2)
+        # funnel edges: two curves from the disc down to a narrow tip
+        edge_l, edge_r = [], []
+        for i in range(25):
+            t = i / 24
+            y = 26 + int(40 * t)
+            hw = 68 - int(64 * (t ** 1.3))
+            edge_l.append((cx - hw, y))
+            edge_r.append((cx + hw, y))
+        d.line(edge_l, fill="white", width=2, joint="curve")
+        d.line(edge_r, fill="white", width=2, joint="curve")
+        # curved horizontal bands inside the funnel, alternating drift
+        for by, bhw, bdx in ((32, 58, -4), (39, 50, 4), (46, 42, -3),
+                             (53, 33, 3), (59, 24, -2), (64, 16, 2)):
+            d.arc([cx + bdx - bhw, by - 3, cx + bdx + bhw, by + 3],
+                  0, 180, fill="white", width=2)
+        # dust cloud at the funnel's base, straddling the shoreline —
+        # kept right of the AKVAN scrim (which ends ~x166) so no puff
+        # crosses the "3.7 LAKH EVACUATED" line
+        for px0, py0, pw, ph in ((176, 60, 20, 10), (192, 64, 24, 9),
+                                 (208, 58, 22, 11), (224, 63, 22, 9),
+                                 (240, 60, 16, 9)):
+            d.ellipse([px0, py0, px0 + pw, py0 + ph],
+                      outline=(220, 232, 245), width=2)
+        d.ellipse([198, 62, 216, 70], fill=(220, 232, 245))
+        # red warning triangle, moved right of the disc (was tucked
+        # against the old spiral's upper arm, now in the disc's way)
+        d.polygon([(308, 4), (320, 26), (296, 26)], fill=RED,
                   outline=(20, 20, 20))
-        d.text((252, 13), "!", font=F_ART2_S, fill=YELLOW, anchor="mm")
+        d.text((308, 15), "!", font=F_ART2_S, fill=YELLOW, anchor="mm")
         # the coast: shoreline + three lit houses + two bending palms
         d.rectangle([0, 70, w, h], fill=(8, 44, 96))
         d.line([0, 70, w, 70], fill=(220, 230, 240), width=2)
