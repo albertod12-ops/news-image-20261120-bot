@@ -242,9 +242,10 @@ def wrap(d, text, fnt, width, max_lines=None):
     return out
 
 
-def art_text(img, d, x, y, w, h, big, small, f_big, f_small):
+def art_text(img, d, x, y, w, h, big, small, f_big, f_small, dy=0):
     """White bold label inside the art on a dark scrim, bottom-left.
-    Draws nothing when both strings are empty — the art already says it."""
+    Draws nothing when both strings are empty — the art already says it.
+    dy shifts the whole label up (negative) or down inside the art."""
     if not big and not small:
         return
     big_w = int(d.textlength(big, font=f_big))
@@ -255,14 +256,14 @@ def art_text(img, d, x, y, w, h, big, small, f_big, f_small):
     label_h = f_big.size + f_small.size + 10
     scrim = Image.new("RGBA", img.size, (0, 0, 0, 0))
     sd = ImageDraw.Draw(scrim)
-    sd.rounded_rectangle([x + 4, y + h - label_h - 4,
-                          x + 4 + label_w + 12, y + h - 4],
+    sd.rounded_rectangle([x + 4, y + h - label_h - 4 + dy,
+                          x + 4 + label_w + 12, y + h - 4 + dy],
                          radius=3, fill=(0, 0, 0, 115))
     img.paste(scrim, (0, 0), scrim)
-    d.text((x + 10, y + h - label_h), big, font=f_big, fill="white",
+    d.text((x + 10, y + h - label_h + dy), big, font=f_big, fill="white",
            stroke_width=1, stroke_fill=(0, 0, 0))
     if small:
-        d.text((x + 10, y + h - label_h + f_big.size + 2), small,
+        d.text((x + 10, y + h - label_h + f_big.size + 2 + dy), small,
                font=f_small, fill="white", stroke_width=1,
                stroke_fill=(0, 0, 0))
 
@@ -749,8 +750,10 @@ def art_image(key, w, h):
         # red arrow ABOVE the bars, ending well clear of the 9% focal
         d.line([(6, 34), (134, 13)], fill=RED, width=2)
         d.polygon([(134, 13), (124, 11), (128, 21)], fill=RED)
-        # big 9% focal, top-right, on the grid
-        d.text((192, 0), "9%", font=F_ART2, fill=RED, anchor="ra",
+        # big 9% focal, top-right, on the grid — v3.1: was drawn at x=192,
+        # its ink ending 3px from the art's right edge and reading as
+        # clipped; now at x=184, 12px clear of the edge, clear of the arrow
+        d.text((184, 0), "9%", font=F_ART2, fill=RED, anchor="ra",
                stroke_width=1, stroke_fill="white")
         # gold coins along the bottom, one stamped Rs (right of the scrim)
         for cx in (14, 44, 74, 104, 134, 164):
@@ -938,7 +941,10 @@ def small_card(img, d, story, x, y):
     w = 196
     art = art_image(key, w, 80)
     art_d = ImageDraw.Draw(art)
-    art_text(art, art_d, 0, 0, w, 80, big, small, F_LBL2, F_LBL2_S)
+    # v3.1: the strike label sat flush on the kick strip, its corner
+    # crowding "LABOUR" — lift it 6px up inside the art, clear of the strip.
+    art_text(art, art_d, 0, 0, w, 80, big, small, F_LBL2, F_LBL2_S,
+             dy=-6 if key == "strike" else 0)
     img.paste(art, (x, y))
     d.rectangle([x, y + 80, x + w, y + 95], fill=NAVY)
     d.text((x + 4, y + 81), "%d. %s · %s" % (num, reg, topic),
