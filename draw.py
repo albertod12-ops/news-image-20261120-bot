@@ -81,8 +81,11 @@ for _fname, _ffile, _fsize, _fbase in _FONT_TABLE:
     globals()[_fname] = load_font(_ffile, _fsize, _fbase)
 del _fname, _ffile, _fsize, _fbase, _FONT_TABLE
 
-PILL_COL = {"REPORTED": (16, 165, 90), "FORECAST": (20, 110, 230),
-            "CLAIM": (230, 150, 0)}
+PILL_COL = {
+    "REPORTED": (16, 165, 90),
+    "FORECAST": (20, 110, 230),
+    "CLAIM": (230, 150, 0),
+}
 
 TIMELINE = [
     ("08:00 ODISHA", "Akvan makes landfall"),
@@ -303,22 +306,25 @@ def art_image(key, w, h):
         d.ellipse([84, 9, 126, 13], outline="white", width=1)
         # the twisting funnel: stacked rings, narrowing as they fall, each
         # offset a little so the funnel reads as turning
-        for ry, rw, ro in ((16, 72, 0), (24, 58, 3), (32, 44, -3),
-                           (40, 32, 3), (48, 22, -2), (56, 14, 0)):
-            cx = 105 + ro
-            d.ellipse([cx - rw // 2, ry, cx + rw // 2, ry + 8],
+        funnel = ((16, 72, 0), (24, 58, 3), (32, 44, -3),
+                  (40, 32, 3), (48, 22, -2), (56, 14, 0))
+        for ring_y, ring_w, ring_dx in funnel:
+            ring_cx = 105 + ring_dx
+            d.ellipse([ring_cx - ring_w // 2, ring_y,
+                       ring_cx + ring_w // 2, ring_y + 8],
                       outline="white", width=2)
         # the cloud base the funnel touches down into
-        for bx, by, bw, bh in ((65, 60, 34, 12), (85, 58, 36, 14),
-                               (108, 60, 34, 12)):
-            d.ellipse([bx, by, bx + bw, by + bh], fill=(240, 240, 245))
+        cloud_base = ((65, 60, 34, 12), (85, 58, 36, 14), (108, 60, 34, 12))
+        for puff_x, puff_y, puff_w, puff_h in cloud_base:
+            d.ellipse([puff_x, puff_y, puff_x + puff_w, puff_y + puff_h],
+                      fill=(240, 240, 245))
         # the Odisha coast at the bottom; two houses and a yellow arrow
         # showing people moving inland, away from the sea
-        d.polygon([(0, 80), (0, 68), (60, 66), (120, 68), (196, 66),
-                   (196, 80)], fill=(8, 40, 90))
-        for hx in (155, 178):
-            d.rectangle([hx, 56, hx + 14, 66], fill=(240, 230, 210))
-            d.polygon([(hx, 56), (hx + 14, 56), (hx + 7, 50)],
+        coast = [(0, 80), (0, 68), (60, 66), (120, 68), (196, 66), (196, 80)]
+        d.polygon(coast, fill=(8, 40, 90))
+        for house_x in (155, 178):
+            d.rectangle([house_x, 56, house_x + 14, 66], fill=(240, 230, 210))
+            d.polygon([(house_x, 56), (house_x + 14, 56), (house_x + 7, 50)],
                       fill=(180, 60, 40))
         d.line([166, 64, 166, 48], fill=YELLOW, width=3)
         d.polygon([(166, 44), (160, 52), (172, 52)], fill=YELLOW)
@@ -359,16 +365,17 @@ def art_image(key, w, h):
         # The document says "draft drops" at a glance; every line of text is
         # centred in the box. The strike lines run through the MIDDLE of each
         # word, not at the bottom edge (there they read as underlines).
-        d.rectangle([16, 6, 180, 52], fill="white", outline=(120, 110, 95))
-        d.text((98, 10), "COP31 DRAFT", font=F_SRC, fill=(20, 20, 20),
+        doc_x0, doc_x1, doc_cx = 16, 180, 98
+        d.rectangle([doc_x0, 6, doc_x1, 52], fill="white",
+                    outline=(120, 110, 95))
+        d.text((doc_cx, 10), "COP31 DRAFT", font=F_SRC, fill=(20, 20, 20),
                anchor="ma")
-        # FOSSIL FUELS struck through in red, centred (73px wide)
-        d.text((98, 27), "FOSSIL FUELS", font=F_ART2_S, fill=RED,
-               anchor="mm")
-        d.line([60, 27, 136, 27], fill=RED, width=2)
-        # PHASE-OUT struck through in red, centred (~55px wide)
-        d.text((98, 39), "PHASE-OUT", font=F_ART2_S, fill=RED, anchor="mm")
-        d.line([70, 39, 126, 39], fill=RED, width=2)
+        # each cut line: text, its y, and the strike's x-range, all centred
+        cuts = (("FOSSIL FUELS", 27, 60, 136), ("PHASE-OUT", 39, 70, 126))
+        for cut_text, cut_y, strike_x0, strike_x1 in cuts:
+            d.text((doc_cx, cut_y), cut_text, font=F_ART2_S, fill=RED,
+                   anchor="mm")
+            d.line([strike_x0, cut_y, strike_x1, cut_y], fill=RED, width=2)
         # diagonal CUT stamp on the document, clear of the centred text
         stamp(img, 140, 6, "CUT")
         # a BIG globe + a thermometer, like the top-1 entry: the planet the
@@ -376,44 +383,51 @@ def art_image(key, w, h):
         # green continents; the thermometer stands beside it.
         d.ellipse([204, 6, 266, 68], fill=(30, 120, 200),
                   outline=(20, 20, 20), width=2)
-        d.ellipse([216, 16, 236, 32], fill=(60, 180, 90))
-        d.ellipse([236, 38, 256, 54], fill=(60, 180, 90))
-        d.ellipse([214, 44, 226, 56], fill=(60, 180, 90))
+        land = ((216, 16, 236, 32), (236, 38, 256, 54), (214, 44, 226, 56))
+        for lx0, ly0, lx1, ly1 in land:
+            d.ellipse([lx0, ly0, lx1, ly1], fill=(60, 180, 90))
         # thermometer: white tube, red fill rising, round bulb, tick marks
         d.rectangle([274, 8, 284, 58], fill="white", outline=(20, 20, 20))
         d.rectangle([276, 24, 282, 58], fill=(220, 30, 40))
         d.ellipse([270, 56, 290, 76], fill=(220, 30, 40),
                   outline=(20, 20, 20))
-        for ty in (14, 22, 30, 38, 46, 54):
-            d.line([284, ty, 289, ty], fill=(20, 20, 20), width=1)
+        for tick_y in (14, 22, 30, 38, 46, 54):
+            d.line([284, tick_y, 289, tick_y], fill=(20, 20, 20), width=1)
     elif key == "icj":
+        # the World Court as a temple: pediment, 15 columns, steps.
+        # The first 9 columns are paper, the last 6 ink — the 9-6 vote.
         d.rectangle([0, 0, w, h], fill=(226, 218, 196))
-        # pediment + 15 columns: first 9 paper, last 6 ink = the 9-6 vote
-        d.polygon([(104, 36), (198, 12), (292, 36)], fill=(120, 110, 95))
+        pediment = [(104, 36), (198, 12), (292, 36)]
+        d.polygon(pediment, fill=(120, 110, 95))
+        col_top, col_bottom, col_w = 40, 74, 7
         for i in range(15):
-            cx = 116 + i * 11
-            if i < 9:
-                d.rectangle([cx, 40, cx + 7, 74], fill=(244, 239, 226),
-                            outline=(120, 110, 95))
-            else:
-                d.rectangle([cx, 40, cx + 7, 74], fill=NAVY, outline="white")
-        # steps
-        d.rectangle([110, 76, 282, 80], fill=(240, 234, 220))
-        d.rectangle([104, 80, 288, 84], fill=(240, 234, 220))
-        d.rectangle([98, 84, 292, 90], fill=(240, 234, 220))
+            col_x = 116 + i * 11
+            col_fill = (244, 239, 226) if i < 9 else NAVY
+            col_edge = (120, 110, 95) if i < 9 else "white"
+            d.rectangle([col_x, col_top, col_x + col_w, col_bottom],
+                        fill=col_fill, outline=col_edge)
+        # three steps, each wider than the one above it
+        step_fill = (240, 234, 220)
+        for step_x0, step_y0, step_x1, step_y1 in ((110, 76, 282, 80),
+                                                   (104, 80, 288, 84),
+                                                   (98, 84, 292, 90)):
+            d.rectangle([step_x0, step_y0, step_x1, step_y1], fill=step_fill)
         # red divider between the 9 paper and 6 ink columns (the 9-6 vote)
         d.line([213, 40, 213, 74], fill=(179, 34, 44), width=3)
         # Myanmar flag top left (yellow/green/red + white star), white outline
-        d.rectangle([12, 8, 38, 13], fill=(254, 203, 0))
-        d.rectangle([12, 13, 38, 18], fill=(0, 140, 60))
-        d.rectangle([12, 18, 38, 24], fill=(220, 40, 40))
+        flag_bands = (((8, 13), (254, 203, 0)), ((13, 18), (0, 140, 60)),
+                      ((18, 24), (220, 40, 40)))
+        for (band_y0, band_y1), band_col in flag_bands:
+            d.rectangle([12, band_y0, 38, band_y1], fill=band_col)
         d.rectangle([12, 8, 38, 24], outline="white", width=1)
         _star(d, 25, 16, 5, 2)
         # gold scales of justice, left, below the flag (the recognisable object)
-        d.line([60, 34, 60, 58], fill=GOLD, width=2)
+        scale_x = 60
+        d.line([scale_x, 34, scale_x, 58], fill=GOLD, width=2)
         d.line([44, 38, 76, 38], fill=GOLD, width=2)
-        d.polygon([(48, 38), (56, 38), (52, 48)], fill=GOLD)
-        d.polygon([(64, 38), (72, 38), (68, 48)], fill=GOLD)
+        for pan_x in (48, 64):
+            d.polygon([(pan_x, 38), (pan_x + 8, 38), (pan_x + 4, 48)],
+                      fill=GOLD)
         d.ellipse([56, 58, 64, 64], fill=GOLD)
     elif key == "selloff":
         # the rout as a chart: four bars falling, a thick red arrow down
