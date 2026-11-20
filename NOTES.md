@@ -1,4 +1,12 @@
-# news-image-20261120 — entry notes (v3.5.1, NOT submitted)
+# news-image-20261120 — entry notes (v3.6, NOT submitted)
+
+## Entry v3.6 (user 2026-11-21 ~00:15 WIB: "pesawat ada yang rusak, patah dan terbakar" + "no 13 tulisan close ganti warna text hitam kotaknya putih")
+- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit 5caed6f (v3.6: wrecked burning An-12; CLOSED black-on-white).
+- entry.png: 1024x1024, 276,346 bytes, sha256 5ae9c2085319c31af10b624efffbb1fe456e80d61b9e2d955648fc726be7ac7f, deterministic (3x draw.py identical sha + `main.py --verify`).
+- Change, cards 10 and 13 ONLY — pixel-diff vs v3.5.1: 1,871 px changed, all inside the two cards' art boxes (crash 1,213 px, rikers 658 px), 0 px elsewhere. Layout/headlines/decks/other cards untouched. All drawings ORIGINAL PIL vector code.
+  1. Card 10 AN-12 (key "crash") — user: the plane should look damaged, broken, burning. The down-wing is now SNAPPED: a short stub with a jagged tear at its end, the outer fragment (white, red tip) lying bent on the sand down-right of the break; a jagged crack across the fuselage mid-body + a dark dent ahead of it; MORE fire — bigger flames at the lower engine plus a second fire at the wing break, a dark scorch mark on the sand under the fires; thicker smoke — a 6-puff column drifting right so it clears the fuselage; debris scattered on the sand (dark triangle left, white panel + dark panel + small fragments right, small panel under the fuselage). Desert scene kept (tan sand, white fuselage red stripe/tail/wingtips, cacti, shadow). Verified at 2x: reads as a wrecked, broken, burning plane; AN-12 DOWN scrim fully clear.
+  2. Card 13 RIKERS — user: the CLOSED writing should be black text in a white box. stamp() gained ink + fill params (defaults keep the old red-on-transparent behaviour — no other caller exists); the RIKERS call now passes ink=(0,0,0,255), fill=(255,255,255,255). Same text "CLOSED", same position/size/angle (-10). Verified at 2x: black CLOSED on a white box, top-right, readable against the bars.
+- Recording: `makefun record` re-attempted fresh for v3.6 — HTTP 400 again, same explicit reason as every round (loose transcripts, not sealed recordings). Session: f1c4a9b6-5ec8-403b-ad20-b79867693692 (copy in ~/workspace/makefun/news-image-20261120-transcripts/ — NOTE: copied mid-session for the gate run; re-copy the final file before bundling.)
 
 ## Entry v3.5.1 (main agent 2x check of v3.5: Nikkei zigzag clipped at top edge)
 - Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit 343eab2 (v3.5.1: Nikkei down-zigzag fits inside art box).
