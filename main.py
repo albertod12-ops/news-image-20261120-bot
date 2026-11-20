@@ -24,6 +24,45 @@ from pathlib import Path
 
 SOURCE = Path(__file__).resolve().parent / "entry.png"
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+DRAW = Path(__file__).resolve().parent / "draw.py"
+
+
+def verify_determinism():
+    """Re-render entry.png twice via draw.py and compare hashes.
+
+    The front page is deterministic: two runs of draw.py must produce
+    byte-identical files, and both must match the committed entry.png.
+    Any mismatch is a loud failure (exit 1).
+    """
+    import subprocess
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        rendered = []
+        for run_no in (1, 2):
+            workdir = Path(tmp) / f"run{run_no}"
+            workdir.mkdir()
+            shutil.copy(DRAW, workdir / "draw.py")
+            shutil.copy(Path(__file__).resolve().parent / "world.geo.json",
+                        workdir / "world.geo.json")
+            proc = subprocess.run([sys.executable, "draw.py"],
+                                  cwd=workdir, capture_output=True,
+                                  text=True)
+            if proc.returncode != 0:
+                print(f"draw.py run {run_no} failed:\n{proc.stderr}",
+                      file=sys.stderr)
+                return 1
+            rendered.append(file_sha256(workdir / "entry.png"))
+        if rendered[0] != rendered[1]:
+            print(f"non-deterministic render: {rendered[0]} vs "
+                  f"{rendered[1]}", file=sys.stderr)
+            return 1
+        if rendered[0] != file_sha256(SOURCE):
+            print(f"render differs from committed entry.png: {rendered[0]} "
+                  f"vs {file_sha256(SOURCE)}", file=sys.stderr)
+            return 1
+    print(f"deterministic: {rendered[0]}")
+    return 0
 
 
 def file_sha256(path):
@@ -57,4 +96,6 @@ def run():
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "--verify":
+        raise SystemExit(verify_determinism())
     raise SystemExit(run())
