@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""news-image-20261120 v2: 36 stories, newspaper front page, same frozen v21 design as 19 Nov.
+"""news-image-20261120 v3: 36 stories, newspaper front page, same frozen v21 design as 19 Nov.
 Draws entry.png (1024x1024, deterministic) from world.geo.json only.
-v2: redrawn art for cards 1, 2, 4, 7, 9, 10, 11, 12, 13 (user 2x-zoom review) —
-every art label plate now sits on plain background, clear of all shapes.
+v3: densified art for cards 1, 2, 4, 7, 9, 10, 11, 12, 13 (user 22:21 WIB: v2 still
+worse than our 19 Nov entry) — every art box is now a full layered scene like 19 Nov
+v39 (sky + midground + foreground, several objects, _skyline with lit windows),
+instead of 1-2 small elements on a flat background. Layout/headlines/decks
+unchanged; the art_text scrim sits on top of the dense art, as in 19 Nov.
 Design baseline (user-approved 2026-11-20): boxed 1px INK cards, LiberationSerif-Bold
 headlines + LiberationSerif decks, 68px Times masthead, stats/timeline/map/date-check
 geometry as in news-image-20261119 v39. CONTENT ONLY changed for Friday 20 Nov 2026.
@@ -275,6 +278,23 @@ def _star(d, cx, cy, r_out, r_in, fill="white"):
     d.polygon(points, fill=fill)
 
 
+def _skyline(d, w, h, base, col, seed):
+    """Night skyline with lit windows, ported from 19 Nov (v3 density).
+    Deterministic: seeded Random, so the render is reproducible."""
+    import random
+    rnd = random.Random(seed)
+    x = 0
+    while x < w:
+        bw = rnd.randint(14, 30)
+        bh = rnd.randint(int(h * 0.3), int(h * 0.75))
+        d.rectangle([x, base - bh, x + bw, base], fill=col)
+        for wy in range(base - bh + 6, base - 4, 10):
+            for wx in range(x + 3, x + bw - 3, 7):
+                if rnd.random() < 0.5:
+                    d.rectangle([wx, wy, wx + 3, wy + 4], fill=(255, 210, 31))
+        x += bw + 3
+
+
 def stamp(img, x, y, text, angle=-15, font=None):
     """Diagonal red rubber-stamp label (the #1 entry's signature device).
     `text` in red bold caps inside a 3px red outline box, drawn on a small
@@ -301,90 +321,122 @@ def art_image(key, w, h):
     img = Image.new("RGB", (w, h), PAPER)
     d = ImageDraw.Draw(img)
     if key == "akvan":
-        # v2: the cyclone from above, like a satellite view — a big spiral
-        # with a calm eye, rain bands on the left, the Odisha coast
-        # bottom-right. The bottom-left stays plain blue: the AKVAN label
-        # plate sits there, clear of every shape.
-        d.rectangle([0, 0, w, h], fill=(12, 70, 160))
-        cx, cy = 210, 44
-        # spiral arms: arcs of growing radius, each rotated on from the last
-        for r, a0, a1 in ((12, 30, 270), (20, 120, 360), (28, 210, 360),
-                          (28, 0, 90), (36, 300, 360), (36, 0, 180)):
+        # v3: DENSITY like 19 Nov — the whole frame is the storm, not a
+        # spiral on plain blue. Storm sky + rain across the full width, a
+        # big spiral cyclone, churning sea along the bottom, a coast with
+        # lit houses and bending palms. The AKVAN scrim sits on top,
+        # bottom-left, like 19 Nov's labels.
+        d.rectangle([0, 0, w, h], fill=(10, 58, 138))
+        d.rectangle([0, 0, w, 14], fill=(8, 46, 112))
+        # storm clouds, top-left and top-right
+        for cx0, cy0 in ((6, 2), (330, 0), (356, 6)):
+            d.ellipse([cx0, cy0, cx0 + 34, cy0 + 12], fill=(180, 195, 215))
+            d.ellipse([cx0 + 12, cy0 - 4, cx0 + 44, cy0 + 8],
+                      fill=(200, 212, 228))
+        # rain streaks across the WHOLE width, two slants
+        for rx in range(6, w, 16):
+            d.line([rx, 14, rx - 5, 26], fill=(190, 210, 235), width=2)
+        for rx in range(14, w, 26):
+            d.line([rx, 30, rx - 5, 42], fill=(160, 190, 225), width=2)
+        # the cyclone, big and centred: spiral arms + calm eye
+        cx, cy = 205, 42
+        for r, a0, a1 in ((10, 30, 270), (17, 120, 360), (17, 0, 90),
+                          (24, 210, 360), (24, 0, 90), (31, 300, 360),
+                          (31, 0, 180), (38, 150, 330)):
             d.arc([cx - r, cy - r, cx + r, cy + r], a0, a1,
                   fill="white", width=3)
-        # the calm eye
         d.ellipse([cx - 7, cy - 7, cx + 7, cy + 7], fill="white")
-        d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(12, 70, 160))
-        # rain bands, top-left and mid-right, clear of the label plate
-        for rx, ry in ((14, 10), (30, 18), (48, 8), (64, 20), (82, 12),
-                       (100, 22), (118, 10), (136, 20), (258, 34), (272, 44)):
-            d.line([rx, ry, rx - 6, ry + 10], fill="white", width=2)
-        # red warning triangle tucked against the spiral's upper-right arm
-        d.polygon([(262, 4), (276, 26), (248, 26)], fill=RED,
+        d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(10, 58, 138))
+        # rain bands curling off the spiral, left and right
+        for bx, by, br in ((150, 30, 14), (140, 52, 10), (262, 28, 12),
+                           (272, 52, 10)):
+            d.arc([bx - br, by - br, bx + br, by + br], 200, 340,
+                  fill=(220, 232, 245), width=2)
+        # red warning triangle tucked against the spiral's upper arm
+        d.polygon([(252, 2), (266, 24), (238, 24)], fill=RED,
                   outline=(20, 20, 20))
-        d.text((262, 15), "!", font=F_ART2_S, fill=YELLOW, anchor="mm")
-        # the coast: a dark shoreline, two bigger houses with roofs, and
-        # waves along the bottom, right of the label plate
-        d.line([270, 82, w, 82], fill=(8, 40, 90), width=3)
-        for hx, hy, hw in ((300, 62, 30), (340, 66, 32)):
-            d.rectangle([hx, hy, hx + hw, 82], fill=(240, 230, 210))
+        d.text((252, 13), "!", font=F_ART2_S, fill=YELLOW, anchor="mm")
+        # the coast: shoreline + three lit houses + two bending palms
+        d.rectangle([0, 70, w, h], fill=(8, 44, 96))
+        d.line([0, 70, w, 70], fill=(220, 230, 240), width=2)
+        for hx, hy, hw in ((286, 52, 30), (322, 56, 32), (358, 50, 30)):
+            d.rectangle([hx, hy, hx + hw, 70], fill=(240, 230, 210))
             d.polygon([(hx - 2, hy), (hx + hw + 2, hy),
                        (hx + hw // 2, hy - 12)], fill=(180, 60, 40))
-            d.rectangle([hx + hw // 2 - 3, 74, hx + hw // 2 + 3, 82],
-                        fill=(60, 40, 20))
-        for wx in range(130, w - 10, 18):
-            d.arc([wx, 84, wx + 14, 92], 180, 360, fill="white", width=2)
+            d.rectangle([hx + 5, hy + 6, hx + 11, hy + 12],
+                        fill=(255, 210, 31))
+            d.rectangle([hx + hw - 11, hy + 6, hx + hw - 5, hy + 12],
+                        fill=(255, 210, 31))
+        for px in (272, 344):
+            d.line([px, 70, px + 4, 52], fill=(60, 40, 20), width=2)
+            for ang in (-50, -20, 10):
+                ex = px + 4 + int(12 * math.cos(math.radians(ang - 90)))
+                ey = 52 + int(12 * math.sin(math.radians(ang - 90)))
+                d.line([px + 4, 52, ex, ey], fill=(30, 120, 60), width=2)
+        # churning sea: white wave arcs across the whole bottom
+        for wx in range(4, w - 10, 16):
+            d.arc([wx, 76, wx + 13, 86], 180, 360, fill="white", width=2)
+        for wx in range(12, w - 10, 22):
+            d.arc([wx, 83, wx + 10, 89], 180, 360, fill=(200, 220, 240),
+                  width=2)
     elif key == "kyiv":
-        # v2: one bridge across the Dnipro at night — a thick gold deck on
-        # two pale towers with cables, the middle span broken and dropped
-        # into the river, fire + smoke on the break, the Kyiv skyline
-        # behind. The deck ends above the label plate; the bottom-left is
-        # plain river, so the KYIV BRIDGES plate sits on clear water.
-        d.rectangle([0, 0, w, h], fill=(16, 28, 58))
-        # skyline behind the bridge, right side only, feet on the river line
-        for sx, sh in ((204, 24), (232, 30), (262, 20)):
-            d.rectangle([sx, 46 - sh, sx + 18, 46], fill=(70, 95, 140))
-            d.rectangle([sx + 4, 46 - sh + 5, sx + 7, 46 - sh + 8],
-                        fill=(255, 210, 31))
-            d.rectangle([sx + 11, 46 - sh + 12, sx + 14, 46 - sh + 15],
-                        fill=(255, 210, 31))
-        # the river, from the deck line down
-        d.rectangle([0, 46, w, h], fill=(20, 60, 110))
-        # towers: pale, from the sky down into the river
-        for tx in (70, 210):
-            d.rectangle([tx, 16, tx + 8, 78], fill=(220, 220, 220))
-            d.rectangle([tx - 4, 28, tx + 12, 32], fill=(220, 220, 220))
+        # v3: DENSITY — a night scene filling the whole frame: stars,
+        # skyline with lit windows across the back, river with reflections
+        # below, three towers + cables, deck with a broken middle span,
+        # fire + a big smoke plume, debris and ripples. No empty dark top.
+        d.rectangle([0, 0, w, h], fill=(14, 24, 52))
+        # stars across the sky
+        for sx, sy in ((10, 6), (40, 10), (90, 4), (130, 8), (180, 5),
+                       (230, 9), (270, 4), (286, 12), (160, 12), (60, 14)):
+            d.ellipse([sx, sy, sx + 2, sy + 2], fill="white")
+        # Kyiv skyline across the whole back, lit windows (19 Nov _skyline)
+        _skyline(d, w, 52, 46, (38, 58, 96), 7)
+        # a gold-domed church in the skyline, right side
+        d.rectangle([238, 28, 262, 46], fill=(120, 140, 180))
+        d.ellipse([240, 18, 260, 32], fill=GOLD)
+        d.line([250, 10, 250, 18], fill=GOLD, width=2)
+        # the river, from the deck line down, with reflections
+        d.rectangle([0, 46, w, h], fill=(18, 54, 100))
+        for ry in (56, 64, 72, 80):
+            for rx0, rx1 in ((8, 60), (70, 120), (130, 200), (210, 286)):
+                d.line([rx0, ry, rx1, ry], fill=(70, 120, 180), width=1)
+        # towers: pale, three of them, sky down into the river
+        for tx in (48, 148, 248):
+            d.rectangle([tx, 12, tx + 8, 80], fill=(220, 220, 220))
+            d.rectangle([tx - 4, 24, tx + 12, 28], fill=(220, 220, 220))
+            d.rectangle([tx - 4, 52, tx + 12, 56], fill=(200, 200, 200))
         # cables fanning from each tower top down to the deck
-        for cx0, cx1 in ((74, 18), (74, 150), (214, 18), (214, 272)):
-            d.line([cx0, 18, cx1, 40], fill=(200, 200, 200), width=2)
+        for cx0, cx1 in ((52, 10), (52, 120), (152, 90), (152, 210),
+                         (252, 180), (252, 290)):
+            d.line([cx0, 14, cx1, 40], fill=(200, 200, 200), width=2)
         # the deck: gold and thick; the middle span is broken and dropped
-        d.rectangle([0, 40, 150, 47], fill=(255, 205, 40))
-        d.rectangle([180, 40, w, 47], fill=(255, 205, 40))
-        d.polygon([(150, 40), (180, 40), (174, 58), (156, 58)],
+        d.rectangle([0, 40, 132, 47], fill=(255, 205, 40))
+        d.rectangle([168, 40, w, 47], fill=(255, 205, 40))
+        d.polygon([(132, 40), (168, 40), (162, 58), (138, 58)],
                   fill=(120, 30, 30))
         # fire on the broken span: layered burst with flame spikes, and a
-        # connected smoke plume rising from it (one cloud, not lone circles)
-        d.ellipse([150, 30, 182, 48], fill=(200, 40, 30))
-        d.ellipse([154, 26, 178, 46], fill=(255, 140, 40))
-        d.ellipse([160, 32, 174, 44], fill=(255, 220, 80))
-        d.ellipse([152, 10, 170, 26], fill=(200, 200, 200))
-        d.ellipse([160, 2, 178, 18], fill=(220, 220, 220))
-        d.ellipse([146, 16, 160, 28], fill=(210, 210, 210))
-        for fx, fy in ((156, 28), (166, 24), (174, 28)):
+        # big smoke plume rising from it (overlapping grey clouds)
+        d.ellipse([132, 28, 168, 48], fill=(200, 40, 30))
+        d.ellipse([136, 24, 164, 46], fill=(255, 140, 40))
+        d.ellipse([142, 30, 160, 44], fill=(255, 220, 80))
+        for fx, fy in ((138, 28), (148, 24), (158, 28)):
             d.polygon([(fx - 4, 30), (fx, fy - 10), (fx + 4, 30)],
                       fill=(255, 140, 40))
+        d.ellipse([134, 6, 152, 22], fill=(200, 200, 200))
+        d.ellipse([146, 0, 164, 16], fill=(220, 220, 220))
+        d.ellipse([126, 12, 142, 26], fill=(210, 210, 210))
         # a second, smaller spiked fire on the right span
-        d.ellipse([236, 32, 262, 46], fill=(255, 140, 40))
-        d.ellipse([242, 37, 254, 44], fill=(255, 220, 80))
-        d.polygon([(240, 34), (238, 26), (244, 32)], fill=(255, 140, 40))
-        d.polygon([(252, 34), (254, 26), (256, 34)], fill=(255, 140, 40))
-        # debris in the river under the break
-        d.rectangle([156, 62, 168, 66], fill=(40, 40, 40))
-        d.rectangle([170, 66, 178, 69], fill=(40, 40, 40))
-        # ripples, right of the label plate, split around the tower
-        for ry in (64, 72, 80):
-            d.line([186, ry, 206, ry], fill=(60, 120, 180), width=1)
-            d.line([222, ry, 286, ry], fill=(60, 120, 180), width=1)
+        d.ellipse([222, 32, 248, 46], fill=(255, 140, 40))
+        d.ellipse([228, 37, 242, 44], fill=(255, 220, 80))
+        d.polygon([(226, 34), (224, 26), (230, 32)], fill=(255, 140, 40))
+        d.polygon([(240, 34), (242, 26), (244, 34)], fill=(255, 140, 40))
+        d.ellipse([232, 20, 246, 32], fill=(205, 205, 205))
+        # debris in the river under the break + a rescue boat, far right
+        d.rectangle([138, 62, 150, 66], fill=(40, 40, 40))
+        d.rectangle([152, 66, 160, 69], fill=(40, 40, 40))
+        d.polygon([(262, 74), (288, 74), (284, 80), (266, 80)],
+                  fill=(255, 210, 31))
+        d.rectangle([272, 68, 280, 74], fill=(230, 200, 160))
     elif key == "cop31":
         d.rectangle([0, 0, w, h], fill=(11, 110, 110))
         # THE DRAFT ITSELF: a white document with the two cuts struck through.
@@ -456,19 +508,39 @@ def art_image(key, w, h):
                       fill=GOLD)
         d.ellipse([56, 58, 64, 64], fill=GOLD)
     elif key == "selloff":
-        # v2: the rout as a chart — four bars falling, a thin red trend
-        # line ABOVE the bars (never crossing them), -5% top-right in
-        # clear space. The bars end above the label plate, which sits on
-        # plain paper; grid lines stop above the plate too.
+        # v3: DENSITY — a trading floor, not four bars on blank paper.
+        # Full grid, six descending bars filling the width, a red trend
+        # line above them, a big -5% focal, falling arrows, a ticker tape
+        # and a Tokyo skyline silhouette along the bottom.
         d.rectangle([0, 0, w, h], fill=(246, 242, 233))
-        for gy in range(0, 46, 14):
-            d.line([0, gy, w, gy], fill=(200, 200, 210), width=1)
-        for bx, top in ((20, 14), (60, 20), (100, 26), (140, 32)):
-            d.rectangle([bx, top, bx + 26, 42], fill=NAVY)
-        d.rectangle([140, 32, 166, 42], fill=RED)
-        d.line([(14, 8), (180, 26)], fill=RED, width=2)
-        d.polygon([(180, 26), (170, 22), (174, 32)], fill=RED)
-        d.text((190, 4), "-5%", font=F_ART2_S, fill=RED, anchor="ra")
+        for gy in range(0, h, 12):
+            d.line([0, gy, w, gy], fill=(205, 205, 215), width=1)
+        for gx in range(0, w, 24):
+            d.line([gx, 0, gx, h], fill=(220, 220, 228), width=1)
+        # Tokyo skyline silhouette along the bottom, behind the bars
+        _skyline(d, w, 30, 80, (150, 160, 180), 21)
+        # six descending bars, the last two red
+        for i, (bx, top) in enumerate(((8, 10), (38, 16), (68, 22),
+                                       (98, 28), (128, 34), (158, 40))):
+            d.rectangle([bx, top, bx + 24, 62],
+                        fill=NAVY if i < 4 else RED)
+            d.rectangle([bx + 3, top + 3, bx + 8, top + 6], fill="white")
+        # red trend line ABOVE the bars, small arrowhead
+        d.line([(6, 6), (186, 34)], fill=RED, width=2)
+        d.polygon([(186, 34), (176, 30), (180, 40)], fill=RED)
+        # falling arrows between the bars
+        for ax, ay in ((34, 44), (94, 50), (154, 56)):
+            d.line([ax, ay - 8, ax, ay], fill=RED, width=2)
+            d.polygon([(ax - 3, ay - 3), (ax + 3, ay - 3), (ax, ay + 3)],
+                      fill=RED)
+        # big -5% focal, top-right, on the grid
+        d.text((192, 2), "-5%", font=F_ART2, fill=RED, anchor="ra",
+               stroke_width=1, stroke_fill="white")
+        # ticker tape along the very bottom: small down-triangles
+        d.rectangle([0, 72, w, h], fill=(20, 20, 20))
+        for tx, tcol in ((10, RED), (56, RED), (102, (30, 140, 80)),
+                         (148, RED)):
+            d.polygon([(tx - 3, 74), (tx + 3, 74), (tx, 79)], fill=tcol)
     elif key == "ukeu":
         # two flags, one deal: EU stars on the left, the Union Jack's cross
         # on the right, a gold link between them
@@ -485,29 +557,41 @@ def art_image(key, w, h):
         d.rectangle([90, 34, 106, 46], fill=GOLD)
         d.text((98, 40), "=", font=F_ART2, fill=(20, 20, 20), anchor="mm")
     elif key == "strike":
-        # v2: a European street march — three bigger walkers with heads,
-        # torsos, arms and striding legs; the first and third hold the
-        # COST OF LIVING banner on poles, the middle one a placard. All
-        # stand right of the label plate; the road starts right of it too,
-        # so the plate sits on plain sky.
-        d.rectangle([0, 0, w, h], fill=(210, 218, 228))
-        # clouds, top-left, clear of the banner and the label
-        d.ellipse([10, 8, 42, 20], fill="white")
-        d.ellipse([48, 14, 78, 24], fill="white")
-        d.rectangle([84, 64, w, h], fill=(120, 120, 125))
-        d.line([90, 64, w, 64], fill=(60, 60, 65), width=2)
-        for dx in range(96, w, 20):
+        # v3: DENSITY — a full street, not three figures on blank sky.
+        # Paris facades with windows across the top, six marchers filling
+        # the width in stride, the COST OF LIVING banner carried across
+        # the top by the front two, placards in hand, road + dashes below.
+        d.rectangle([0, 0, w, h], fill=(205, 214, 226))
+        # Paris facades behind the march, windows lit
+        for fx, fw, fh in ((0, 34, 30), (38, 30, 38), (72, 36, 28),
+                           (112, 30, 36), (146, 28, 30), (178, 18, 34)):
+            d.rectangle([fx, 40 - fh, fx + fw, 40], fill=(150, 140, 120))
+            for wy in range(40 - fh + 5, 36, 10):
+                for wx in range(fx + 4, fx + fw - 4, 9):
+                    d.rectangle([wx, wy, wx + 4, wy + 5],
+                                fill=(255, 220, 130))
+            d.polygon([(fx, 40 - fh), (fx + fw, 40 - fh),
+                       (fx + fw // 2, 40 - fh - 8)], fill=(120, 60, 50))
+        # clouds above the roofs
+        d.ellipse([8, 2, 34, 10], fill="white")
+        d.ellipse([150, 2, 182, 10], fill="white")
+        # the road, full width, with dashes
+        d.rectangle([0, 62, w, h], fill=(110, 110, 116))
+        d.line([0, 62, w, 62], fill=(60, 60, 65), width=2)
+        for dx in range(4, w, 20):
             d.line([dx, 71, dx + 10, 71], fill="white", width=2)
-        # the banner, held on poles by the first and third marchers
-        d.rectangle([92, 6, 192, 24], fill="white", outline=RED, width=2)
-        d.text((142, 15), "COST OF LIVING", font=F_SRC, fill=RED,
+        # the banner, held on poles by the first and last marchers
+        d.rectangle([14, 6, 182, 24], fill="white", outline=RED, width=2)
+        d.text((98, 15), "COST OF LIVING", font=F_SRC, fill=RED,
                anchor="mm")
-        d.line([104, 24, 104, 40], fill=(60, 40, 20), width=2)
-        d.line([180, 24, 180, 40], fill=(60, 40, 20), width=2)
-        # marchers: head, torso, striding legs; arms raised to the poles
-        skins = [(200, 140, 90), (220, 180, 140), (190, 130, 85)]
-        shirts = [(40, 90, 160), (200, 40, 40), (30, 140, 80)]
-        for i, x in enumerate((96, 132, 168)):
+        d.line([26, 24, 26, 40], fill=(60, 40, 20), width=2)
+        d.line([170, 24, 170, 40], fill=(60, 40, 20), width=2)
+        # six marchers, bigger, filling the width, in stride
+        skins = [(200, 140, 90), (220, 180, 140), (190, 130, 85),
+                 (210, 160, 110), (200, 140, 90), (220, 180, 140)]
+        shirts = [(40, 90, 160), (200, 40, 40), (30, 140, 80),
+                  (220, 170, 40), (90, 60, 140), (20, 120, 140)]
+        for i, x in enumerate((8, 40, 72, 104, 136, 168)):
             d.ellipse([x + 3, 30, x + 15, 42], fill=skins[i])
             d.ellipse([x + 6, 35, x + 8, 37], fill=(20, 20, 20))
             d.ellipse([x + 10, 35, x + 12, 37], fill=(20, 20, 20))
@@ -515,13 +599,13 @@ def art_image(key, w, h):
             d.line([x + 5, 56, x + 1, 68], fill=(20, 20, 20), width=2)
             d.line([x + 9, 56, x + 15, 68], fill=(20, 20, 20), width=2)
             if i == 0:
-                d.line([x + 4, 44, 104, 40], fill=skins[i], width=2)
-            if i == 2:
-                d.line([x + 10, 44, 180, 40], fill=skins[i], width=2)
-            if i == 1:
-                # middle marcher holds a small placard in his left hand
-                d.line([x + 2, 44, x - 2, 34], fill=(60, 40, 20), width=2)
-                d.rectangle([x - 14, 28, x + 2, 40], fill="white",
+                d.line([x + 4, 44, 26, 40], fill=skins[i], width=2)
+            if i == 5:
+                d.line([x + 10, 44, 170, 40], fill=skins[i], width=2)
+            if i in (2, 3):
+                # middle marchers hold small placards up
+                d.line([x + 12, 44, x + 16, 34], fill=(60, 40, 20), width=2)
+                d.rectangle([x + 10, 26, x + 24, 36], fill="white",
                             outline=INK)
     elif key == "iraq":
         # desert stronghold: a walled compound with a watchtower, two tanks
@@ -546,114 +630,223 @@ def art_image(key, w, h):
         d.ellipse([150, 8, 170, 20], fill=(240, 230, 200))
         d.ellipse([160, 12, 186, 22], fill=(240, 230, 200))
     elif key == "gaza":
-        # v2: a tank crossing the yellow truce line — hull with a sloped
-        # front, turret, a long barrel clear above the hull, five track
-        # wheels. The dashed line is painted on the ground BELOW the tank,
-        # right of the label plate; the tank stands right of the plate,
-        # exhaust smoke behind it.
-        d.rectangle([0, 0, w, h], fill=(232, 210, 160))
-        d.rectangle([104, 62, w, h], fill=(200, 175, 120))
-        # the yellow truce line, painted on the ground
-        for dx in range(104, w, 14):
-            d.line([dx, 70, dx + 8, 70], fill=YELLOW, width=4)
-        # the tank, right of the label plate
-        d.rectangle([112, 58, 190, 62], fill=(180, 155, 105))
-        d.rectangle([110, 48, 188, 58], fill=(60, 65, 50))
-        for wx in (118, 134, 150, 166, 182):
-            d.ellipse([wx - 4, 50, wx + 4, 58], fill=(40, 40, 40))
-            d.ellipse([wx - 1, 53, wx + 1, 55], fill=(120, 120, 110))
-        d.polygon([(116, 36), (182, 36), (190, 42), (190, 48), (116, 48)],
+        # v3: DENSITY — a desert scene filling the frame: sun + clouds,
+        # layered dunes, a distant wall with watchtower, a dust cloud
+        # behind the tracks, and a tank twice as big as v2, crossing the
+        # yellow truce dashes painted on the ground.
+        d.rectangle([0, 0, w, h], fill=(240, 215, 160))
+        # sun, top-right, and clouds
+        d.ellipse([168, 4, 188, 24], fill=(255, 220, 80),
+                  outline=(230, 180, 60), width=2)
+        d.ellipse([8, 6, 34, 14], fill=(250, 240, 220))
+        d.ellipse([20, 10, 48, 18], fill=(250, 240, 220))
+        d.ellipse([120, 2, 146, 10], fill=(250, 240, 220))
+        # distant wall with a watchtower, across the back
+        d.rectangle([0, 34, w, 44], fill=(190, 160, 110))
+        d.rectangle([0, 34, w, 38], fill=(160, 130, 85))
+        d.rectangle([150, 18, 172, 38], fill=(170, 140, 95))
+        d.rectangle([156, 23, 166, 29], fill=(60, 40, 20))
+        for wx in range(6, w, 20):
+            d.rectangle([wx, 40, wx + 8, 46], fill=(90, 70, 40))
+        # dunes: two layered bands
+        d.polygon([(0, 52), (60, 44), (120, 52), (196, 46), (196, 80),
+                   (0, 80)], fill=(222, 190, 130))
+        d.polygon([(0, 62), (80, 54), (140, 62), (196, 56), (196, 80),
+                   (0, 80)], fill=(205, 172, 112))
+        # the yellow truce line, painted on the ground, full width
+        for dx in range(0, w, 14):
+            d.line([dx, 66, dx + 8, 66], fill=YELLOW, width=4)
+        # the tank, bigger: hull, turret, long barrel, six track wheels
+        d.rectangle([34, 58, 158, 64], fill=(150, 128, 88))
+        d.rectangle([32, 48, 156, 58], fill=(60, 65, 50))
+        for wx in (42, 62, 82, 102, 122, 142):
+            d.ellipse([wx - 5, 50, wx + 5, 60], fill=(40, 40, 40))
+            d.ellipse([wx - 2, 53, wx + 2, 57], fill=(120, 120, 110))
+        d.polygon([(40, 36), (150, 36), (158, 42), (158, 48), (40, 48)],
                   fill=(90, 100, 70))
-        d.rectangle([132, 26, 162, 36], fill=(90, 100, 70))
-        d.rectangle([136, 22, 158, 26], fill=(80, 90, 62))
-        d.ellipse([144, 27, 150, 33], fill=(70, 80, 55))
-        d.line([140, 22, 138, 12], fill=(50, 55, 40), width=1)
-        d.line([162, 28, 193, 28], fill=(50, 55, 40), width=4)
-        # exhaust smoke behind the tank
-        d.ellipse([94, 30, 106, 40], fill=(200, 200, 200))
-        d.ellipse([100, 24, 110, 34], fill=(220, 220, 220))
+        d.rectangle([62, 24, 108, 36], fill=(90, 100, 70))
+        d.rectangle([68, 20, 102, 24], fill=(80, 90, 62))
+        d.ellipse([80, 25, 88, 33], fill=(70, 80, 55))
+        d.line([76, 20, 73, 8], fill=(50, 55, 40), width=2)
+        d.line([108, 27, 168, 27], fill=(50, 55, 40), width=5)
+        # dust cloud billowing behind the tracks + exhaust smoke
+        d.ellipse([4, 44, 22, 58], fill=(220, 200, 165))
+        d.ellipse([12, 38, 30, 52], fill=(230, 210, 175))
+        d.ellipse([22, 46, 36, 58], fill=(220, 200, 165))
+        d.ellipse([20, 30, 30, 40], fill=(200, 200, 200))
     elif key == "crash":
-        # v2: Siberia in winter — a cargo plane diving nose-down, fuselage,
-        # swept wing and tail fin, smoke trailing behind it, a spiked
-        # fireball where the nose hits the snow, big pines at the right.
-        # The left side stays plain snow under the label plate.
-        d.rectangle([0, 0, w, h], fill=(200, 215, 228))
-        d.rectangle([100, 62, w, h], fill=(240, 244, 248))
-        # smoke trail behind the plane, up-left
-        d.ellipse([50, 10, 58, 18], fill=(200, 200, 200))
-        d.ellipse([38, 6, 46, 14], fill=(220, 220, 220))
-        d.ellipse([26, 4, 32, 10], fill=(220, 220, 220))
-        # the plane, diving nose-down to the right
-        d.polygon([(64, 10), (156, 50), (150, 60), (58, 20)],
-                  fill=(90, 90, 100))
-        d.polygon([(100, 28), (128, 18), (134, 26), (108, 40)],
-                  fill=(70, 70, 80))
-        d.polygon([(64, 10), (54, 2), (58, 18)], fill=(70, 70, 80))
-        d.ellipse([142, 50, 146, 54], fill=(180, 220, 240))
-        # fireball where the nose hits the snow, with flame spikes
-        d.ellipse([138, 52, 168, 74], fill=(255, 140, 40))
-        d.ellipse([146, 58, 160, 70], fill=(255, 220, 80))
-        d.polygon([(146, 52), (142, 42), (150, 46)], fill=(255, 140, 40))
-        d.polygon([(158, 52), (160, 42), (164, 50)], fill=(255, 140, 40))
-        d.ellipse([170, 44, 180, 52], fill=(200, 200, 200))
-        # big pines, right side, clear of the label plate
-        d.polygon([(118, 62), (128, 38), (138, 62)], fill=(30, 90, 60))
-        d.polygon([(170, 62), (180, 34), (190, 62)], fill=(30, 90, 60))
+        # v3: DENSITY — a Siberian winter filling the frame: grey sky with
+        # falling snow, a big cargo plane diving nose-down (fuselage, swept
+        # wing, tail, four engines), a long smoke trail, a spiked fireball
+        # + black smoke column where it hits, and a forest of large pines
+        # across the snow.
+        d.rectangle([0, 0, w, h], fill=(185, 200, 215))
+        d.rectangle([0, 0, w, 10], fill=(165, 182, 200))
+        # falling snow across the sky
+        for sx, sy in ((12, 14), (40, 8), (70, 16), (100, 10), (130, 18),
+                       (160, 12), (188, 16), (26, 26), (84, 28), (146, 26)):
+            d.ellipse([sx, sy, sx + 2, sy + 2], fill="white")
+        # the snow ground, full width, with drifts
+        d.rectangle([0, 58, w, h], fill=(238, 242, 246))
+        d.ellipse([0, 56, 70, 66], fill=(228, 234, 240))
+        d.ellipse([120, 56, 196, 66], fill=(228, 234, 240))
+        # smoke trail behind the plane, across the sky
+        for ex, ey, er in ((18, 8, 4), (32, 12, 5), (48, 16, 5),
+                           (62, 20, 6), (76, 24, 6)):
+            d.ellipse([ex - er, ey - er, ex + er, ey + er],
+                      fill=(200, 200, 200))
+        # the plane, BIG, diving nose-down to the right: tapered fuselage,
+        # swept wing, tail fin, four engine dots
+        d.polygon([(52, 12), (158, 52), (150, 62), (46, 22)],
+                  fill=(85, 85, 95))
+        d.polygon([(96, 30), (128, 16), (136, 26), (104, 42)],
+                  fill=(65, 65, 75))
+        d.polygon([(52, 12), (40, 2), (46, 20)], fill=(65, 65, 75))
+        d.polygon([(150, 52), (168, 46), (164, 56), (152, 60)],
+                  fill=(65, 65, 75))
+        for ex, ey in ((86, 30), (104, 38), (122, 46), (140, 54)):
+            d.ellipse([ex - 2, ey - 2, ex + 2, ey + 2], fill=(180, 220, 240))
+        # scorch mark on the snow first, then the fireball on top of it
+        d.ellipse([136, 68, 176, 78], fill=(60, 55, 50))
+        # fireball where the nose hits the snow, flame spikes + smoke column
+        d.ellipse([140, 48, 172, 74], fill=(255, 140, 40))
+        d.ellipse([148, 54, 164, 68], fill=(255, 220, 80))
+        for fx, fy in ((146, 50), (156, 46), (166, 50)):
+            d.polygon([(fx - 4, 52), (fx, fy - 10), (fx + 4, 52)],
+                      fill=(255, 140, 40))
+        d.ellipse([150, 30, 162, 44], fill=(60, 60, 60))
+        d.ellipse([146, 18, 160, 32], fill=(90, 90, 90))
+        d.ellipse([154, 8, 166, 20], fill=(120, 120, 120))
+        # debris on the snow
+        d.rectangle([128, 72, 138, 75], fill=(40, 40, 40))
+        d.rectangle([172, 70, 180, 73], fill=(40, 40, 40))
+        # a forest of large pines across the bottom
+        for px, ph in ((6, 26), (28, 32), (52, 24), (180, 28)):
+            d.polygon([(px, 58), (px + 8, 58 - ph), (px + 16, 58)],
+                      fill=(25, 80, 55))
+            d.rectangle([px + 6, 58, px + 10, 64], fill=(90, 60, 30))
     elif key == "rates":
-        # v2: the hike as a chart — four bars climbing, a thin red trend
-        # line ABOVE the bars (never crossing them), 9% top-right in clear
-        # space. The bars end above the label plate, which sits on plain
-        # paper; grid lines stop above the plate too.
+        # v3: DENSITY — a bank scene, not four bars on blank paper. Full
+        # grid, six climbing bars filling the width, a red arrow above
+        # them, a big 9% focal, gold coins along the bottom and bank
+        # columns rising behind the bars.
         d.rectangle([0, 0, w, h], fill=(245, 240, 228))
-        for gy in range(0, 46, 14):
+        for gy in range(0, h, 12):
             d.line([0, gy, w, gy], fill=(210, 205, 190), width=1)
-        for bx, top in ((20, 36), (60, 30), (100, 24), (140, 18)):
-            d.rectangle([bx, top, bx + 26, 42], fill=NAVY)
-        d.line([(14, 30), (150, 12)], fill=RED, width=2)
-        d.polygon([(150, 12), (140, 8), (144, 18)], fill=RED)
-        d.text((192, 2), "9%", font=F_ART2, fill=RED, anchor="ra")
+        for gx in range(0, w, 24):
+            d.line([gx, 0, gx, h], fill=(228, 223, 208), width=1)
+        # bank columns behind the bars, pediment on top
+        d.polygon([(20, 8), (176, 8), (98, 0)], fill=(120, 110, 95))
+        for cx in (28, 62, 96, 130, 164):
+            d.rectangle([cx, 10, cx + 7, 58], fill=(200, 192, 170),
+                        outline=(120, 110, 95))
+        # six climbing bars, all navy — the red 9% focal sits on paper
+        # above the last bar, never red-on-red
+        for i, (bx, top) in enumerate(((8, 40), (38, 34), (68, 28),
+                                       (98, 22), (128, 16), (158, 10))):
+            d.rectangle([bx, top, bx + 24, 62], fill=NAVY)
+            d.rectangle([bx + 3, top + 3, bx + 8, top + 6], fill="white")
+        # red arrow ABOVE the bars, ending well clear of the 9% focal
+        d.line([(6, 34), (134, 13)], fill=RED, width=2)
+        d.polygon([(134, 13), (124, 11), (128, 21)], fill=RED)
+        # big 9% focal, top-right, on the grid
+        d.text((192, 0), "9%", font=F_ART2, fill=RED, anchor="ra",
+               stroke_width=1, stroke_fill="white")
+        # gold coins along the bottom, one stamped Rs (right of the scrim)
+        for cx in (14, 44, 74, 104, 134, 164):
+            d.ellipse([cx, 66, cx + 12, 78], fill=GOLD,
+                      outline=(180, 130, 20), width=1)
+            d.ellipse([cx + 3, 69, cx + 9, 75], fill=(255, 220, 80))
+        d.text((170, 72), "Rs", font=F_ART2_S, fill=(120, 80, 0),
+               anchor="mm")
     elif key == "quake":
-        # v2: the ground splits — the red seismograph trace stays on top
-        # as the main element; below it the ground drops 6px across a
-        # jagged crack, one house tilted on each side. The crack stands
-        # right of the label plate; the left house ends above it.
+        # v3: DENSITY — a California scene filling the frame: the red
+        # seismograph trace across the top, San Andreas hills behind, a
+        # cracked highway with offset lanes, tilted houses and palm trees
+        # on both sides of the crack, dust and rubble.
         d.rectangle([0, 0, w, h], fill=(232, 214, 170))
-        d.rectangle([0, 0, w, 18], fill="white")
-        d.line([(4, 9), (30, 9), (38, 3), (46, 15), (54, 9), (80, 9),
-                (88, 2), (96, 16), (104, 9), (130, 9), (138, 4), (146, 14),
-                (154, 9), (192, 9)], fill=RED, width=2)
-        # left block full height, right block dropped 6px: the offset
-        d.rectangle([130, 18, w, 24], fill=(200, 180, 140))
-        d.rectangle([130, 24, w, h], fill=(220, 200, 155))
-        # the crack, jagged, down the boundary
-        d.line([(130, 24), (126, 36), (133, 48), (127, 60), (132, 72),
-                (128, 80)], fill=(40, 30, 20), width=3)
-        d.line([(130, 48), (142, 58)], fill=(40, 30, 20), width=2)
-        # rubble at the crack's foot
-        d.rectangle([122, 74, 128, 78], fill=(40, 30, 20))
+        # hills behind, across the whole back
+        d.polygon([(0, 22), (50, 10), (100, 20), (150, 8), (196, 18),
+                   (196, 26), (0, 26)], fill=(190, 170, 120))
+        d.polygon([(0, 26), (70, 16), (130, 26), (196, 14), (196, 30),
+                   (0, 30)], fill=(170, 148, 100))
+        # the seismograph trace on a white strip across the top
+        d.rectangle([0, 0, w, 14], fill="white")
+        d.line([(2, 7), (16, 7), (22, 2), (28, 12), (34, 7), (52, 7),
+                (58, 1), (64, 13), (70, 7), (92, 7), (98, 3), (104, 11),
+                (110, 7), (130, 7), (136, 2), (142, 12), (148, 7),
+                (170, 7), (176, 4), (182, 10), (188, 7), (194, 7)],
+               fill=RED, width=2)
+        # the ground: left block full height, right block dropped 6px
+        d.rectangle([0, 30, w, 36], fill=(200, 180, 140))
+        d.rectangle([130, 30, w, 36], fill=(200, 180, 140))
+        d.rectangle([130, 36, w, h], fill=(220, 200, 155))
+        # the highway, offset across the crack: lanes + dashes both sides
+        d.rectangle([0, 44, 128, 62], fill=(90, 90, 95))
+        d.rectangle([132, 50, w, 68], fill=(90, 90, 95))
+        for dx in range(4, 124, 18):
+            d.line([dx, 53, dx + 9, 53], fill=YELLOW, width=2)
+        for dx in range(138, w, 18):
+            d.line([dx, 59, dx + 9, 59], fill=YELLOW, width=2)
+        # the crack, jagged and BOLD, down the boundary, with branches
+        d.line([(130, 36), (126, 46), (133, 56), (127, 66), (132, 74),
+                (128, 80)], fill=(40, 30, 20), width=4)
+        d.line([(130, 56), (142, 64)], fill=(40, 30, 20), width=3)
+        d.line([(128, 66), (118, 72)], fill=(40, 30, 20), width=3)
+        # dust clouds at the crack + rubble at its foot
+        d.ellipse([118, 38, 132, 48], fill=(210, 195, 165))
+        d.ellipse([132, 42, 146, 52], fill=(220, 205, 175))
+        d.rectangle([120, 74, 127, 78], fill=(40, 30, 20))
         d.rectangle([134, 76, 142, 79], fill=(40, 30, 20))
-        # a house tilted on each side of the crack
-        d.rectangle([96, 30, 124, 44], fill=(200, 180, 140))
-        d.polygon([(94, 30), (126, 26), (110, 18)], fill=(180, 60, 40))
-        d.rectangle([138, 36, 166, 50], fill=(200, 180, 140))
-        d.polygon([(136, 36), (168, 40), (152, 26)], fill=(180, 60, 40))
+        d.rectangle([110, 77, 116, 80], fill=(60, 50, 40))
+        # tilted houses + palms on both sides of the crack
+        d.rectangle([14, 32, 44, 46], fill=(200, 180, 140))
+        d.polygon([(12, 32), (46, 28), (29, 20)], fill=(180, 60, 40))
+        d.rectangle([52, 34, 82, 48], fill=(210, 190, 150))
+        d.polygon([(50, 34), (84, 38), (67, 26)], fill=(180, 60, 40))
+        d.rectangle([146, 38, 176, 52], fill=(200, 180, 140))
+        d.polygon([(144, 38), (178, 42), (161, 28)], fill=(180, 60, 40))
+        for px in (92, 186):
+            d.line([px, 44, px + 2, 30], fill=(60, 40, 20), width=2)
+            for ang in (-60, -30, 0, 30):
+                ex = px + 2 + int(9 * math.cos(math.radians(ang - 90)))
+                ey = 30 + int(9 * math.sin(math.radians(ang - 90)))
+                d.line([px + 2, 30, ex, ey], fill=(30, 120, 60), width=2)
     elif key == "rikers":
-        # v2: the jail — dark bars across a grey wall, the name on a navy
-        # sign moved UP, clear of the label plate, the red CLOSED stamp
-        # fully inside the frame, and a barred cell door at the
-        # bottom-right so the cell is not just bars. Bars and the bottom
-        # strip start right of the label plate.
+        # v3: DENSITY — a full cell block, not bars on a grey wall. Brick
+        # texture top and bottom, bars across the whole frame, the RIKERS
+        # sign, the CLOSED stamp, a barred cell door with a small window,
+        # and the island's water strip along the bottom.
         d.rectangle([0, 0, w, h], fill=(150, 155, 165))
-        d.rectangle([0, 0, w, 12], fill=(90, 95, 105))
-        d.rectangle([116, 68, w, h], fill=(90, 95, 105))
-        for bx in (118, 140, 162, 184):
+        # brick texture, top band and bottom band
+        d.rectangle([0, 0, w, 12], fill=(120, 90, 80))
+        for bx in range(0, w, 16):
+            d.line([bx, 0, bx, 12], fill=(90, 65, 55), width=1)
+        d.line([0, 6, w, 6], fill=(90, 65, 55), width=1)
+        d.rectangle([0, 68, w, h], fill=(110, 82, 72))
+        for bx in range(8, w, 16):
+            d.line([bx, 68, bx, 80], fill=(85, 60, 50), width=1)
+        d.line([0, 74, w, 74], fill=(85, 60, 50), width=1)
+        # bars across the whole frame
+        for bx in (10, 32, 54, 76, 98, 120, 142, 164, 186):
             d.rectangle([bx, 12, bx + 8, 68], fill=(40, 42, 48))
-        d.rectangle([16, 20, 108, 42], fill=NAVY)
-        d.text((62, 31), "RIKERS", font=F_ART2, fill="white", anchor="mm")
-        stamp(img, 122, 8, "CLOSED", angle=-10)
-        # a barred cell door, bottom-right
-        d.rectangle([160, 52, 190, 68], outline=(40, 42, 48), width=2)
-        d.line([160, 60, 190, 60], fill=(40, 42, 48), width=2)
+        # the RIKERS sign, high on the bars
+        d.rectangle([16, 18, 108, 40], fill=NAVY)
+        d.text((62, 29), "RIKERS", font=F_ART2, fill="white", anchor="mm")
+        # CLOSED stamp, fully inside the frame, top-right
+        stamp(img, 122, 4, "CLOSED", angle=-10)
+        # a barred cell door with a small window, bottom-right
+        d.rectangle([148, 44, 190, 68], fill=(70, 72, 80),
+                    outline=(40, 42, 48), width=2)
+        d.rectangle([156, 48, 182, 56], fill=(180, 200, 220),
+                    outline=(40, 42, 48), width=1)
+        d.line([169, 48, 169, 56], fill=(40, 42, 48), width=1)
+        d.line([148, 60, 190, 60], fill=(40, 42, 48), width=2)
+        d.ellipse([184, 62, 188, 66], fill=GOLD)
+        # water strip along the very bottom: Rikers is an island
+        d.rectangle([0, 76, w, h], fill=(30, 90, 150))
+        for wx in range(4, w, 18):
+            d.arc([wx, 76, wx + 10, 80], 180, 360, fill="white", width=1)
     return img
 
 # pixel nudges so clustered pins stay readable (map is small): the pin circle
