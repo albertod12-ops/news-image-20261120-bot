@@ -557,10 +557,13 @@ def art_image(key, w, h):
         # baseline under the bars
         d.rectangle([4, 62, 192, 65], fill=(35, 55, 85))
         # thick red zigzag arrow, the reference's shape — clear of the
-        # -5% focal (top-right) and of the last bar's top
-        d.line([(4, 8), (16, 5), (47, 17), (80, 5), (150, 32)],
+        # -5% focal (top-right) and of the last bar's top. v3.5.1: the
+        # whole zigzag now sits INSIDE the art box with a clear margin
+        # from the top edge (peaks y=12-13, stroke top >= y=9) — the
+        # v3.5 peaks at y=5 sat flush on the edge and read as clipped.
+        d.line([(4, 17), (16, 13), (47, 26), (80, 12), (150, 41)],
                fill=RED, width=6, joint="curve")
-        d.polygon([(156, 35), (144, 25), (151, 38)], fill=RED)
+        d.polygon([(156, 44), (144, 34), (151, 47)], fill=RED)
         # big -5% focal, top-right, on the light background
         d.text((192, 2), "-5%", font=F_ART2, fill=RED, anchor="ra",
                stroke_width=1, stroke_fill="white")
