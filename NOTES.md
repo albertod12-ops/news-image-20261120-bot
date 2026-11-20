@@ -6,6 +6,21 @@
 - Quota (live re-check 2026-11-20 ~20:33 WIB): entries made 0, left today 3 of 3, can submit now yes. Observed cap 3 per competition.
 - Top-1 benchmark (live 2026-11-20 ~20:20 WIB, 8,169 entries): #1 888dao-sats 99.1652% ("Friday 20 November 2026: 36 stories, 6 continents — Cyclone Akvan landfall, Kyiv ballistic missiles, COP31 final day deadlock"); #2 kiencx 99.1429%; top-20 cutoff 98.9426%, top-50 cutoff 98.8016%.
 
+## Entry v3.1 (main agent 2x check of v3: two label defects)
+- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit a29ab78 (v3.1: fix clipped 9% focal (card 11) and LABOUR kick overlap (card 7)).
+- entry.png: 1024x1024, 276,564 bytes, sha256 003b489fbe08f86f65a590b6c9be3ab4f330e4a90cf68fb7425868284a781eae, deterministic (3x draw.py identical sha + `main.py --verify`).
+- Fixes, NOTHING else changed (layout/headlines/decks/art otherwise identical):
+  1. Card 11 SRI LANKA: the big red "9%" focal was drawn at x=192 anchor "ra" — its ink ended 3px from the art's right edge and read as clipped. Moved to x=184: ink now ends at art-x 184, 14px clear of the edge (pixel-verified), clear of the red arrow (ends x=134); its lower edge still sits over the top of the last bar exactly as in v3 (red on navy + white stroke, readable — no placement at this size clears both the edge and all six bar tops in the top-right).
+  2. Card 7 PARIS/STRIKES: the "ON STRIKE / 25+ COUNTRIES" scrim sat flush on the kick strip, its corner crowding "LABOUR". art_text() gained an optional dy param; the strike card passes dy=-6, lifting the whole label 6px up inside the art — scrim bottom now y=454 absolute, 10px clear of the strip (was 4px); "7. PARIS · LABOUR" fully readable, REPORTED pill clear.
+- Verified at 2x zoom per fixed card + pixel measurement (see above).
+- Recording: `makefun record` re-attempted fresh for v3.1 — HTTP 400 again (this competition takes loose transcripts, not sealed recordings), same as v1/v2/v3. Session: b408bc3c-f0a5-4716-b1b1-467834d3e561 (copy in ~/workspace/makefun/news-image-20261120-transcripts/ — NOTE: copied mid-session for the gate run; re-copy the final file before bundling.)
+
+## Gate v3.1 (pre-submit-gate.py, commit a29ab78, 2026-11-20 ~22:42 WIB, --entrypoint main.py)
+- GATE: DO NOT SUBMIT — same 2 FAILs as v3, both fixable only at submit time by the top-level agent:
+  1. thinking_priced — 0 usage rows for the Muse sessions in muse.db. At submit time the main agent must re-extract rows from muse.db (agent ids a0d7a9b0-d798-4cb8-8268-5e1f98e7b0b3 + b96cfac6-c393-4b9d-a411-084f3c27afc7 + cc7c6ebb-446f-4d54-8f32-d2a8ae19d817 + b408bc3c-f0a5-4716-b1b1-467834d3e561 + its own aa7f29f8-0889-4b4b-bb01-3e6c8d34a124) into ~/.makefun/muse-usage-news-image-20261120.jsonl and re-run the gate.
+  2. transcripts_run_record — no bundle yet. Bundle command for the main agent: v3 command in the Gate v3 section below, plus --session /home/hatch/agents/agent-b408bc3c-f0a5-4716-b1b1-467834d3e561/sessions/b408bc3c-f0a5-4716-b1b1-467834d3e561.jsonl (re-copy the final file first — the transcripts-dir copy was taken mid-session). Then re-run the gate with --bundle <bundle.tar.gz> and --entrypoint main.py.
+- PASS now: transcripts_witnessed 8/8, thinking_reproduces 40.9% authored (488/1193, up from v3's 40.1%; unwritten 18.5%), thinking_revised (draw.py 37 messages), thinking_turns 252, thinking_in_window (note: first gate run passed --open 2026-11-22T00:00:00Z — the CLOSE date — by mistake and failed thinking_in_window spuriously; re-run with the correct --open 2026-11-20T00:00:00Z passes it), thinking_wellformed, thinking_own_work, entry-artifact-size, grader-sandbox PASS, quota (left today 3), competition_open, snapshot, license_osi, entrypoint.
+
 ## Entry v3 (user 2026-11-20 ~22:21 WIB: "Masih jelek, coba lihat punya kita yang sum 19 itu")
 - Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit 91c730a (v3: densify art cards 1,2,4,7,9,10,11,12,13 to 19 Nov density).
 - entry.png: 1024x1024, 275,931 bytes, sha256 48a519037cccc7ec3ef9b03fa341bf5e5872b09daadd8513512e1a1b22baa0e8, deterministic across runs (verified by `python3 main.py --verify` + 3x draw.py, identical sha; no truncation).
