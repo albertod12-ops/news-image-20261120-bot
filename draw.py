@@ -335,53 +335,52 @@ def art_image(key, w, h):
             d.ellipse([cx0 + 12, cy0 - 4, cx0 + 44, cy0 + 8],
                       fill=(200, 212, 228))
         # rain streaks across the width, two slants — kept clear of the
-        # funnel zone (x 118-292) so the tornado lines read clean
+        # funnel zone (x 152-252) so the tornado lines read clean
         for rx in range(6, w, 16):
-            if 118 < rx < 292:
+            if 152 < rx < 252:
                 continue
             d.line([rx, 14, rx - 5, 26], fill=(190, 210, 235), width=2)
         for rx in range(14, w, 26):
-            if 118 < rx < 292:
+            if 152 < rx < 252:
                 continue
             d.line([rx, 30, rx - 5, 42], fill=(160, 190, 225), width=2)
-        # v3.2: the cyclone redrawn as a thin line-art tornado, in the
-        # style of the user's reference — a wide flat spiral disc on top,
-        # a funnel tapering to the ground with curved horizontal bands,
-        # and a dust cloud at its base. Original PIL vector lines in
-        # white on the navy storm sky (the reference file itself is not
-        # used anywhere); rain is kept clear of the funnel zone above.
+        # v3.3: the tornado SLIMMED, per the user ("masih terlalu besar
+        # pusarannya") — the v3.2 funnel spanned ~half the hero width;
+        # now a tall narrow funnel like the reference line-art (spiral
+        # disc halved to rx 40, funnel top half-width 34, same 42px
+        # drop). Original PIL vector lines in white on the navy storm
+        # sky; rain is kept clear of the narrower funnel zone above.
         cx = 200
-        # spiral disc: flat concentric ellipses, wide and low
-        for rx, ry in ((74, 12), (56, 10), (34, 7), (14, 4)):
-            d.ellipse([cx - rx, 18 - ry, cx + rx, 18 + ry],
+        # spiral disc: flat concentric ellipses, half the v3.2 width
+        for rx, ry in ((40, 10), (30, 8), (19, 5), (8, 3)):
+            d.ellipse([cx - rx, 16 - ry, cx + rx, 16 + ry],
                       outline="white", width=2)
         # one spiral sweep across the disc, hinting the rotation
-        d.arc([cx - 74, 6, cx + 74, 30], 200, 340,
+        d.arc([cx - 40, 6, cx + 40, 26], 200, 340,
               fill=(190, 215, 240), width=2)
         # funnel edges: two curves from the disc down to a narrow tip
         edge_l, edge_r = [], []
         for i in range(25):
             t = i / 24
-            y = 26 + int(40 * t)
-            hw = 68 - int(64 * (t ** 1.3))
+            y = 24 + int(42 * t)
+            hw = 34 - int(30 * (t ** 1.3))
             edge_l.append((cx - hw, y))
             edge_r.append((cx + hw, y))
         d.line(edge_l, fill="white", width=2, joint="curve")
         d.line(edge_r, fill="white", width=2, joint="curve")
         # curved horizontal bands inside the funnel, alternating drift
-        for by, bhw, bdx in ((32, 58, -4), (39, 50, 4), (46, 42, -3),
-                             (53, 33, 3), (59, 24, -2), (64, 16, 2)):
+        for by, bhw, bdx in ((30, 30, -2), (37, 26, 2), (44, 22, -2),
+                             (51, 17, 2), (57, 13, -1), (62, 9, 1)):
             d.arc([cx + bdx - bhw, by - 3, cx + bdx + bhw, by + 3],
                   0, 180, fill="white", width=2)
         # dust cloud at the funnel's base, straddling the shoreline —
         # kept right of the AKVAN scrim (which ends ~x166) so no puff
         # crosses the "3.7 LAKH EVACUATED" line
-        for px0, py0, pw, ph in ((176, 60, 20, 10), (192, 64, 24, 9),
-                                 (208, 58, 22, 11), (224, 63, 22, 9),
-                                 (240, 60, 16, 9)):
+        for px0, py0, pw, ph in ((180, 62, 16, 9), (192, 65, 18, 8),
+                                 (204, 60, 16, 9), (214, 64, 14, 8)):
             d.ellipse([px0, py0, px0 + pw, py0 + ph],
                       outline=(220, 232, 245), width=2)
-        d.ellipse([198, 62, 216, 70], fill=(220, 232, 245))
+        d.ellipse([194, 63, 208, 70], fill=(220, 232, 245))
         # red warning triangle, moved right of the disc (was tucked
         # against the old spiral's upper arm, now in the disc's way)
         d.polygon([(308, 4), (320, 26), (296, 26)], fill=RED,
@@ -706,56 +705,60 @@ def art_image(key, w, h):
         d.ellipse([22, 46, 36, 58], fill=(220, 200, 165))
         d.ellipse([20, 30, 30, 40], fill=(200, 200, 200))
     elif key == "crash":
-        # v3: DENSITY — a Siberian winter filling the frame: grey sky with
-        # falling snow, a big cargo plane diving nose-down (fuselage, swept
-        # wing, tail, four engines), a long smoke trail, a spiked fireball
-        # + black smoke column where it hits, and a forest of large pines
-        # across the snow.
-        d.rectangle([0, 0, w, h], fill=(185, 200, 215))
-        d.rectangle([0, 0, w, 10], fill=(165, 182, 200))
-        # falling snow across the sky
-        for sx, sy in ((12, 14), (40, 8), (70, 16), (100, 10), (130, 18),
-                       (160, 12), (188, 16), (26, 26), (84, 28), (146, 26)):
-            d.ellipse([sx, sy, sx + 2, sy + 2], fill="white")
-        # the snow ground, full width, with drifts
-        d.rectangle([0, 58, w, h], fill=(238, 242, 246))
-        d.ellipse([0, 56, 70, 66], fill=(228, 234, 240))
-        d.ellipse([120, 56, 196, 66], fill=(228, 234, 240))
-        # smoke trail behind the plane, across the sky
-        for ex, ey, er in ((18, 8, 4), (32, 12, 5), (48, 16, 5),
-                           (62, 20, 6), (76, 24, 6)):
+        # v3.3: redrawn in the style of the user's reference 2 — a blue
+        # sky with white clouds, a grey cartoon plane nose-diving
+        # diagonally (mirrored to dive right, so the nose and the engine
+        # fire stay clear of the AN-12 DOWN scrim at bottom-left), a grey
+        # smoke trail from the tail, a small orange fire on one engine,
+        # and a green treeline along the bottom. Original PIL vector
+        # code; the reference file (watermarked) is not used anywhere.
+        d.rectangle([0, 0, w, h], fill=(125, 185, 235))
+        d.rectangle([0, 0, w, 8], fill=(150, 200, 240))
+        # white clouds across the sky
+        for cx0, cy0, cw in ((8, 6, 30), (66, 2, 36), (130, 8, 28),
+                             (168, 2, 26), (30, 24, 24), (150, 28, 30)):
+            d.ellipse([cx0, cy0, cx0 + cw, cy0 + 10], fill="white")
+            d.ellipse([cx0 + 6, cy0 - 3, cx0 + cw - 6, cy0 + 7],
+                      fill="white")
+        # smoke trail from the tail, growing up-left to the corner
+        for ex, ey, er in ((52, 16, 4), (40, 12, 5), (28, 8, 6),
+                           (16, 5, 7), (6, 3, 6)):
             d.ellipse([ex - er, ey - er, ex + er, ey + er],
-                      fill=(200, 200, 200))
-        # the plane, BIG, diving nose-down to the right: tapered fuselage,
-        # swept wing, tail fin, four engine dots
-        d.polygon([(52, 12), (158, 52), (150, 62), (46, 22)],
-                  fill=(85, 85, 95))
-        d.polygon([(96, 30), (128, 16), (136, 26), (104, 42)],
-                  fill=(65, 65, 75))
-        d.polygon([(52, 12), (40, 2), (46, 20)], fill=(65, 65, 75))
-        d.polygon([(150, 52), (168, 46), (164, 56), (152, 60)],
-                  fill=(65, 65, 75))
-        for ex, ey in ((86, 30), (104, 38), (122, 46), (140, 54)):
-            d.ellipse([ex - 2, ey - 2, ex + 2, ey + 2], fill=(180, 220, 240))
-        # scorch mark on the snow first, then the fireball on top of it
-        d.ellipse([136, 68, 176, 78], fill=(60, 55, 50))
-        # fireball where the nose hits the snow, flame spikes + smoke column
-        d.ellipse([140, 48, 172, 74], fill=(255, 140, 40))
-        d.ellipse([148, 54, 164, 68], fill=(255, 220, 80))
-        for fx, fy in ((146, 50), (156, 46), (166, 50)):
-            d.polygon([(fx - 4, 52), (fx, fy - 10), (fx + 4, 52)],
-                      fill=(255, 140, 40))
-        d.ellipse([150, 30, 162, 44], fill=(60, 60, 60))
-        d.ellipse([146, 18, 160, 32], fill=(90, 90, 90))
-        d.ellipse([154, 8, 166, 20], fill=(120, 120, 120))
-        # debris on the snow
-        d.rectangle([128, 72, 138, 75], fill=(40, 40, 40))
-        d.rectangle([172, 70, 180, 73], fill=(40, 40, 40))
-        # a forest of large pines across the bottom
-        for px, ph in ((6, 26), (28, 32), (52, 24), (180, 28)):
-            d.polygon([(px, 58), (px + 8, 58 - ph), (px + 16, 58)],
-                      fill=(25, 80, 55))
-            d.rectangle([px + 6, 58, px + 10, 64], fill=(90, 60, 30))
+                      fill=(160, 160, 160))
+        for ex, ey, er in ((44, 13, 2), (30, 9, 3), (18, 5, 3)):
+            d.ellipse([ex - er, ey - er, ex + er, ey + er],
+                      fill=(120, 120, 120))
+        # the plane, diving nose-down to the right: a THIN light-grey
+        # fuselage (so it reads as a plane, not a slab), darker swept
+        # wings for contrast, a big blue tail fin, two engines
+        d.polygon([(54, 10), (60, 16), (160, 54), (156, 60), (48, 20)],
+                  fill=(175, 175, 185))
+        d.line([(54, 10), (160, 54)], fill=(110, 110, 120), width=1)
+        d.line([(48, 20), (156, 60)], fill=(110, 110, 120), width=1)
+        # big blue tail fin, like the reference's
+        d.polygon([(48, 14), (36, 0), (56, 4)], fill=(30, 90, 180))
+        d.polygon([(100, 30), (126, 12), (134, 20), (108, 40)],
+                  fill=(110, 110, 125))
+        d.polygon([(110, 44), (134, 60), (126, 64), (102, 48)],
+                  fill=(110, 110, 125))
+        # windows along the fuselage, then the two engine nacelles
+        for ex, ey in ((84, 28), (102, 36), (120, 44), (138, 52)):
+            d.ellipse([ex - 2, ey - 2, ex + 2, ey + 2], fill=(200, 230, 245))
+        d.ellipse([116, 44, 126, 52], fill=(90, 90, 100))
+        d.ellipse([134, 52, 144, 60], fill=(90, 90, 100))
+        # small orange fire on the lower engine, flame spike + yellow core
+        d.ellipse([132, 56, 148, 70], fill=(255, 140, 40))
+        d.ellipse([136, 59, 145, 66], fill=(255, 220, 80))
+        d.polygon([(140, 56), (140, 47), (144, 56)], fill=(255, 140, 40))
+        # green ground + treeline along the bottom, and a lamp post
+        d.polygon([(0, 68), (60, 62), (120, 68), (196, 62), (196, 80),
+                   (0, 80)], fill=(40, 140, 70))
+        for tx, tr in ((10, 5), (30, 6), (52, 5), (78, 6), (104, 5),
+                       (128, 6), (150, 5), (176, 6)):
+            d.ellipse([tx - tr, 62 - tr, tx + tr, 62 + 2], fill=(25, 110, 55))
+        d.line([168, 66, 168, 46], fill=(60, 60, 60), width=2)
+        d.line([168, 46, 176, 46], fill=(60, 60, 60), width=2)
+        d.ellipse([174, 44, 178, 48], fill=(255, 220, 80))
     elif key == "rates":
         # v3: DENSITY — a bank scene, not four bars on blank paper. Full
         # grid, six climbing bars filling the width, a red arrow above
@@ -793,16 +796,16 @@ def art_image(key, w, h):
         d.text((170, 72), "Rs", font=F_ART2_S, fill=(120, 80, 0),
                anchor="mm")
     elif key == "quake":
-        # v3: DENSITY — a California scene filling the frame: the red
-        # seismograph trace across the top, San Andreas hills behind, a
-        # cracked highway with offset lanes, tilted houses and palm trees
-        # on both sides of the crack, dust and rubble.
-        d.rectangle([0, 0, w, h], fill=(232, 214, 170))
-        # hills behind, across the whole back
-        d.polygon([(0, 22), (50, 10), (100, 20), (150, 8), (196, 18),
-                   (196, 26), (0, 26)], fill=(190, 170, 120))
-        d.polygon([(0, 26), (70, 16), (130, 26), (196, 14), (196, 30),
-                   (0, 30)], fill=(170, 148, 100))
+        # v3.3: redrawn in the style of the user's reference 1 — an
+        # isometric earth block filling the frame: pale sage background,
+        # green top surface split by a thick orange zigzag fault crack,
+        # two small houses (one tilted, one with a collapsed roof), thin
+        # white concentric epicentre rings on the crack, debris, and
+        # orange block sides at the bottom. The red seismograph trace
+        # stays across the top; the rings are centred right of the QUAKE
+        # M5 scrim (bottom-left) so the label stays clear. Original PIL
+        # vector code; the reference file is not used anywhere.
+        d.rectangle([0, 0, w, h], fill=(205, 220, 200))
         # the seismograph trace on a white strip across the top
         d.rectangle([0, 0, w, 14], fill="white")
         d.line([(2, 7), (16, 7), (22, 2), (28, 12), (34, 7), (52, 7),
@@ -810,41 +813,42 @@ def art_image(key, w, h):
                 (110, 7), (130, 7), (136, 2), (142, 12), (148, 7),
                 (170, 7), (176, 4), (182, 10), (188, 7), (194, 7)],
                fill=RED, width=2)
-        # the ground: left block full height, right block dropped 6px
-        d.rectangle([0, 30, w, 36], fill=(200, 180, 140))
-        d.rectangle([130, 30, w, 36], fill=(200, 180, 140))
-        d.rectangle([130, 36, w, h], fill=(220, 200, 155))
-        # the highway, offset across the crack: lanes + dashes both sides
-        d.rectangle([0, 44, 128, 62], fill=(90, 90, 95))
-        d.rectangle([132, 50, w, 68], fill=(90, 90, 95))
-        for dx in range(4, 124, 18):
-            d.line([dx, 53, dx + 9, 53], fill=YELLOW, width=2)
-        for dx in range(138, w, 18):
-            d.line([dx, 59, dx + 9, 59], fill=YELLOW, width=2)
-        # the crack, jagged and BOLD, down the boundary, with branches
-        d.line([(130, 36), (126, 46), (133, 56), (127, 66), (132, 74),
-                (128, 80)], fill=(40, 30, 20), width=4)
-        d.line([(130, 56), (142, 64)], fill=(40, 30, 20), width=3)
-        d.line([(128, 66), (118, 72)], fill=(40, 30, 20), width=3)
-        # dust clouds at the crack + rubble at its foot
-        d.ellipse([118, 38, 132, 48], fill=(210, 195, 165))
-        d.ellipse([132, 42, 146, 52], fill=(220, 205, 175))
-        d.rectangle([120, 74, 127, 78], fill=(40, 30, 20))
-        d.rectangle([134, 76, 142, 79], fill=(40, 30, 20))
-        d.rectangle([110, 77, 116, 80], fill=(60, 50, 40))
-        # tilted houses + palms on both sides of the crack
-        d.rectangle([14, 32, 44, 46], fill=(200, 180, 140))
-        d.polygon([(12, 32), (46, 28), (29, 20)], fill=(180, 60, 40))
-        d.rectangle([52, 34, 82, 48], fill=(210, 190, 150))
-        d.polygon([(50, 34), (84, 38), (67, 26)], fill=(180, 60, 40))
-        d.rectangle([146, 38, 176, 52], fill=(200, 180, 140))
-        d.polygon([(144, 38), (178, 42), (161, 28)], fill=(180, 60, 40))
-        for px in (92, 186):
-            d.line([px, 44, px + 2, 30], fill=(60, 40, 20), width=2)
-            for ang in (-60, -30, 0, 30):
-                ex = px + 2 + int(9 * math.cos(math.radians(ang - 90)))
-                ey = 30 + int(9 * math.sin(math.radians(ang - 90)))
-                d.line([px + 2, 30, ex, ey], fill=(30, 120, 60), width=2)
+        # the isometric block: green top, orange sides
+        d.polygon([(8, 38), (98, 18), (188, 38), (98, 58)],
+                  fill=(35, 150, 75))
+        d.polygon([(8, 38), (98, 58), (98, 76), (8, 56)],
+                  fill=(240, 120, 50))
+        d.polygon([(98, 58), (188, 38), (188, 56), (98, 76)],
+                  fill=(215, 100, 40))
+        # thick orange fault crack zigzagging across the top face,
+        # dark-edged ribbon
+        crack = [(16, 36), (44, 28), (66, 35), (96, 25), (124, 34),
+                 (152, 27), (182, 35)]
+        d.line(crack, fill=(180, 60, 20), width=7, joint="curve")
+        d.line(crack, fill=(250, 125, 50), width=4, joint="curve")
+        # two houses: one tilted left, one with a collapsed roof right
+        d.polygon([(28, 30), (52, 26), (52, 40), (28, 44)],
+                  fill=(240, 240, 235))
+        d.polygon([(26, 30), (54, 26), (40, 18)], fill=(40, 110, 200))
+        d.rectangle([34, 32, 38, 38], fill=(255, 180, 90))
+        d.rectangle([44, 30, 48, 36], fill=(255, 180, 90))
+        d.polygon([(150, 30), (174, 26), (174, 40), (150, 44)],
+                  fill=(240, 240, 235))
+        d.polygon([(148, 30), (162, 20), (176, 28), (168, 32),
+                   (156, 30)], fill=(40, 110, 200))
+        d.rectangle([156, 32, 160, 38], fill=(255, 180, 90))
+        d.rectangle([166, 30, 170, 36], fill=(255, 180, 90))
+        # debris on the top face, clear of the scrim
+        d.rectangle([108, 40, 116, 44], fill=(250, 125, 50))
+        d.rectangle([136, 42, 142, 45], fill=(40, 110, 200))
+        d.rectangle([164, 44, 172, 47], fill=(250, 125, 50))
+        d.rectangle([84, 40, 90, 43], fill=(40, 110, 200))
+        # thin white epicentre rings centred on the crack, right side —
+        # drawn last, like the reference's rings over the whole scene
+        for rr in (7, 12, 17, 22):
+            d.ellipse([132 - rr, 29 - rr, 132 + rr, 29 + rr],
+                      outline="white", width=1)
+        d.ellipse([130, 27, 134, 31], fill="white")
     elif key == "rikers":
         # v3: DENSITY — a full cell block, not bars on a grey wall. Brick
         # texture top and bottom, bars across the whole frame, the RIKERS
