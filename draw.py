@@ -193,9 +193,9 @@ STATS = [
 ]
 
 LEGEND = [
-    ("REPORTED", "confirmed by named sources"),
-    ("FORECAST", "landfall, schedule or draft"),
-    ("CLAIM", "one side says so, unverified"),
+    ("REPORTED", "confirmed, with named sources"),
+    ("FORECAST", "a landfall, schedule or draft"),
+    ("CLAIM", "one side's claim, unverified"),
 ]
 
 PINS = {
@@ -339,11 +339,15 @@ def art_image(key, w, h):
         d.rectangle([0, 62, w, h], fill=(20, 60, 110))
         d.line([0, 66, w, 66], fill=(60, 120, 180), width=1)
         d.line([0, 74, w, 74], fill=(60, 120, 180), width=1)
-        # three bridge spans across the river
-        for bx in (12, 108, 204):
-            d.rectangle([bx, 50, bx + 78, 56], fill=(255, 205, 40))
-            d.rectangle([bx + 8, 38, bx + 12, 50], fill=(220, 220, 220))
-            d.rectangle([bx + 66, 38, bx + 70, 50], fill=(220, 220, 220))
+        # three bridge spans across the river: gold deck, pale pylons
+        deck_y0, deck_y1, pylon_y0 = 50, 56, 38
+        for span_x in (12, 108, 204):
+            d.rectangle([span_x, deck_y0, span_x + 78, deck_y1],
+                        fill=(255, 205, 40))
+            for pylon_dx in (8, 66):
+                d.rectangle([span_x + pylon_dx, pylon_y0,
+                             span_x + pylon_dx + 4, deck_y0],
+                            fill=(220, 220, 220))
         # the middle span is hit: deck broken, dipping into the river
         d.rectangle([108, 50, 140, 56], fill=(255, 205, 40))
         d.polygon([(140, 50), (172, 50), (160, 62), (148, 62)], fill=(120, 30, 30))
@@ -793,13 +797,13 @@ def main():
            "ICJ · UNFCCC · USGS. Original illustrations.",
            font=F_FOOT, fill=GREY, anchor="ma")
 
-    out = os.path.join(HERE, "entry.png")
-    img.save(out)
-    print("saved", out, os.path.getsize(out), "bytes")
+    out_path = os.path.join(HERE, "entry.png")
+    img.save(out_path)
+    print("saved", out_path, os.path.getsize(out_path), "bytes")
     if PROBLEMS:
         print("PROBLEMS:")
-        for p in PROBLEMS:
-            print(" -", p)
+        for problem in PROBLEMS:
+            print(" -", problem)
     else:
         print("no truncation")
 
