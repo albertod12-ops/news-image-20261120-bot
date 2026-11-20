@@ -1,4 +1,28 @@
-# news-image-20261120 — entry notes (v2, NOT submitted)
+# news-image-20261120 — entry notes (v3.3, NOT submitted)
+
+- Account: @transs123 (already connected — API key ~/workspace/makefun/apikey.json, expires 2026-12-11; GET /api/agents/me verified live 2026-11-20 ~20:20 WIB). No new login / approval link needed.
+- Bounty "Sum up 20 November's world news in one image", $250, top 50 paid: 1st $50, 2nd $30, 3rd $15, 4th–10th $5, 11th–50th $3.
+- Entries close 2026-11-22T00:00:00Z = 22 Nov 07:00 WIB. Result due ~2026-12-06.
+- Quota (live re-check 2026-11-20 ~20:33 WIB): entries made 0, left today 3 of 3, can submit now yes. Observed cap 3 per competition.
+- Top-1 benchmark (live 2026-11-20 ~20:20 WIB, 8,169 entries): #1 888dao-sats 99.1652% ("Friday 20 November 2026: 36 stories, 6 continents — Cyclone Akvan landfall, Kyiv ballistic missiles, COP31 final day deadlock"); #2 kiencx 99.1429%; top-20 cutoff 98.9426%, top-50 cutoff 98.8016%.
+
+## Entry v3.3 (user 2026-11-20 ~22:56 WIB, with 2 new reference images)
+- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit 335ecb9 (v3.3: slim Akvan tornado; redraw quake + An-12 per user references).
+- entry.png: 1024x1024, 276,809 bytes, sha256 b7515ec7de5bcf5bc377b4fee8f6e82b849b96f4bd4d0d51063ccad9f3e4c2e5, deterministic (3x draw.py identical sha + `main.py --verify`).
+- Change, cards 1, 10, 12 ONLY, nothing else (layout/headlines/decks/other cards untouched). All three drawings are ORIGINAL PIL vector code — the reference files were looked at only, NOT copied, embedded, traced, or added to the repo.
+  1. Card 1 AKVAN — tornado SLIMMED again ("masih terlalu besar pusarannya"): disc rx halved 74→40, funnel top half-width 68→34, same 42px drop, taller/narrower overall; rain exclusion zone narrowed to x152–252 so rain returns on the sides; dust cloud re-centred under the narrow tip (leftmost puff x180, clear of the AKVAN scrim ending ~x166). Still clearly a tornado (spiral disc + tapering banded funnel + dust cloud).
+  2. Card 12 QUAKE — redrawn in the style of reference 1 (~/workspace/user/files/141211_4_67lr.jpg, "EARTHQUAKES AND FAULTS"): isometric earth block filling the art box — pale sage background, green top surface split by a thick orange zigzag fault crack (dark-edged ribbon), two small houses (one tilted, one with a collapsed/slanted roof), thin white concentric epicentre rings centred on the crack at (132,29) — right of the QUAKE M5 scrim so the label stays clear — a few debris pieces, orange block sides at the bottom. Red seismograph trace kept across the top.
+  3. Card 10 AN-12 (key "crash") — redrawn in the style of reference 2 (~/workspace/user/files/141214_5_bak9.jpg, cartoon plane; watermarked, NOT used): blue sky with white clouds, grey cartoon plane nose-diving diagonally — mirrored to dive RIGHT so the nose and engine fire stay clear of the AN-12 DOWN scrim at bottom-left — grey smoke trail from the tail growing up-left, small orange fire (yellow core + flame spike) on the lower engine, green treeline + lamp post along the bottom. First 2x check: the first redraw read as a grey slab (fuselage too thick, wings same grey, merged); fixed with a THIN light-grey fuselage with darker outline lines, darker wings for contrast, and a bigger blue tail fin — re-verified at 2x, now reads as a diving plane.
+- Verified at 2x zoom per fixed card: tornado visibly slimmer than v3.2, quake reads as the isometric cracked block, plane reads as the diving cartoon plane with smoke + fire, no label overlaps, nothing truncated. Full page re-checked.
+- Recording: `makefun record` re-attempted fresh for v3.3 — HTTP 400 again (this competition takes loose transcripts, not sealed recordings), same as v1/v2/v3/v3.1/v3.2. Session: ad37eb7b-ae04-4758-899e-9e1841241431 (copy in ~/workspace/makefun/news-image-20261120-transcripts/ — NOTE: copied mid-session for the gate run; re-copy the final file before bundling.)
+
+## Gate v3.3 (pre-submit-gate.py, commit 335ecb9, 2026-11-20 ~23:05 WIB, --entrypoint main.py --open 2026-11-20T00:00:00Z)
+- GATE: DO NOT SUBMIT — same 2 FAILs as v3.2, both fixable only at submit time by the top-level agent:
+  1. thinking_priced — 0 usage rows for the Muse sessions in muse.db. At submit time the main agent must re-extract rows from muse.db (agent ids a0d7a9b0-d798-4cb8-8268-5e1f98e7b0b3 + b96cfac6-c393-4b9d-a411-084f3c27afc7 + cc7c6ebb-446f-4d54-8f32-d2a8ae19d817 + b408bc3c-f0a5-4716-b1b1-467834d3e561 + 7dcdaf36-780c-430e-af7e-1d9e257037ec + ad37eb7b-ae04-4758-899e-9e1841241431 + its own aa7f29f8-0889-4b4b-bb01-3e6c8d34a124) into ~/.makefun/muse-usage-news-image-20261120.jsonl and re-run the gate.
+  2. transcripts_run_record — no bundle yet. Bundle command for the main agent: v3.2 command in the Gate v3.2 section below, plus --session /home/hatch/agents/agent-ad37eb7b-ae04-4758-899e-9e1841241431/sessions/ad37eb7b-ae04-4758-899e-9e1841241431.jsonl (re-copy the final file first — the transcripts-dir copy was taken mid-session). Then re-run the gate with --bundle <bundle.tar.gz> and --entrypoint main.py.
+- PASS now: transcripts_witnessed 8/8, thinking_reproduces 41.9% authored (525/1252, up from v3.2's 41.4%; unwritten 18.0%), thinking_revised (draw.py 44 messages), thinking_turns 394, thinking_in_window, thinking_wellformed, thinking_own_work, entry-artifact-size (276,809 bytes), grader-sandbox PASS, quota (left today 3), competition_open, snapshot, license_osi, entrypoint, transcripts_present/recorded.
+
+## Entry v3.2 (user 2026-11-20 ~22:45 WIB, with a reference image: "Untuk pusaran anginnya pakai ini")
 
 - Account: @transs123 (already connected — API key ~/workspace/makefun/apikey.json, expires 2026-12-11; GET /api/agents/me verified live 2026-11-20 ~20:20 WIB). No new login / approval link needed.
 - Bounty "Sum up 20 November's world news in one image", $250, top 50 paid: 1st $50, 2nd $30, 3rd $15, 4th–10th $5, 11th–50th $3.
