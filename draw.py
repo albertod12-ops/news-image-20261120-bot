@@ -296,11 +296,13 @@ def _skyline(d, w, h, base, col, seed):
         x += bw + 3
 
 
-def stamp(img, x, y, text, angle=-15, font=None):
-    """Diagonal red rubber-stamp label (the #1 entry's signature device).
-    `text` in red bold caps inside a 3px red outline box, drawn on a small
+def stamp(img, x, y, text, angle=-15, font=None, ink=(200, 16, 46, 255),
+          fill=None):
+    """Diagonal rubber-stamp label (the #1 entry's signature device).
+    `text` in bold caps inside a 3px outline box, drawn on a small
     RGBA tile that is rotated and pasted onto `img` at (x, y). The text is
-    centred in the box (anchor "mm")."""
+    centred in the box (anchor "mm"). Default: red ink, transparent box;
+    pass fill=(255, 255, 255, 255) + ink=(0, 0, 0, 255) for black-on-white."""
     fnt = font if font is not None else F_SRC
     probe = Image.new("RGBA", (1, 1))
     probe_d = ImageDraw.Draw(probe)
@@ -311,9 +313,9 @@ def stamp(img, x, y, text, angle=-15, font=None):
     tile = Image.new("RGBA", (tile_w, tile_h), (0, 0, 0, 0))
     tile_d = ImageDraw.Draw(tile)
     tile_d.rectangle([2, 2, tile_w - 3, tile_h - 3],
-                     outline=(200, 16, 46, 255), width=3)
+                     fill=fill, outline=ink, width=3)
     tile_d.text((tile_w / 2, tile_h / 2), text, font=fnt,
-                fill=(200, 16, 46, 255), anchor="mm")
+                fill=ink, anchor="mm")
     tile = tile.rotate(angle, expand=True, resample=Image.BICUBIC)
     img.paste(tile, (x, y), tile)
 
@@ -720,6 +722,9 @@ def art_image(key, w, h):
         # the up-wing tip (which ends x124)
         d.line([(140, 0), (146, 6), (142, 12), (148, 18)],
                fill=(120, 85, 45), width=1)
+        # v3.6: scorch mark on the sand under the fires (drawn before the
+        # plane so the wreck lies on it)
+        d.ellipse([98, 63, 126, 72], fill=(70, 50, 30))
         # plane axis: tail (34,12) -> nose (172,54). P(t, s) = point at
         # fraction t along the axis, offset s across it.
         ax_, ay_, bx_, by_ = 34, 12, 172, 54
@@ -736,20 +741,28 @@ def art_image(key, w, h):
         # AN-12 DOWN scrim, which ends x96)
         up_wing = [_P(0.6125, 0), _P(0.578, -34), _P(0.522, -34),
                    _P(0.4875, 0)]
-        dn_wing = [_P(0.6125, 0), _P(0.578, 30), _P(0.522, 30),
+        # v3.6: the down-wing is BROKEN — snapped off at the root, the outer
+        # fragment lying bent on the sand down-right of the break, its red
+        # tip still on it. The up-wing stays intact.
+        dn_stub = [_P(0.6125, 0), _P(0.578, 14), _P(0.522, 14),
                    _P(0.4875, 0)]
+        dn_frag = [(114, 56), (128, 63), (124, 70), (110, 64)]
         fus = [_P(0, -5), _P(0, 5), _P(0.97, 6), _P(1, 0), _P(0.97, -6)]
         # shadow: the plane silhouette shifted down-right, dark brown
-        for poly in (up_wing, dn_wing, fus):
+        for poly in (up_wing, dn_stub, dn_frag, fus):
             d.polygon([(x + 7, y + 9) for (x, y) in poly],
                       fill=(110, 75, 40))
         # wings, white with a dark outline; red tips on the outer fifth
         d.polygon(up_wing, fill=(245, 245, 240), outline=(90, 90, 100))
         d.polygon([(122.5, 11.2), (123.6, 3.7), (116, 1.3), (112.8, 8.2)],
                   fill=RED)
-        d.polygon(dn_wing, fill=(245, 245, 240), outline=(90, 90, 100))
-        d.polygon([(107.9, 59), (104.9, 65), (97.3, 62.6), (98.2, 56)],
-                  fill=RED)
+        d.polygon(dn_stub, fill=(245, 245, 240), outline=(90, 90, 100))
+        # jagged tear across the stub's snapped end
+        d.line([(102, 47), (105, 50), (107, 47), (110, 50)],
+               fill=(40, 40, 50), width=2)
+        # the snapped-off fragment, bent on the sand, red tip at its end
+        d.polygon(dn_frag, fill=(245, 245, 240), outline=(90, 90, 100))
+        d.polygon([(124, 66), (128, 63), (126, 61), (122, 64)], fill=RED)
         # fuselage, white with a dark outline so it reads as a plane body
         d.polygon(fus, fill=(245, 245, 240), outline=(90, 90, 100))
         # red tail cone + red stripe along the fuselage
@@ -761,6 +774,11 @@ def art_image(key, w, h):
                    _P(0.09, -2)], fill=RED)
         d.polygon([_P(0.03, 2), _P(0.03, 12), _P(0.09, 12), _P(0.09, 2)],
                   fill=RED)
+        # v3.6: wreck damage on the fuselage — a jagged crack across the
+        # body mid-way plus a dark dent just ahead of it
+        d.line([(93, 25), (97, 29), (94, 32), (98, 36), (95, 39)],
+               fill=(40, 40, 50), width=2)
+        d.ellipse([84, 27, 90, 33], fill=(90, 90, 100))
         # cabin windows along the upper side, cockpit near the nose, and
         # a door just past the red tail cone
         for wt in (0.22, 0.36, 0.50, 0.64, 0.78):
@@ -773,13 +791,31 @@ def art_image(key, w, h):
         d.ellipse([109, 19, 119, 24], fill=(200, 200, 205),
                   outline=(90, 90, 100))
         d.ellipse([101, 46, 111, 51], fill=(90, 90, 100))
-        d.polygon([(101, 50), (98, 60), (103, 57), (106, 64), (110, 56),
-                   (113, 61), (115, 52)], fill=(255, 140, 40))
-        d.polygon([(103, 54), (105, 60), (108, 55)], fill=(255, 220, 80))
-        # smoke puffs rising from the fire, clear of the scrim (ends x96)
-        for ex, ey, er in ((104, 43, 3), (101, 37, 4)):
-            d.ellipse([ex - er, ey - er, ex + er, ey + er],
-                      fill=(150, 150, 150))
+        # v3.6: MORE fire — bigger flames at the lower engine plus a second
+        # fire where the wing snapped
+        d.polygon([(100, 50), (96, 64), (101, 60), (104, 69), (109, 58),
+                   (113, 66), (116, 53)], fill=(255, 140, 40))
+        d.polygon([(102, 55), (104, 63), (108, 56)], fill=(255, 220, 80))
+        d.polygon([(112, 54), (110, 62), (114, 59), (117, 64), (120, 57),
+                   (121, 52)], fill=(255, 140, 40))
+        d.polygon([(114, 57), (116, 62), (119, 57)], fill=(255, 220, 80))
+        # thick smoke rising from both fires, drifting right so it clears
+        # the fuselage — clear of the scrim (ends x96)
+        for ex, ey, er, col in ((104, 43, 4, (110, 110, 110)),
+                                 (101, 36, 5, (90, 90, 90)),
+                                 (112, 42, 4, (110, 110, 110)),
+                                 (118, 34, 5, (90, 90, 90)),
+                                 (124, 26, 5, (130, 130, 130)),
+                                 (130, 18, 4, (140, 140, 140))):
+            d.ellipse([ex - er, ey - er, ex + er, ey + er], fill=col)
+        # v3.6: debris scattered on the sand around the wreck, clear of
+        # the scrim (ends x96, y55+)
+        d.polygon([(16, 36), (22, 40), (15, 42)], fill=(90, 90, 100))
+        d.polygon([(148, 68), (156, 66), (154, 72), (146, 71)],
+                  fill=(245, 245, 240), outline=(90, 90, 100))
+        d.polygon([(166, 56), (172, 60), (167, 63)], fill=(60, 60, 70))
+        d.polygon([(128, 72), (134, 74), (131, 77)], fill=(120, 120, 125))
+        d.rectangle([58, 28, 64, 31], fill=(70, 70, 80))
         # small green cacti at the edges, clear of the scrim
         for cx0, cy0 in ((10, 18), (186, 10), (184, 64)):
             d.ellipse([cx0 - 3, cy0 + 10, cx0 + 6, cy0 + 12],
@@ -909,8 +945,10 @@ def art_image(key, w, h):
         # the RIKERS sign, high on the bars
         d.rectangle([16, 18, 108, 40], fill=NAVY)
         d.text((62, 29), "RIKERS", font=F_ART2, fill="white", anchor="mm")
-        # CLOSED stamp, fully inside the frame, top-right
-        stamp(img, 122, 4, "CLOSED", angle=-10)
+        # CLOSED stamp, fully inside the frame, top-right — v3.6: black
+        # text on a white box, per the user
+        stamp(img, 122, 4, "CLOSED", angle=-10, ink=(0, 0, 0, 255),
+              fill=(255, 255, 255, 255))
         # a barred cell door with a small window, bottom-right
         d.rectangle([148, 44, 190, 68], fill=(70, 72, 80),
                     outline=(40, 42, 48), width=2)
