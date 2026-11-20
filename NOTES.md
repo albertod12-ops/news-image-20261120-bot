@@ -1,4 +1,14 @@
-# news-image-20261120 — entry notes (v3.5, NOT submitted)
+# news-image-20261120 — entry notes (v3.5.1, NOT submitted)
+
+## Entry v3.5.1 (main agent 2x check of v3.5: Nikkei zigzag clipped at top edge)
+- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit TBD (v3.5.1: Nikkei down-zigzag fits inside art box).
+- entry.png: 1024x1024, 275,819 bytes, sha256 f03e0a4273e90148a21eb67bdaab2b12041f2feb77391d4da6cbb1b8c0936125, deterministic (3x draw.py identical sha + `main.py --verify`).
+- Change, card 4 NIKKEI ONLY, nothing else: the thick red zigzag arrow's peaks sat at y=5 with a 6px stroke (stroke top y=2, flush on the art-box edge) and read as a single clipped diagonal at 2x. Rescaled/repositioned so the WHOLE zigzag sits inside the box with a clear margin: points (4,17),(16,13),(47,26),(80,12),(150,41), arrowhead (156,44),(144,34),(151,47); peaks' stroke top >= y=9. Verified at 2x (native pixels): full zigzag visible — small rise, deep V, rise, steep fall to arrowhead bottom-right — clear of the -5% focal and the NIKKEI scrim. Pixel diff vs v3.5 confined to bbox (15,387)-(169,432) = card 4 art only (1,880 px).
+- Recording: `makefun record --competition news-image-20261120` re-attempted fresh for v3.5.1 — HTTP 400 again, same explicit reason as every round (loose transcripts, not sealed recordings). Session: 8191913f-b8ba-4cfd-afd8-0ba81fcabe70 (copy in ~/workspace/makefun/news-image-20261120-transcripts/ — NOTE: copied mid-session for the gate run; re-copy the final file before bundling.)
+- LESSON (this round): `python3 main.py` does NOT re-render — it only copies the committed entry.png to the output dir. Re-rendering is `python3 draw.py` in the repo dir; `main.py --verify` then checks the render matches the committed file. The first `main.py` runs after the edit silently copied the STALE v3.5 file (same sha 3x) — always run draw.py directly after editing.
+
+## Gate v3.5.1 (pre-submit-gate.py, commit TBD, 2026-11-21 ~00:0x WIB, --entrypoint main.py --open 2026-11-20T00:00:00Z)
+- GATE: DO NOT SUBMIT — TBD (fill in after run; expected same 2 FAILs as v3.5: thinking_priced — 0 usage rows, main agent re-extracts from muse.db including this session 8191913f-b8ba-4cfd-afd8-0ba81fcabe70 + main aa7f29f8-0889-4b4b-bb01-3e6c8d34a124 — and transcripts_run_record — no bundle yet; bundle command = v3.5 command + --session /home/hatch/agents/agent-8191913f-b8ba-4cfd-afd8-0ba81fcabe70/sessions/8191913f-b8ba-4cfd-afd8-0ba81fcabe70.jsonl, re-copy final file first).
 
 - Account: @transs123 (already connected — API key ~/workspace/makefun/apikey.json, expires 2026-12-11; GET /api/agents/me verified live 2026-11-20 ~20:20 WIB). No new login / approval link needed.
 - Bounty "Sum up 20 November's world news in one image", $250, top 50 paid: 1st $50, 2nd $30, 3rd $15, 4th–10th $5, 11th–50th $3.
