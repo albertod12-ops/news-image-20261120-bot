@@ -591,27 +591,56 @@ def art_image(key, w, h):
                       fill=GOLD)
         d.ellipse([56, 58, 64, 64], fill=GOLD)
     elif key == "selloff":
-        # v5: the 4-index table the top entries use — Friday closes, all
-        # down, with a red down-triangle before each value. The old five
-        # navy bars + red zigzag (v3.5, per the user's image 2) are gone;
-        # the deck carries the "worst week since 1990" line. Art is 196x80
-        # with the solid banner over y0-18, so rows start at y24.
-        # Original PIL vector code.
+        # v5.1: per the user's new reference (3D blue bars + one thick
+        # red curved arrow swooping down) — the v5 4-row index table is
+        # gone. Same verified Friday data: Taipei -6.2, Seoul -5.2,
+        # Tokyo -5.1, Hong Kong -1.9 (tallest to shortest, last bar red).
+        # Art is 196x80 with the solid banner over y0-18; bars sit on
+        # baseline y56, names + values in two lines below. The arrow is
+        # drawn over the bars with a white halo so it reads on the blue
+        # and on the red last bar; its head ends just under the baseline,
+        # clear of the labels. Original PIL vector code.
         d.rectangle([0, 0, w, h], fill=(246, 242, 233))
-        rows = (("TAIPEI", "-6.2%"), ("SEOUL", "-5.2%"),
-                ("TOKYO", "-5.1%"), ("HONG KONG", "-1.9%"))
-        for i, (name, val) in enumerate(rows):
-            ry = 24 + i * 14
-            d.text((10, ry), name, font=F_ART2_S, fill=(20, 20, 25))
-            vw = d.textlength(val, font=F_ART2_S)
-            # red down-triangle just left of the value
-            tx = w - 10 - vw - 12
-            d.polygon([(tx, ry + 2), (tx + 8, ry + 2), (tx + 4, ry + 9)],
-                      fill=RED)
-            d.text((w - 10, ry), val, font=F_ART2_S, fill=RED, anchor="ra")
-            if i < 3:
-                d.line([10, ry + 12, w - 10, ry + 12],
-                       fill=(210, 205, 190), width=1)
+        for gy in range(20, 56, 12):
+            d.line([0, gy, w, gy], fill=(228, 223, 208), width=1)
+        base = 56
+        bars = (("TAIPEI", "-6.2%", 32, (0, 150, 210)),
+                ("SEOUL", "-5.2%", 27, (0, 150, 210)),
+                ("TOKYO", "-5.1%", 26, (0, 150, 210)),
+                ("HONG KONG", "-1.9%", 11, (220, 40, 40)))
+        # 3D look: lighter top face + darker right side face per bar
+        for i, (name, val, bh, col) in enumerate(bars):
+            bx = 12 + i * 48
+            top = base - bh
+            light = tuple(min(255, c + 70) for c in col)
+            dark = tuple(max(0, c - 60) for c in col)
+            d.polygon([(bx + 32, top), (bx + 38, top - 4), (bx + 38, base - 4),
+                       (bx + 32, base)], fill=dark)
+            d.polygon([(bx, top), (bx + 6, top - 4), (bx + 38, top - 4),
+                       (bx + 32, top)], fill=light)
+            d.rectangle([bx, top, bx + 32, base], fill=col)
+        d.line([6, base, w - 4, base], fill=(180, 175, 160), width=1)
+        # one thick red curved arrow swooping down from top-left to an
+        # arrowhead at the bottom-right (tip 188,58)
+        pts = []
+        for ti in range(26):
+            t = ti / 25
+            qx = int((1 - t) ** 2 * 8 + 2 * (1 - t) * t * 110 + t ** 2 * 188)
+            qy = int((1 - t) ** 2 * 22 + 2 * (1 - t) * t * 20 + t ** 2 * 58)
+            pts.append((qx, qy))
+        d.line(pts, fill="white", width=9, joint="curve")
+        d.line(pts, fill=RED, width=5, joint="curve")
+        d.polygon([(189, 59), (173, 55), (180, 46)], fill="white")
+        d.polygon([(188, 58), (174, 55), (180, 47)], fill=RED)
+        # names + values in two lines under the bars; the last name is
+        # clamped so it clears the right edge ("HONG KONG" is 51px wide)
+        for i, (name, val, bh, col) in enumerate(bars):
+            cx = 12 + i * 48 + 16
+            nw = d.textlength(name, font=F_LBL2_S)
+            cx = min(cx, 192 - nw / 2)
+            d.text((cx, 61), name, font=F_LBL2_S, fill=INK, anchor="ma")
+            d.text((12 + i * 48 + 16, 70), val, font=F_LBL2_S, fill=RED,
+                   anchor="ma")
     elif key == "ukeu":
         # two flags, one deal: EU stars on the left, the Union Jack's cross
         # on the right, a gold link between them. v4: BIGGER flags — wider
@@ -743,25 +772,36 @@ def art_image(key, w, h):
         d.ellipse([22, 46, 36, 58], fill=(220, 200, 165))
         d.ellipse([20, 30, 30, 40], fill=(200, 200, 200))
     elif key == "cpi":
-        # v5: Japan CPI — three ascending navy bars (2.1 / 2.2 / 2.3) on a
-        # light grid, a thick red zigzag arrow rising to the top-right, a
-        # red 2.3% focal, gold coins along the bottom. The old "crash"
-        # branch (desert An-12 wreck) is gone — the crash is also-list 26.
+        # v5.1: per the user's new reference (5 ascending rainbow bars +
+        # one thick dark curved arrow rising) — the v5 navy bars + red
+        # zigzag are gone. Same verified CPI data (core 2.2%, headline
+        # 2.3%). Light card background kept (not the reference's black).
         # Original PIL vector code.
         d.rectangle([0, 0, w, h], fill=(245, 240, 228))
         for gy in range(18, h, 12):
             d.line([0, gy, w, gy], fill=(210, 205, 190), width=1)
         for gx in range(0, w, 24):
             d.line([gx, 18, gx, h], fill=(228, 223, 208), width=1)
-        # three navy bars, baseline y70 — banner covers y0-18
-        for bx, top in ((12, 52), (48, 42), (84, 32)):
-            d.rectangle([bx, top, bx + 26, 70], fill=(35, 55, 85))
-            d.rectangle([bx + 3, top + 3, bx + 8, top + 6], fill="white")
-        # thick red zigzag arrow rising to the top-right
-        d.line([(6, 64), (50, 38), (80, 52), (110, 30), (146, 22)],
-               fill=RED, width=5, joint="curve")
-        d.polygon([(146, 22), (134, 24), (144, 32)], fill=RED)
-        # red 2.3% focal, top-right, clear of the arrowhead (ends x146)
+        # five rainbow bars, ascending left to right, baseline y68
+        cols = ((60, 180, 80), (250, 200, 40), (240, 130, 30),
+                (220, 50, 50), (40, 140, 220))
+        for i, col in enumerate(cols):
+            bx = 10 + i * 36
+            top = 68 - (12 + i * 7)
+            d.rectangle([bx, top, bx + 24, 68], fill=col)
+            light = tuple(min(255, c + 60) for c in col)
+            d.rectangle([bx, top, bx + 24, top + 2], fill=light)
+        # one thick dark curved arrow rising from bottom-left to an
+        # arrowhead at top-right, clear of the 2.3% focal (starts x151)
+        pts = []
+        for ti in range(26):
+            t = ti / 25
+            qx = int((1 - t) ** 2 * 8 + 2 * (1 - t) * t * 70 + t ** 2 * 142)
+            qy = int((1 - t) ** 2 * 64 + 2 * (1 - t) * t * 58 + t ** 2 * 30)
+            pts.append((qx, qy))
+        d.line(pts, fill=(30, 30, 40), width=5, joint="curve")
+        d.polygon([(142, 30), (132, 39), (128, 30)], fill=(30, 30, 40))
+        # red 2.3% focal, top-right, clear of the arrowhead (ends x148)
         d.text((192, 24), "2.3%", font=F_ART2, fill=RED, anchor="ra",
                stroke_width=1, stroke_fill="white")
         # gold coins along the bottom
