@@ -1278,12 +1278,15 @@ def main():
     # morning cluster 04:30-06:30 would collide on a true 24h axis.
     # Times verified live 2026-11-21, conversions in NOTES.md:
     # 02:30 Akvan landfall (8:00 IST, IMD); 04:30 Kyiv barrage ends
-    # (last blasts ~06:30 Kyiv, Kyiv Independent); 05:30 missile in
-    # Poland (~06:30 CET, Polish DefMin); 06:30 Nikkei closes -5.1%
-    # (15:30 JST close, JPX); 20:00 Italy rail strike (21:00 CET,
-    # railfreight.com / US Embassy Rome); 21:00 Wall St closes
-    # (16:00 EST, NYSE). Label 72.5px, longest event 94.5px in the
-    # 148.7px column — probe-measured before building. ----
+    # (last blasts ~06:30 Kyiv, Kyiv Independent); 05:30 TAIEX closes
+    # -6.2% (13:30 TST close, TWSE via Asia Daily/Yonhap; the Poland
+    # missile point it replaces stays drawn as card 13); 06:30 Nikkei
+    # closes -5.1% (15:30 JST close, JPX); 20:00 Italy rail strike
+    # (21:00 CET, railfreight.com / US Embassy Rome); 21:00 Wall St
+    # closes -3.7% S&P 500 (16:00 EST close, 6,910.39; Motley Fool /
+    # Reuters / CNN / Investopedia — all agree -3.7%). Label 72.5px,
+    # longest event "Wall St closes -3.7%" 98.8px in the 148.7px
+    # column — probe-measured before building. ----
     tl_y = 195
     d.text((12, tl_y), "FRIDAY IN UTC", font=F_TTEXT, fill=RED)
     tl_x0, tl_x1 = 120, 1012
@@ -1292,10 +1295,10 @@ def main():
     for ti, (tt, ev) in enumerate([
             ("02:30", "Akvan landfall"),
             ("04:30", "Kyiv barrage ends"),
-            ("05:30", "Missile in Poland"),
+            ("05:30", "TAIEX closes -6.2%"),
             ("06:30", "Nikkei closes -5.1%"),
             ("20:00", "Italy rail strike"),
-            ("21:00", "Wall St closes")]):
+            ("21:00", "Wall St closes -3.7%")]):
         cx = tl_x0 + ti * tl_col
         d.text((cx, tl_y), tt, font=F_ALSO_N, fill=INK)
         d.ellipse([cx - 3, 207, cx + 3, 213], fill=RED)
