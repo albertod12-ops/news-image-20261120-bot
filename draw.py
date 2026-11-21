@@ -61,6 +61,9 @@ _FONT_TABLE = [
     # the BANNED/CLOSED stamp, big + bold like the user's reference
     ("F_STAMP", "NotoSans-Black.ttf", 12, FNOTO),
     ("F_HEAD", "LiberationSerif-Bold.ttf", 20, FLIB),
+    # v7: hero headlines one step up (20 -> 22px) so the top-3 stories
+    # read as large text at a glance, like the top-3 entries' text rows.
+    ("F_HEAD_H", "LiberationSerif-Bold.ttf", 22, FLIB),
     ("F_HEAD_S", "LiberationSerif-Bold.ttf", 16, FLIB),
     ("F_DECK", "LiberationSerif-Regular.ttf", 12, FLIB),
     ("F_DECK_S", "LiberationSerif-Regular.ttf", 11, FLIB),
@@ -108,12 +111,12 @@ PILL_COL = {
 FRONT = [
     (1, "ODISHA", "STORM", "IMD", "REPORTED",
      "Cyclone Akvan slams into Odisha",
-     "Landfall 8:00–11:20am, gusts to 90 km/h; 3.7 lakh evacuated, 9,300 shelters open.",
-     "AKVAN", "3.7 LAKH EVACUATED", "akvan"),
+     "Landfall 8:00–11:20am, gusts 90 km/h; 370,000 evacuated, 209mm rain.",
+     "AKVAN", "370,000 EVACUATED", "akvan"),
     (2, "KYIV", "WAR", "REUTERS", "REPORTED",
      "Russian missiles strike Kyiv's bridges",
-     "110+ missiles, 400+ drones; three Dnipro crossings hit; 9 killed, 28 hurt.",
-     "KYIV BRIDGES", "3 BRIDGES HIT", "kyiv"),
+     "110+ missiles, 400+ drones; three Dnipro bridges hit; 9 killed, 28 hurt, power cut.",
+     "KYIV BRIDGES", "110+ MISSILES · 400+ DRONES", "kyiv"),
     (3, "ANTALYA", "CLIMATE", "CARBON BRIEF", "REPORTED",
      "COP31's final day ends in fossil-fuel deadlock",
      "Draft 2 drops fossil fuels and the $120bn target; '35 by 35' electrification survives.",
@@ -180,7 +183,7 @@ ALSO = [
     (28, "Naypyidaw", "Myanmar calls ICJ ruling unfair", "REUTERS"),
     (29, "Gaza", "Israeli strikes kill 6 despite truce", "AFP"),
     (30, "Yenne", "Boat: 4 dead, dozens missing", "AL JAZEERA"),
-    (31, "Barcelona", "Cancer pill shrinks tumours", "ECANCER"),
+    (31, "Barcelona", "Cancer pill cuts tumours 60.7%", "ECANCER"),
     (32, "Beijing", "China holds rates (3.0% / 3.5%)", "XINHUA"),
     (33, "Blantyre", "Malawi fuel queues all night", "AL JAZEERA"),
     (34, "Las Vegas", "Russell fastest, 1:47.272", "FORMULA1.COM"),
@@ -194,7 +197,7 @@ STATS = [
     ("-6.2%", "Taipei's fall"),
     ("2.3%", "Japan CPI headline"),
     ("118", "Phillips in Wellington"),
-    ("60.7%", "cancer-pill trial response"),
+    ("110+", "missiles fired at Ukraine"),
 ]
 
 # v6 region bar: per-region story counts counted from OUR actual 36-story
@@ -1102,12 +1105,12 @@ def hero_card(img, d, story, x, y, w):
     d.text((x + 14 + pill_w, y + 113), "%d. %s · %s" % (num, reg, topic),
            font=F_KICK, fill="white", anchor="lm")
     d.text((x + w - 8, y + 113), src, font=F_SRC, fill=GOLD, anchor="rm")
-    head_lines = wrap(d, head, F_HEAD, w - 16, max_lines=2)
+    head_lines = wrap(d, head, F_HEAD_H, w - 16, max_lines=2)
     for j, line in enumerate(head_lines):
-        d.text((x + 8, y + 125 + j * 22), line, font=F_HEAD, fill=INK)
+        d.text((x + 8, y + 125 + j * 24), line, font=F_HEAD_H, fill=INK)
     deck_lines = wrap(d, deck, F_DECK, w - 16, max_lines=2)
     for j, line in enumerate(deck_lines):
-        d.text((x + 8, y + 125 + len(head_lines) * 22 + 2 + j * 14),
+        d.text((x + 8, y + 125 + len(head_lines) * 24 + 2 + j * 14),
                line, font=F_DECK, fill=(60, 60, 60))
     d.rectangle([x, y, x + w, y + 205], outline=INK, width=1)
 
