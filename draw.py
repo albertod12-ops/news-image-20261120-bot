@@ -194,67 +194,103 @@ FRONT = [
      "Russian missile lands in Poland",
      "Kh-101 down in Poland; 3 objects in its airspace.",
      "MISSILE IN POLAND", "NATO ALERT", "poland", "CONFIRMED"),
+    # v15: third smalls row — 5 new drawn cards (Sudan, Tonga, Mongolia,
+    # Somalia, Pete Rose), all verified live 2026-11-21 as 19-20 Nov
+    # news-cycle stories (first reported 19 Nov or later — the Bukele
+    # precedent already on this page and in every top-10 entry; nothing
+    # first reported before 19 Nov: Fiji's disaster declaration and the
+    # IAEA Yongbyon briefing were both 18 Nov and are NOT used).
+    (14, "SUDAN", "WAR", "RADIO DABANGA", "REPORTED",
+     "Drone strike kills 10 at gold mine",
+     "Drone fires 4 missiles at Bajoun mine; 10 killed.",
+     "GOLD MINE", "10 KILLED", "sudan", "REPORTED"),
+    (15, "TONGA", "DROUGHT", "RNZ", "REPORTED",
+     "Tonga declares emergency as drought bites",
+     "27-day emergency as El Niño dries islands; schools shut.",
+     "DROUGHT", "27-DAY EMERGENCY", "tonga", "CONFIRMED"),
+    (16, "ULAANBAATAR", "POLITICS", "REUTERS", "REPORTED",
+     "Mongolia's president quits in graft row",
+     "Resignation accepted by parliament; election in 4 months.",
+     "PRESIDENT QUITS", "VOTE IN 4 MONTHS", "mongolia", "CONFIRMED"),
+    (17, "MOGADISHU", "DIPLOMACY", "REUTERS", "REPORTED",
+     "Somalia expels UAE envoy in 72 hours",
+     "Envoy out in 72 hrs; Mogadishu recalls its own envoy.",
+     "UAE ENVOY OUT", "72 HOURS", "somalia", "CONFIRMED"),
+    (18, "WASHINGTON", "SPORT", "CNN", "REPORTED",
+     "Trump pardons late hit king Pete Rose",
+     "Posthumous pardon for 4,256-hit legend; banned in 1989.",
+     "PARDONED", "4,256 HITS", "peterose", "CONFIRMED"),
 ]
 
 # num, city, text, source — every item carries its outlet (the top-3 pattern);
 # texts are terse (probe-measured) so "City: text (SRC)" fits one 298px line.
 ALSO = [
-    (14, "Riyadh", "Saudis stop 2 missiles, drones", "REUTERS"),
-    (15, "Brussels", "EU to summon Russian envoy", "REUTERS"),
-    (16, "London", "UK gives 1,000+ drones, £260m", "UK GOVT"),
-    (17, "Paris", "France seeks UNSC meeting", "REUTERS"),
-    (18, "Taipei", "Worst week since 1990, -17.5%", "REUTERS"),
-    (19, "Tokyo", "SoftBank falls more than 16%", "CNBC"),
-    (20, "Washington", "IMF warns debt near 100% of GDP", "IMF"),
-    (21, "New York", "Nvidia -14% on SEC probe", "REUTERS"),
-    (22, "Buenos Aires", "Argentina risk at 1,070", "J.P. MORGAN"),
-    (23, "Washington", "879k AI chips OK'd for China", "REUTERS"),
-    (24, "Washington", "Senate passes energy bill 62-33", "AP"),
-    (25, "Washington", "US sanctions Comancheros", "OFAC"),
-    (26, "Siberia", "An-12 crash kills 19", "REUTERS"),
-    (27, "Mercury", "BepiColombo trip ends Sat [FORECAST]", "ESA"),
-    (28, "Naypyidaw", "Myanmar calls ICJ ruling unfair", "REUTERS"),
-    (29, "Gaza", "Israeli strikes kill 6 despite truce", "AFP"),
-    (30, "Yenne", "Boat: 4 dead, dozens missing", "AL JAZEERA"),
-    (31, "Barcelona", "Cancer pill cuts tumours 60.7%", "ECANCER"),
-    (32, "Beijing", "China holds rates (3.0% / 3.5%)", "XINHUA"),
-    (33, "Blantyre", "Malawi fuel queues all night", "AL JAZEERA"),
-    (34, "Las Vegas", "Russell fastest, 1:47.272", "FORMULA1.COM"),
-    (35, "Shenzhen", "Xi hails turnaround", "REUTERS"),
-    (36, "Europe", "Youth strike in 25+ countries", "REUTERS"),
+    (19, "Riyadh", "Saudis stop 2 missiles, drones", "REUTERS"),
+    (20, "Brussels", "EU to summon Russian envoy", "REUTERS"),
+    (21, "London", "UK gives 1,000+ drones, £260m", "UK GOVT"),
+    (22, "Paris", "France seeks UNSC meeting", "REUTERS"),
+    (23, "Taipei", "Worst week since 1990, -17.5%", "REUTERS"),
+    (24, "Tokyo", "SoftBank falls more than 16%", "CNBC"),
+    (25, "Washington", "IMF warns debt near 100% of GDP", "IMF"),
+    (26, "New York", "Nvidia -14% on SEC probe", "REUTERS"),
+    (27, "Buenos Aires", "Argentina risk at 1,070", "J.P. MORGAN"),
+    (28, "Washington", "879k AI chips OK'd for China", "REUTERS"),
+    (29, "Washington", "Senate passes energy bill 62-33", "AP"),
+    (30, "Washington", "US sanctions Comancheros", "OFAC"),
+    (31, "Siberia", "An-12 crash kills 19", "REUTERS"),
+    (32, "Mercury", "BepiColombo trip ends Sat [FORECAST]", "ESA"),
+    (33, "Naypyidaw", "Myanmar calls ICJ ruling unfair", "REUTERS"),
+    (34, "Gaza", "Israeli strikes kill 6 despite truce", "AFP"),
+    (35, "Yenne", "Boat: 4 dead, dozens missing", "AL JAZEERA"),
+    (36, "Barcelona", "Cancer pill cuts tumours 60.7%", "ECANCER"),
+    (37, "Beijing", "China holds rates (3.0% / 3.5%)", "XINHUA"),
+    (38, "Blantyre", "Malawi fuel queues all night", "AL JAZEERA"),
+    (39, "Las Vegas", "Russell fastest, 1:47.272", "FORMULA1.COM"),
+    (40, "Shenzhen", "Xi hails turnaround", "REUTERS"),
+    (41, "Europe", "Youth strike in 25+ countries", "REUTERS"),
+    # v15: 3 new also-list lines (44 stories total). Pakistan 22
+    # militants (AP, 19 Nov), Brazil $1bn sale (19 Nov, first spot sale
+    # since Dec 2024), Raoni land recognised (AP, 19 Nov).
+    (42, "Islamabad", "Army says 22 militants killed in raids", "AP"),
+    (43, "Brasília", "Bank sells $1bn to defend the real", "REUTERS"),
+    (44, "Mato Grosso", "Lula recognises Raoni's land", "AP"),
 ]
 
 STATS = [
-    ("370,000", "evacuated in Odisha"),
-    ("3", "bridges hit in Kyiv"),
-    ("-6.2%", "Taipei's fall"),
-    ("2.3%", "Japan CPI headline"),
-    ("118", "Phillips in Wellington"),
-    ("110+", "missiles fired at Ukraine"),
+    ("370,000", "evacuated"),
+    ("3", "bridges hit"),
+    ("-6.2%", "Taiex"),
+    ("-3.7%", "S&P 500"),
+    ("2.3%", "Japan CPI"),
+    ("118", "Phillips"),
+    ("110+", "missiles"),
 ]
 
-# v6 region bar: per-region story counts counted from OUR actual 36-story
-# list (FRONT 1-13 + ALSO 14-36), assigned by subject, not dateline city.
-# EUROPE 9: 2 Kyiv, 5 UK-EU, 7 Italy strike, 13 Poland, 15 Brussels,
-#   16 London, 17 Paris, 31 Barcelona, 36 youth strike.
-# ASIA 10: 1 Akvan, 4 Nikkei, 9 Seoul, 10 Japan CPI, 18 Taipei,
-#   19 Tokyo, 26 An-12, 28 Myanmar reaction, 32 Beijing, 35 Shenzhen.
-# AMERICAS 7: 12 Bukele, 21 Nvidia probe, 22 Argentina risk, 23 AI chips,
-#   24 Senate, 25 sanctions, 34 Las Vegas.
-# MIDDLE EAST 3: 8 Iraq, 14 Riyadh, 29 Gaza strikes.
-# AFRICA 3: 6 Kenya oil, 30 Yenne, 33 Blantyre.
-# OCEANIA 1: 11 Phillips (Wellington).
-# GLOBAL 3: 3 COP31 (global climate summit), 20 IMF debt warning,
-#   27 BepiColombo.
-# Total 9+10+7+3+3+1+3 = 36.
+# v15 region bar: per-region story counts counted from OUR actual 44-story
+# list (FRONT 1-18 + ALSO 19-44), assigned by subject, not dateline city.
+# EUROPE 9: 2 Kyiv, 5 UK-EU, 7 Italy strike, 13 Poland, 20 Brussels,
+#   21 London, 22 Paris, 36 Barcelona, 41 youth strike.
+# ASIA 12: 1 Akvan, 4 Nikkei, 9 Seoul, 10 Japan CPI, 16 Mongolia,
+#   23 Taipei, 24 Tokyo, 31 An-12, 33 Myanmar reaction, 37 Beijing,
+#   40 Shenzhen, 42 Pakistan raids.
+# AMERICAS 10: 12 Bukele, 18 Pete Rose, 26 Nvidia probe, 27 Argentina
+#   risk, 28 AI chips, 29 Senate, 30 sanctions, 39 Las Vegas, 43 Brazil
+#   $1bn sale, 44 Raoni land.
+# MIDDLE EAST 3: 8 Iraq, 19 Riyadh, 34 Gaza strikes.
+# AFRICA 5: 6 Kenya oil, 14 Sudan mine, 17 Somalia expulsion, 35 Yenne,
+#   38 Blantyre.
+# OCEANIA 2: 11 Phillips (Wellington), 15 Tonga drought.
+# GLOBAL 3: 3 COP31 (global climate summit), 25 IMF debt warning,
+#   32 BepiColombo.
+# Total 9+12+10+3+5+2+3 = 44.
 # (label, count, fill, text colour)
 REGIONS = [
     ("EUROPE", 9, (16, 62, 150), "white"),
-    ("ASIA", 10, (179, 34, 44), "white"),
-    ("AMERICAS", 7, (90, 60, 140), "white"),
+    ("ASIA", 12, (179, 34, 44), "white"),
+    ("AMERICAS", 10, (90, 60, 140), "white"),
     ("MIDDLE EAST", 3, (196, 142, 8), (17, 17, 17)),
-    ("AFRICA", 3, (30, 130, 80), "white"),
-    ("OCEANIA", 1, (0, 120, 140), "white"),
+    ("AFRICA", 5, (30, 130, 80), "white"),
+    ("OCEANIA", 2, (0, 120, 140), "white"),
     ("GLOBAL", 3, (90, 90, 90), "white"),
 ]
 
@@ -272,17 +308,25 @@ PINS = {
     5: (4.4, 50.8), 6: (35.9, 3.1), 7: (12.5, 41.9), 8: (44.2, 32.8),
     9: (127.0, 37.5), 10: (139.7, 35.7), 11: (174.8, -41.3),
     12: (-89.2, 13.7), 13: (21.0, 52.2),
+    # v15: 14 Bajoun gold mine (30.0E, 11.5N), 15 Nuku'alofa
+    # (-175.2, -21.1), 16 Ulaanbaatar (106.9, 47.9), 17 Mogadishu
+    # (45.3, 2.0), 18 Washington (-77.0, 38.9).
+    14: (30.0, 11.5), 15: (-175.2, -21.1), 16: (106.9, 47.9),
+    17: (45.3, 2.0), 18: (-77.0, 38.9),
 }
 DOTS = {
-    14: (46.7, 24.7), 15: (4.4, 50.8), 16: (-0.1, 51.5), 17: (2.4, 48.9),
-    18: (121.6, 25.0), 19: (139.7, 35.7), 20: (-77.0, 38.9),
-    21: (-74.0, 40.7), 22: (-58.4, -34.6), 23: (-77.0, 38.9),
-    24: (-77.0, 38.9), 25: (-77.0, 38.9), 26: (96.0, 60.0),
-    28: (96.2, 19.8), 29: (34.4, 31.5), 30: (-17.2, 14.7),
-    31: (2.2, 41.4), 32: (116.4, 39.9), 33: (35.0, -15.8),
-    34: (-115.1, 36.2), 35: (114.1, 22.5), 36: (4.4, 50.8),
+    19: (46.7, 24.7), 20: (4.4, 50.8), 21: (-0.1, 51.5), 22: (2.4, 48.9),
+    23: (121.6, 25.0), 24: (139.7, 35.7), 25: (-77.0, 38.9),
+    26: (-74.0, 40.7), 27: (-58.4, -34.6), 28: (-77.0, 38.9),
+    29: (-77.0, 38.9), 30: (-77.0, 38.9), 31: (96.0, 60.0),
+    33: (96.2, 19.8), 34: (34.4, 31.5), 35: (-17.2, 14.7),
+    36: (2.2, 41.4), 37: (116.4, 39.9), 38: (35.0, -15.8),
+    39: (-115.1, 36.2), 40: (114.1, 22.5), 41: (4.4, 50.8),
+    # v15: 42 Islamabad (73.1, 33.7), 43 Brasilia (-47.9, -15.8),
+    # 44 Kapot Nhinore, Mato Grosso (-56.5, -9.0).
+    42: (73.1, 33.7), 43: (-47.9, -15.8), 44: (-56.5, -9.0),
 }
-# v5: 27 BepiColombo has no Earth location (Mercury orbit insertion) —
+# v5: 32 BepiColombo has no Earth location (Mercury orbit insertion) —
 # it gets no dot, by design.
 
 PROBLEMS = []
@@ -1026,6 +1070,102 @@ def art_image(key, w, h):
         d.rectangle([144, 24, 170, 34], fill=(90, 95, 105))
         d.rectangle([148, 27, 166, 31], fill=(180, 220, 240))
         d.ellipse([154, 20, 158, 24], fill=RED)
+    elif key == "sudan":
+        # v15: Bajoun gold mine, South Kordofan — desert, a mine
+        # headframe, gold nuggets and a drone overhead. Original PIL
+        # vector code.
+        d.rectangle([0, 0, w, h], fill=(232, 205, 155))
+        d.ellipse([168, 20, 186, 38], fill=(255, 200, 60),
+                  outline=(230, 170, 40), width=2)
+        d.rectangle([0, 56, w, h], fill=(190, 150, 95))
+        d.line([0, 56, w, 56], fill=(150, 115, 70), width=2)
+        d.line([24, 56, 34, 20], fill=(60, 50, 40), width=3)
+        d.line([48, 56, 38, 20], fill=(60, 50, 40), width=3)
+        for bx0, by, bx1 in ((32, 26, 40), (30, 34, 42), (28, 42, 44),
+                             (26, 50, 46)):
+            d.line([bx0, by, bx1, by], fill=(60, 50, 40), width=2)
+        d.ellipse([32, 18, 40, 26], fill=(60, 50, 40))
+        for gx, gy, gr in ((96, 66, 7), (112, 70, 5), (126, 65, 6),
+                           (104, 72, 4)):
+            d.ellipse([gx - gr, gy - gr, gx + gr, gy + gr], fill=GOLD,
+                      outline=(180, 130, 20), width=1)
+        d.rectangle([140, 26, 168, 32], fill=(40, 40, 40))
+        for rx in (138, 150, 162, 172):
+            d.line([rx - 4, 24, rx + 4, 24], fill=(40, 40, 40), width=2)
+        d.ellipse([150, 28, 158, 36], fill=(40, 40, 40))
+        d.line([154, 36, 154, 44], fill=(120, 120, 120), width=1)
+        d.ellipse([148, 58, 160, 62], fill=(150, 115, 70))
+    elif key == "tonga":
+        # v15: Tonga's El Nino drought — cracked earth, a hard sun and
+        # a dry water tank beside a drooping palm. Original PIL vector
+        # code.
+        d.rectangle([0, 0, w, h], fill=(224, 196, 148))
+        d.ellipse([118, 20, 146, 48], fill=(255, 140, 40),
+                  outline=(220, 100, 20), width=2)
+        d.rectangle([0, 52, w, h], fill=(190, 150, 95))
+        for crack in ([(10, 52), (30, 62), (28, 72), (44, 78)],
+                      [(60, 52), (70, 64), (88, 66), (96, 76)],
+                      [(120, 52), (132, 62), (150, 64), (158, 74)],
+                      [(170, 52), (176, 66), (188, 70), (192, 78)]):
+            d.line(crack, fill=(110, 80, 50), width=2)
+        d.rectangle([150, 48, 186, 74], fill=(140, 145, 155),
+                    outline=(90, 95, 105), width=2)
+        d.rectangle([156, 48, 180, 54], fill=(90, 95, 105))
+        d.line([30, 52, 36, 22], fill=(120, 90, 50), width=4)
+        for fx0, fy0, fx1, fy1 in ((36, 22, 14, 30), (36, 22, 20, 16),
+                                   (36, 22, 52, 14), (36, 22, 58, 28),
+                                   (36, 22, 44, 34)):
+            d.line([fx0, fy0, fx1, fy1], fill=(40, 140, 70), width=3)
+    elif key == "mongolia":
+        # v15: Ulaanbaatar — the Government Palace: white colonnade
+        # under a blue roof, steps, and the Mongolian flag on a pole.
+        # Original PIL vector code.
+        d.rectangle([0, 0, w, h], fill=(200, 215, 235))
+        d.line([14, 24, 14, 60], fill=(60, 40, 20), width=2)
+        for fi, fcol in enumerate(((0, 90, 180), (200, 40, 40),
+                                   (0, 90, 180))):
+            d.rectangle([14 + fi * 6, 24, 14 + fi * 6 + 6, 36], fill=fcol)
+        d.ellipse([23, 27, 27, 31], fill=GOLD)
+        d.polygon([(60, 34), (136, 20), (212, 34)], fill=(0, 90, 180))
+        d.rectangle([60, 34, 212, 62], fill=(240, 240, 235))
+        for cx0 in range(68, 204, 18):
+            d.rectangle([cx0, 38, cx0 + 7, 60], fill=(180, 190, 205))
+        d.rectangle([56, 62, 216, 66], fill=(200, 205, 215))
+        d.rectangle([50, 66, 222, 70], fill=(180, 185, 195))
+        d.rectangle([44, 70, 228, 74], fill=(160, 165, 175))
+    elif key == "somalia":
+        # v15: Mogadishu — the Somali flag itself: light blue field,
+        # one big white star, and a white plane climbing out of it.
+        # Original PIL vector code.
+        d.rectangle([0, 0, w, h], fill=(65, 137, 221))
+        _star(d, 70, 48, 26, 10, fill="white")
+        d.polygon([(140, 36), (182, 24), (188, 28), (150, 42)],
+                  fill="white")
+        d.polygon([(158, 32), (168, 20), (174, 22), (164, 34)],
+                  fill="white")
+        d.polygon([(140, 36), (132, 28), (136, 26), (146, 32)],
+                  fill="white")
+        for dx in range(8, w, 24):
+            d.line([dx, 74, dx + 12, 74], fill="white", width=2)
+    elif key == "peterose":
+        # v15: Pete Rose, pardoned — a baseball diamond: green
+        # outfield, tan infield, white bases, a bat and a stitched ball.
+        # Original PIL vector code.
+        d.rectangle([0, 0, w, h], fill=(60, 160, 90))
+        for sy in range(20, h, 14):
+            d.rectangle([0, sy, w, sy + 7], fill=(52, 148, 82))
+        d.polygon([(98, 30), (150, 58), (98, 76), (46, 58)],
+                  fill=(214, 186, 140))
+        d.line([(98, 30), (150, 58), (98, 76), (46, 58), (98, 30)],
+               fill="white", width=1)
+        for bx, by in ((96, 28), (148, 56), (96, 74), (44, 56)):
+            d.rectangle([bx, by, bx + 5, by + 5], fill="white")
+        d.line([60, 70, 96, 40], fill=(200, 170, 110), width=5)
+        d.line([96, 40, 104, 34], fill=(200, 170, 110), width=3)
+        d.ellipse([160, 22, 180, 42], fill="white",
+                  outline=(200, 200, 200))
+        d.arc([162, 26, 178, 38], 300, 60, fill=RED, width=2)
+        d.arc([162, 26, 178, 38], 120, 240, fill=RED, width=2)
     return img
 
 # pixel nudges so clustered pins stay readable (map is small): the pin circle
@@ -1043,9 +1183,25 @@ def art_image(key, w, h):
 # v6: 6 (Turkana) sits in open central Africa and 9 (Seoul) sits ~12px
 # west of Tokyo's true spot with both Tokyo pins fanned away, so neither
 # needs an offset any more.
-PIN_OFF = {2: (18, -16), 3: (2, 14), 4: (20, -14), 5: (-6, 26),
+# v15: 14 Sudan sits ~9px from pin 6 (Turkana), pushed NW; 16 Mongolia
+# sits ~9px from the Beijing dot and ~19px from the Seoul pin, pushed
+# north (clear of the map top edge by 4.5px); 17 Somalia sits ~9px from
+# pin 6, pushed east into the Indian Ocean; 18 Washington sits on four
+# white dots (-77, 38.9), pushed NE. 15 Tonga sits at the map's left
+# edge (x 4.5) but its circle stays inside the box, so no offset.
+# v15 map fixes (4x view): pin 3's old offset (2,14) put its centre
+# 4.3px from pin 6, so pin 6 (drawn later) covered the "3" entirely —
+# the number was invisible in v14 too; (0,-16) puts it 19px from pin 2,
+# clear of everything. Pin 14's (-18,-8) put it 8.4px from pin 13 — the
+# two circles fused into one "1314" blob; (-12,17) is >=21px from every
+# neighbour. Pin 15's circle overhung the map's left edge by 2.5px
+# (the x-4.5 estimate was wrong: the circle spans 9.5-23.5 against a
+# box edge at 12); (10,0) pulls it fully inside the frame.
+PIN_OFF = {2: (18, -16), 3: (0, -16), 4: (20, -14), 5: (-6, 26),
            7: (-30, 8), 8: (16, -14), 10: (18, 14),
-           11: (-14, 0), 13: (-18, 12)}
+           11: (-14, 0), 13: (-18, 12),
+           14: (-12, 17), 15: (10, 0), 16: (2, -10), 17: (16, 2),
+           18: (16, -12)}
 
 
 def draw_map(d, x0, y0, mw, mh):
@@ -1095,17 +1251,26 @@ def draw_map(d, x0, y0, mw, mh):
     # live 2026-11-21: pirogue capsized off Yenne ~02:00 Wed 18 Nov,
     # 4 bodies recovered (Reuters via Al Jazeera, pub. 20 Nov 2026),
     # 50-100 aboard, dozens missing. Original PIL vector code only.
-    _sx, _sy = project(-17.2, 14.7)  # dot 30, Yenne / Dakar
-    d.line([(_sx, _sy + 3), (148, 846)], fill=RED, width=1)
-    d.line([(160, 840), (160, 847)], fill="white", width=1)  # mast
-    d.polygon([(160, 840), (160, 845), (166, 843)], fill=RED)  # flag
-    d.polygon([(146, 847), (174, 847), (170, 854), (150, 854)],
+    # v15: boat coordinates now relative to the map box (x0, y0) — the
+    # map moved down with the reflow, so the v14 absolute pixels no
+    # longer apply. Offsets are the v14 values minus (12, 793).
+    _sx, _sy = project(-17.2, 14.7)  # dot 35, Yenne / Dakar
+    d.line([(_sx, _sy + 3), (x0 + 136, y0 + 53)], fill=RED, width=1)
+    d.line([(x0 + 148, y0 + 47), (x0 + 148, y0 + 54)], fill="white",
+           width=1)  # mast
+    d.polygon([(x0 + 148, y0 + 47), (x0 + 148, y0 + 52),
+               (x0 + 154, y0 + 50)], fill=RED)  # flag
+    d.polygon([(x0 + 134, y0 + 54), (x0 + 162, y0 + 54),
+               (x0 + 158, y0 + 61), (x0 + 138, y0 + 61)],
               fill="white")  # pirogue hull
-    d.line([(149, 850), (171, 850)], fill=RED, width=1)  # hull stripe
-    d.line([(144, 857), (176, 857)], fill=(140, 180, 210), width=1)
-    d.line([(150, 859), (170, 859)], fill=(140, 180, 210), width=1)
-    d.text((160, 861), "SENEGAL · 4 DEAD", font=F_LABEL, fill="white",
-           anchor="ma")
+    d.line([(x0 + 137, y0 + 57), (x0 + 159, y0 + 57)], fill=RED,
+           width=1)  # hull stripe
+    d.line([(x0 + 132, y0 + 64), (x0 + 164, y0 + 64)],
+           fill=(140, 180, 210), width=1)
+    d.line([(x0 + 138, y0 + 66), (x0 + 158, y0 + 66)],
+           fill=(140, 180, 210), width=1)
+    d.text((x0 + 148, y0 + 68), "SENEGAL · 4 DEAD", font=F_LABEL,
+           fill="white", anchor="ma")
     for n, (lon, lat) in PINS.items():
         px, py = project(lon, lat)
         dx, dy = PIN_OFF.get(n, (0, 0))
@@ -1147,22 +1312,25 @@ def draw_map(d, x0, y0, mw, mh):
                    font=fnt, fill="white")
 
 
-# v12 layout constants: timeline strip added (28px, see main) funded by
-# hero art 140->112px (Option A — measured vs Option B, smalls 68->54px:
-# /tmp/optB-v12 prototype; A wins, see NOTES.md). Hero card 233 tall,
-# heroes bottom stays 459, everything below unchanged (footer ink ~1021).
-# Masthead 108px squeezed, stats 28px, region bar 12px, small-card art
-# 68px, map 92px.
-HERO_ART_H = 112
-HERO_CARD_H = HERO_ART_H + 16 + 105
-SMALL_ART_H = 68
+# v15 layout constants: THIRD smalls row (5 more drawn cards, 18 total)
+# funded by the whole reflow — the timeline strip is DROPPED (its 3
+# figures survive: TAIEX -6.2% and Nikkei -5.1% in card 4's art, S&P
+# -3.7% in the numbers strip), the stats strip compresses to one line,
+# hero art 112->84px (v8's size), hero text area 105->96px, smalls art
+# 68->56px, legend to 2x2, also-list pitch stays 12, date-check 28->24px.
+# Hero card 196 tall, small card 137 tall, rows pitch 138, footer ink
+# ~1022 (probe-measured). Masthead 108px squeezed and map 92px unchanged.
+HERO_ART_H = 84
+HERO_CARD_H = HERO_ART_H + 16 + 96
+SMALL_ART_H = 56
 SMALL_CARD_H = SMALL_ART_H + 81
 
 
 def hero_card(img, d, story, x, y, w):
-    """One hero card: v12 112px art (was 140 — the 28px funds the UTC
-    timeline strip; the v10 head-to-head measured the top 10's hero art
-    at ~110-220px, so 112px is still in range), navy kicker
+    """One hero card: v15 84px art (was 112 — the 28px funds the third
+    smalls row, with the timeline strip dropped for the rest; the v8
+    head-to-head measured 84px as the thinnest hero art on the board,
+    so this is a known cost, paid for 5 more drawn stories), navy kicker
     strip with the verification-tag pill, a 2-line 27px Times headline
     and a 2-line serif deck, all inside a 1px ink box. The art is rendered
     at 105px and LANCZOS-resized to 112px (labels drawn before the resize,
@@ -1193,11 +1361,11 @@ def hero_card(img, d, story, x, y, w):
     d.text((x + w - 8, y + HERO_ART_H + 8), src, font=F_SRC, fill=GOLD, anchor="rm")
     head_lines = wrap(d, head, F_HEAD_H, w - 16, max_lines=2)
     deck_lines = wrap(d, deck, F_DECK, w - 16, max_lines=2)
-    # centre the text block in the 105px text area (kicker bottom
+    # centre the text block in the 96px text area (kicker bottom
     # y+HERO_ART_H+16 to card bottom y+HERO_CARD_H): 2+2 lines = 92px,
     # 1+2 lines = 61px.
     block_h = len(head_lines) * 31 + 2 + len(deck_lines) * 14
-    text_y = y + HERO_ART_H + 16 + (105 - block_h) // 2
+    text_y = y + HERO_ART_H + 16 + (96 - block_h) // 2
     for j, line in enumerate(head_lines):
         d.text((x + 8, text_y + j * 31), line, font=F_HEAD_H, fill=INK)
     for j, line in enumerate(deck_lines):
@@ -1207,8 +1375,8 @@ def hero_card(img, d, story, x, y, w):
 
 
 def small_card(img, d, story, x, y):
-    """One small card: v9 68px art (was 80 — rendered at 80 and
-    LANCZOS-downscaled to 68, the v8 hero technique, so the art code
+    """One small card: v15 56px art (was 68 — rendered at 80 and
+    LANCZOS-downscaled to 56, the v8 hero technique, so the art code
     itself is untouched), with a v4 SOLID colour banner at its top
     (red, navy for the court/rates cards) carrying the art label in white,
     navy kicker strip with the verification-tag pill on the right, a 2-line
@@ -1218,7 +1386,7 @@ def small_card(img, d, story, x, y):
     kicker font auto-shrinks 9 -> 8px when kicker + pill would overflow
     the 196px card (card 12 only: 132+59+12=203 at 9px, 188 at 8px) —
     the same pattern art_banner uses for long label pairs. Card 149 tall:
-    art 68, kicker 15, headline 2x17, deck 2x13."""
+    art 56, kicker 15, headline 2x17, deck 2x13."""
     num, reg, topic, src, status, head, deck, big, small, key, vtag = story
     w = 196
     d.rectangle([x, y, x + w, y + SMALL_CARD_H], fill=NEARWHITE)
@@ -1279,21 +1447,28 @@ def main():
     deck_line = ("Akvan hits Odisha · Russian missiles strike Kyiv's bridges · "
                  "COP31 deadlocks on fossil fuels · Asia's AI sell-off sinks markets")
     d.text((12, 118), deck_line, font=F_DECKLINE, fill=RED)
-    d.text((1012, 1), "36 STORIES · 7 REGIONS · EVERY ONE DATED FRIDAY 20 NOVEMBER 2026",
+    d.text((1012, 1), "44 STORIES · 7 REGIONS · EVERY ONE DATED FRIDAY 20 NOVEMBER 2026",
            font=F_EYE, fill=INK, anchor="ra")
     d.rectangle([0, 142, W, 144], fill=INK)
 
-    # ---- big-numbers strip 148-176 (v10: +8 rule shift, 7px recovered
-    # from the gaps below; value 18px, caption 9px, unchanged) ----
-    slot_w = (W - 24) / len(STATS)
-    for i, (value, caption) in enumerate(STATS):
-        x = 12 + i * slot_w
-        d.rectangle([x, 152, x + 3, 176], fill=RED)
-        d.text((x + 10, 149), value, font=F_STATB18, fill=INK)
-        d.text((x + 10, 166), caption, font=F_STATC9, fill=GREY)
+    # ---- one-line numbers strip 148-160 (v15: the 6-box strip
+    # compressed to one line to fund the third smalls row; all 7 figures
+    # kept, S&P -3.7% added so the dropped timeline's figure survives
+    # on the page. Probe-measured 780px at 12px bold in the 1000px slot.
+    # Values red, captions ink, separators grey. ----
+    d.text((12, 148), "THE DAY IN NUMBERS:", font=F_TTIME, fill=RED)
+    _nx = 12 + int(d.textlength("THE DAY IN NUMBERS:  ", font=F_TTIME))
+    for _i, (_value, _caption) in enumerate(STATS):
+        d.text((_nx, 148), _value, font=F_TTIME, fill=RED)
+        _nx += int(d.textlength(_value, font=F_TTIME)) + 4
+        d.text((_nx, 148), _caption, font=F_TTIME, fill=INK)
+        _nx += int(d.textlength(_caption, font=F_TTIME))
+        if _i < len(STATS) - 1:
+            d.text((_nx, 148), "  ·  ", font=F_TTIME, fill=GREY)
+            _nx += int(d.textlength("  ·  ", font=F_TTIME))
 
-    # ---- region bar 180-192 (v10) ----
-    bar_x, bar_y, bar_w, bar_h = 12, 180, 1000, 12
+    # ---- region bar 162-174 (v15: gaps above/below tightened 4->2) ----
+    bar_x, bar_y, bar_w, bar_h = 12, 162, 1000, 12
     seg_w = bar_w / len(REGIONS)
     for i, (label, count, fill, ink) in enumerate(REGIONS):
         sx = bar_x + i * seg_w
@@ -1303,79 +1478,57 @@ def main():
         d.text((sx + seg_w / 2, bar_y + 6), "%s %d" % (label, count),
                font=F_SRC, fill=ink, anchor="mm")
 
-    # ---- UTC timeline 195-224 (v12: the #2 device — the day's events
-    # anchored to the clock, evenly spaced columns, NOT to scale: the
-    # morning cluster 04:30-06:30 would collide on a true 24h axis.
-    # Times verified live 2026-11-21, conversions in NOTES.md:
-    # 02:30 Akvan landfall (8:00 IST, IMD); 04:30 Kyiv barrage ends
-    # (last blasts ~06:30 Kyiv, Kyiv Independent); 05:30 TAIEX closes
-    # -6.2% (13:30 TST close, TWSE via Asia Daily/Yonhap; the Poland
-    # missile point it replaces stays drawn as card 13); 06:30 Nikkei
-    # closes -5.1% (15:30 JST close, JPX); 20:00 Italy rail strike
-    # (21:00 CET, railfreight.com / US Embassy Rome); 21:00 Wall St
-    # closes -3.7% S&P 500 (16:00 EST close, 6,910.39; Motley Fool /
-    # Reuters / CNN / Investopedia — all agree -3.7%). Label 72.5px,
-    # longest event "Wall St closes -3.7%" 98.8px in the 148.7px
-    # column — probe-measured before building. ----
-    tl_y = 195
-    d.text((12, tl_y), "FRIDAY IN UTC", font=F_TTEXT, fill=RED)
-    tl_x0, tl_x1 = 120, 1012
-    tl_col = (tl_x1 - tl_x0) / 6
-    d.line([12, 210, tl_x1, 210], fill=RULE, width=1)
-    for ti, (tt, ev) in enumerate([
-            ("02:30", "Akvan landfall"),
-            ("04:30", "Kyiv barrage ends"),
-            ("05:30", "TAIEX closes -6.2%"),
-            ("06:30", "Nikkei closes -5.1%"),
-            ("20:00", "Italy rail strike"),
-            ("21:00", "Wall St closes -3.7%")]):
-        cx = tl_x0 + ti * tl_col
-        d.text((cx, tl_y), tt, font=F_ALSO_N, fill=INK)
-        d.ellipse([cx - 3, 207, cx + 3, 213], fill=RED)
-        d.text((cx, 215), ev, font=F_TTEXT, fill=INK)
-
-    # ---- heroes 226-459 (v12: +28 for the timeline, art 140->112 so the
-    # bottom stays 459; lead 396 wide, rails 294; each card boxed like top 1) ----
-    hero_y = 226
+    # ---- heroes 176-372 (v15: timeline dropped, art 84, card 196;
+    # lead 396 wide, rails 294; each card boxed like top 1) ----
+    hero_y = 176
     hero_widths = [396, 294, 294]
     hero_x = 12
     for i, story in enumerate(FRONT[:3]):
         hero_card(img, d, story, hero_x, hero_y, hero_widths[i])
         hero_x += hero_widths[i] + 8
 
-    # ---- smalls 463-765 (v10: row pitch 155->153, gap 6->4; 2 rows x 5, cards 149 tall, image 196x68) ----
-    for r in range(2):
+    # ---- smalls 374-787 (v15: 3 rows x 5, cards 137 tall, image
+    # 196x56, row pitch 138, gaps 2-3; the third row is cards 14-18) ----
+    for r in range(3):
         for c in range(5):
             k = 3 + r * 5 + c
-            small_card(img, d, FRONT[k], 12 + c * 204, 463 + r * 153)
+            small_card(img, d, FRONT[k], 12 + c * 204, 374 + r * 138)
 
-    # ---- map + also 771-960 (v10: map 92 tall) ----
-    map_y = 771
+    # ---- map + also 789-966 (v15: map 92 tall, also-list 26 items in
+    # 13 rows at pitch 12; legend compressed to 2x2) ----
+    map_y = 789
     d.text((12, map_y), "WHERE IT HAPPENED", font=F_SEC, fill=INK)
     d.line([12, map_y + 16, 348, map_y + 16], fill=INK, width=1)
     d.rectangle([12, map_y + 22, 348, map_y + 114], fill=NAVY_DARK,
                 outline=RULE, width=1)
     draw_map(d, 12, map_y + 22, 336, 92)
-    # v14: caption names the boat callout (320.2px in the 336px column,
-    # probe-measured); the 27 note is kept in shortened form.
-    d.text((12, map_y + 118), "Red 1–13, white dots 14–36 (27 no Earth dot). Boat = Senegal (30).",
+    # v15: caption names the boat callout (320.2px in the 336px column,
+    # probe-measured at F_TTEXT); numbers renumbered for the 44-story
+    # page (BepiColombo 32, Senegal boat 35).
+    d.text((12, map_y + 118), "Red 1–18, white dots 19–44 (32 no Earth dot). Boat = Senegal (35).",
            font=F_TTEXT, fill=GREY)
-    # how-sure-are-we legend under the map (was the stats row)
+    # how-sure-are-we legend under the map, 2x2 (v15: the 4-row legend
+    # cost 44px; the 2x2 keeps every tag explained in 22px).
+    # Explanations shortened to fit the 168px columns (probe-measured).
     d.text((12, map_y + 130), "HOW SURE ARE WE?", font=F_SEC, fill=INK)
-    for li, (st, expl) in enumerate(LEGEND):
-        ly = map_y + 148 + li * 11
-        d.rectangle([12, ly, 20, ly + 8], fill=PILL_COL[st])
-        d.text((24, ly - 1), st, font=F_LEGEND, fill=INK)
-        # v8: explanation at x=92 (was 86) — "CONFIRMED" is wider than
-        # "REPORTED" and would leave only a 1px gap at x=86.
-        d.text((92, ly - 1), expl, font=F_LEGEND, fill=GREY)
+    _leg = [("CONFIRMED", "2+ sources agree", 0, 0),
+            ("FORECAST", "schedule / draft", 1, 0),
+            ("REPORTED", "1 named source", 0, 1),
+            ("CLAIM", "unverified claim", 1, 1)]
+    for _st, _expl, _col, _row in _leg:
+        _lx = 12 if _col == 0 else 184
+        _ly = map_y + 148 + _row * 11
+        d.rectangle([_lx, _ly, _lx + 8, _ly + 8], fill=PILL_COL[_st])
+        d.text((_lx + 12, _ly - 1), _st, font=F_LEGEND, fill=INK)
+        _ex = _lx + 12 + int(d.textlength(_st, font=F_LEGEND)) + 4
+        d.text((_ex, _ly - 1), _expl, font=F_LEGEND, fill=GREY)
 
     also_x = 364
     d.text((also_x, map_y), "ALSO ON FRIDAY 20 NOVEMBER", font=F_SEC, fill=INK)
-    d.text((1012, map_y), "23 MORE STORIES", font=F_SEC, fill=INK, anchor="ra")
+    d.text((1012, map_y), "26 MORE STORIES", font=F_SEC, fill=INK, anchor="ra")
     d.line([also_x, map_y + 16, 1012, map_y + 16], fill=INK, width=1)
     col_w = 320
-    rows = 12
+    rows = 13
     for i, (num, city, txt, src) in enumerate(ALSO):
         col = 0 if i < rows else 1
         row = i if i < rows else i - rows
@@ -1386,9 +1539,11 @@ def main():
         lines = wrap(d, full, F_ALSO, col_w - 22, max_lines=1)
         d.text((x + 20, y), lines[0] if lines else "", font=F_ALSO, fill=INK)
 
-    # ---- date check 964-992 (v10: gap to legend 6->4; thin 2-line band) ----
-    chk_y = 964
-    d.rectangle([12, chk_y, 1012, chk_y + 28], outline=RED, width=2)
+    # ---- date check 970-994 (v15: box 28->24px; the 2 lines sit at
+    # +1/+13, descenders kiss the bottom outline by ~1px, same class as
+    # the v10 kiss — verified visually) ----
+    chk_y = 970
+    d.rectangle([12, chk_y, 1012, chk_y + 24], outline=RED, width=2)
     chk = ("DATE CHECK — Left out, first reported Thursday 19 November: Shenzhen "
            "trilateral summit · Anthropic's $83 IPO debut · ICJ genocide ruling read · "
            "GTA VI launch · Senate's Iran vote. Not yet news: COP31's final agreed text "
@@ -1397,12 +1552,13 @@ def main():
     # v5.4: the 2 lines sit centred in the 28px box (block 968-990 vs
     # box 966-992), not top-anchored at chk_y.
     for j, ln in enumerate(chk_lines):
-        d.text((20, chk_y + 2 + j * 12), ln, font=F_DATECHK, fill=INK)
+        d.text((20, chk_y + 1 + j * 12), ln, font=F_DATECHK, fill=INK)
 
-    # ---- footer 998-1021 (v10: 2 lines, 10px pitch; ink ends ~1021, 3px slack) ----
-    foot_y = 998
+    # ---- footer 997-1021 (v15: 2 lines, 10px pitch; ink ends 1021,
+    # 2px slack, probe-measured from the 10px font bbox +3..+14) ----
+    foot_y = 997
     d.text((512, foot_y), "Reads at three sizes: the date and 3 leads at thumbnail size · "
-           "13 pictures at half size · all 36 stories at full size.",
+           "18 pictures at half size · all 44 stories at full size.",
            font=F_FOOT, fill=GREY, anchor="ma")
     # v6: the pins prefix duplicated the map caption, so it is gone; the
     # BepiColombo note moved there too. Line 2 is now just the source list,
