@@ -1076,6 +1076,36 @@ def draw_map(d, x0, y0, mw, mh):
     for n, (lon, lat) in DOTS.items():
         px, py = project(lon, lat)
         d.ellipse([px - 2, py - 2, px + 2, py + 2], fill="white")
+    # v14: Senegal boat callout — the 14th DRAWN element. Space audit
+    # (2026-11-21, measured before building): a 3rd smalls row needs
+    # ~153px; footer slack is 3px (ink ends 1021/1024); harvesting EVERY
+    # inter-section gap to 0px yields only 29px — no clean space for a
+    # full 14th card without shrinking hero art below the 112px floor or
+    # smalls art below 68px, and the strip alternative (map 92->72px +
+    # gap tightening) buys only ~17px while degrading the map in every
+    # duel. The map's South Atlantic is genuinely empty pixels instead:
+    # probe-sampled v13 entry.png — (150,850),(160,855),(130,860),
+    # (170,860),(140,866),(190,866),(125,862),(195,862),(160,870),
+    # (150,875) all NAVY_DARK ocean, no land, no pin/dot within 15px
+    # (nearest: dot 22 at (125.5,856.7), dot 30 at (163.9,831.5),
+    # dot 33 at (212.7,847.1)). So story 30 (Yenne boat, also-list
+    # only until now) gets a drawn pirogue in that ocean + a red leader
+    # to its dot + a white label, and the map caption names it. Zero
+    # reflow, zero shrinkage, nothing else moves. Facts re-verified
+    # live 2026-11-21: pirogue capsized off Yenne ~02:00 Wed 18 Nov,
+    # 4 bodies recovered (Reuters via Al Jazeera, pub. 20 Nov 2026),
+    # 50-100 aboard, dozens missing. Original PIL vector code only.
+    _sx, _sy = project(-17.2, 14.7)  # dot 30, Yenne / Dakar
+    d.line([(_sx, _sy + 3), (148, 846)], fill=RED, width=1)
+    d.line([(160, 840), (160, 847)], fill="white", width=1)  # mast
+    d.polygon([(160, 840), (160, 845), (166, 843)], fill=RED)  # flag
+    d.polygon([(146, 847), (174, 847), (170, 854), (150, 854)],
+              fill="white")  # pirogue hull
+    d.line([(149, 850), (171, 850)], fill=RED, width=1)  # hull stripe
+    d.line([(144, 857), (176, 857)], fill=(140, 180, 210), width=1)
+    d.line([(150, 859), (170, 859)], fill=(140, 180, 210), width=1)
+    d.text((160, 861), "SENEGAL · 4 DEAD", font=F_LABEL, fill="white",
+           anchor="ma")
     for n, (lon, lat) in PINS.items():
         px, py = project(lon, lat)
         dx, dy = PIN_OFF.get(n, (0, 0))
@@ -1326,7 +1356,9 @@ def main():
     d.rectangle([12, map_y + 22, 348, map_y + 114], fill=NAVY_DARK,
                 outline=RULE, width=1)
     draw_map(d, 12, map_y + 22, 336, 92)
-    d.text((12, map_y + 118), "Red numbers 1–13, white dots 14–36 (27 has no Earth dot).",
+    # v14: caption names the boat callout (320.2px in the 336px column,
+    # probe-measured); the 27 note is kept in shortened form.
+    d.text((12, map_y + 118), "Red 1–13, white dots 14–36 (27 no Earth dot). Boat = Senegal (30).",
            font=F_TTEXT, fill=GREY)
     # how-sure-are-we legend under the map (was the stats row)
     d.text((12, map_y + 130), "HOW SURE ARE WE?", font=F_SEC, fill=INK)
