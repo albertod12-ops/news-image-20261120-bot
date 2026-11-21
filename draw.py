@@ -620,21 +620,9 @@ def art_image(key, w, h):
                        (20, 18), (110, 2), (200, 14), (250, 2), (70, 20),
                        (150, 2), (285, 20), (100, 16)):
             d.ellipse([sx, sy, sx + 2, sy + 2], fill="white")
-        # v4: missile trails arcing across the sky — dashed orange/white
-        # curves from the top edge down toward the bridges, each with a
-        # bright head. Drawn as short dashes along a quadratic arc.
-        for (x0, y0, xc, yc, x1, y1) in (
-                (30, 0, 70, 22, 148, 38), (190, 0, 220, 18, 236, 36),
-                (270, 0, 250, 24, 130, 40)):
-            prev = None
-            for ti in range(21):
-                t = ti / 20
-                qx = int((1 - t) ** 2 * x0 + 2 * (1 - t) * t * xc + t ** 2 * x1)
-                qy = int((1 - t) ** 2 * y0 + 2 * (1 - t) * t * yc + t ** 2 * y1)
-                if prev is not None and ti % 2 == 0:
-                    d.line([prev, (qx, qy)], fill=(255, 180, 80), width=2)
-                prev = (qx, qy)
-            d.ellipse([x1 - 3, y1 - 3, x1 + 3, y1 + 3], fill=(255, 220, 120))
+        # v22: the missile trails moved BELOW the skyline/deck (see the
+        # v22 block after the deck) — the v4 set was drawn here, before
+        # the skyline, so the buildings covered most of each arc.
         # Kyiv skyline across the whole back, lit windows (19 Nov _skyline)
         _skyline(d, w, 52, 46, (38, 58, 96), 7)
         # a gold-domed church in the skyline, right side
@@ -665,6 +653,33 @@ def art_image(key, w, h):
         d.rectangle([168, 40, w, 47], fill=(255, 205, 40))
         d.polygon([(132, 40), (168, 40), (162, 58), (138, 58)],
                   fill=(120, 30, 30))
+        # v22: SEVEN missile trails — #3's last edge. The v4 set was 3
+        # thin dashed arcs drawn BEFORE the skyline, so the buildings
+        # covered most of each arc and only specks showed at the top
+        # edge. #3's Kyiv art is 5-7 long bold continuous streaks
+        # across the whole sky. These 7 are solid width-3 arcs drawn
+        # AFTER the skyline/church/towers/deck, so they read across
+        # the full sky like #3's, fanning down-left from the top edge
+        # to the deck; the two right-hand arcs are routed clear of the
+        # gold dome (T6 passes left of it, T7 right of it). Heads and
+        # glows are drawn last (after the fires) so every warhead
+        # stays visible.
+        for (x0, y0, xc, yc, x1, y1, col) in (
+                (48, 0, 30, 24, 12, 46, (255, 170, 60)),
+                (96, 0, 72, 26, 48, 48, (255, 110, 50)),
+                (144, 0, 122, 26, 98, 48, (255, 200, 90)),
+                (188, 0, 168, 26, 146, 48, (255, 170, 60)),
+                (228, 0, 208, 26, 186, 46, (255, 110, 50)),
+                (262, 0, 232, 24, 210, 46, (255, 200, 90)),
+                (292, 0, 276, 22, 266, 42, (255, 170, 60))):
+            prev = None
+            for ti in range(41):
+                t = ti / 40
+                qx = int((1 - t) ** 2 * x0 + 2 * (1 - t) * t * xc + t ** 2 * x1)
+                qy = int((1 - t) ** 2 * y0 + 2 * (1 - t) * t * yc + t ** 2 * y1)
+                if prev is not None:
+                    d.line([prev, (qx, qy)], fill=col, width=3)
+                prev = (qx, qy)
         # fire on the broken span: layered burst with flame spikes, and a
         # big smoke plume rising from it (overlapping grey clouds)
         d.ellipse([132, 28, 168, 48], fill=(200, 40, 30))
@@ -690,6 +705,17 @@ def art_image(key, w, h):
         d.ellipse([34, 22, 46, 32], fill=(205, 205, 205))
         d.ellipse([142, -2, 158, 12], fill=(225, 225, 225))
         d.ellipse([128, 2, 142, 14], fill=(210, 210, 210))
+        # v22: glowing warheads at all 7 trail ends + a wider smoke
+        # cloud flanking the main column + embers rising from the
+        # break. Drawn last so they sit on top of the deck/fires.
+        for (hx, hy) in ((12, 46), (48, 48), (98, 48), (146, 48),
+                         (186, 46), (210, 46), (266, 42)):
+            d.ellipse([hx - 6, hy - 6, hx + 6, hy + 6], fill=(255, 120, 40))
+            d.ellipse([hx - 3, hy - 3, hx + 3, hy + 3], fill=(255, 235, 150))
+        d.ellipse([112, 8, 128, 20], fill=(215, 215, 215))
+        d.ellipse([158, 6, 174, 18], fill=(225, 225, 225))
+        for ex, ey in ((140, 20), (160, 14), (232, 16), (40, 26), (200, 30)):
+            d.ellipse([ex, ey, ex + 2, ey + 2], fill=(255, 180, 80))
         # debris in the river under the break + a rescue boat, far right
         d.rectangle([138, 62, 150, 66], fill=(40, 40, 40))
         d.rectangle([152, 66, 160, 69], fill=(40, 40, 40))
