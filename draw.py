@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""news-image-20261120 v6: 36 stories, newspaper front page, top-1 chase.
+"""news-image-20261120 v8: 36 stories, newspaper front page, top-10 chase.
 Draws entry.png (1024x1024, deterministic) from world.geo.json only.
-v6 (on the v5 design — cream paper, black serif masthead, 6-number strip,
-region bar, solid art banners): the TOP-3 rebuild — per-item sources on all
-23 also-list items, Kenya oil + Seoul impeachment drawn (Myanmar reaction
-and Gaza strikes demoted to also-list), Nvidia probe + Argentina risk replace
-the two stale also-list items (Meta fine 14 Nov, FAA stop 13 Nov), stats
-"0 fossil-fuel mentions" -> "60.7%" trial response, DATE CHECK rewritten to
-top-3 consensus, masthead subline to 4 items. All facts verified live
-2026-11-21; see research-v5.md + NOTES.md. Design baseline (user-approved
-2026-11-20): boxed 1px INK cards, LiberationSerif-Bold headlines +
-LiberationSerif decks. CONTENT ONLY changed for Friday 20 Nov 2026.
+v8 (on the v7 design — cream paper, black serif masthead, 6-number strip,
+region bar, solid art banners): the TOP-10 rebuild — masthead + hero
+headlines scaled up (title 68->72px, kicker/deckline up a step, hero
+headlines 22->27px with the art shrunk 105->84px to fit and the hero text
+block vertically centred), per-card verification tags (CONFIRMED where
+research-v5.md shows 2+ named outlets agree, REPORTED where single-outlet;
+BepiColombo flagged [FORECAST] in the also-list), legend gains CONFIRMED.
+All facts verified live 2026-11-21; see research-v5.md + NOTES.md. Design
+baseline (user-approved 2026-11-20): boxed 1px INK cards,
+LiberationSerif-Bold headlines + LiberationSerif decks. CONTENT ONLY changed
+for Friday 20 Nov 2026.
 NOTE: the first draw.py run right after an edit can render the pre-edit file
 — always verify with 2-3 runs and take the later sha.
 Run: python3 draw.py  -> writes entry.png in this directory."""
@@ -46,9 +47,12 @@ def load_font(filename, size, base=FD):
 
 # (name, file, size, base) — one table instead of thirty near-identical calls.
 _FONT_TABLE = [
-    ("F_TITLE", "LiberationSerif-Bold.ttf", 68, FLIB),
-    ("F_EYE", "NotoSans-Black.ttf", 13, FNOTO),
-    ("F_DECKLINE", "NotoSerif-Italic.ttf", 16, FNOTO),
+    # v8: masthead scaled up — title 68->72px (76px measured: the title's
+    # descender would hit the deck line), kicker 13->15px, deck line 16->17px
+    # (965px in the 1000px slot; 18px = 1022px, overflow).
+    ("F_TITLE", "LiberationSerif-Bold.ttf", 72, FLIB),
+    ("F_EYE", "NotoSans-Black.ttf", 15, FNOTO),
+    ("F_DECKLINE", "NotoSerif-Italic.ttf", 17, FNOTO),
     ("F_DATE", "NotoSans-Black.ttf", 30, FNOTO),
     ("F_DATE2", "NotoSans-Bold.ttf", 11, FNOTO),
     ("F_TTIME", "NotoSans-Bold.ttf", 12, FNOTO),
@@ -56,14 +60,18 @@ _FONT_TABLE = [
     ("F_KICK", "NotoSans-Bold.ttf", 10, FNOTO),
     # smalls kicker: 10px made #9 touch the pill (0.3px gap)
     ("F_KICK_S", "NotoSans-Bold.ttf", 9, FNOTO),
+    # v8: fallback kicker size — card 12's kicker + CONFIRMED pill overflows
+    # the 196px card at 9px (132+59+12=203); 8px fits (117+59+12=188).
+    ("F_KICK_S8", "NotoSans-Bold.ttf", 8, FNOTO),
     ("F_PILL", "NotoSans-Bold.ttf", 8, FNOTO),
     ("F_SRC", "NotoSans-Bold.ttf", 9, FNOTO),
     # the BANNED/CLOSED stamp, big + bold like the user's reference
     ("F_STAMP", "NotoSans-Black.ttf", 12, FNOTO),
     ("F_HEAD", "LiberationSerif-Bold.ttf", 20, FLIB),
-    # v7: hero headlines one step up (20 -> 22px) so the top-3 stories
-    # read as large text at a glance, like the top-3 entries' text rows.
-    ("F_HEAD_H", "LiberationSerif-Bold.ttf", 22, FLIB),
+    # v8: hero headlines 22 -> 27px (28px measured: COP31 wraps to 3 lines;
+    # 27px is the largest size fitting all three headlines in 2 lines).
+    # Spacing 24 -> 31px in hero_card.
+    ("F_HEAD_H", "LiberationSerif-Bold.ttf", 27, FLIB),
     ("F_HEAD_S", "LiberationSerif-Bold.ttf", 16, FLIB),
     ("F_DECK", "LiberationSerif-Regular.ttf", 12, FLIB),
     ("F_DECK_S", "LiberationSerif-Regular.ttf", 11, FLIB),
@@ -102,65 +110,77 @@ for _fname, _ffile, _fsize, _fbase in _FONT_TABLE:
 del _fname, _ffile, _fsize, _fbase, _FONT_TABLE
 
 PILL_COL = {
+    # v8: CONFIRMED (two named sources agree) joins REPORTED (one named
+    # source) as the per-card verification tag, the #2 pattern. The pill
+    # shows the tag; the old `status` field stays in FRONT for the record.
+    "CONFIRMED": (16, 165, 90),
     "REPORTED": (16, 165, 90),
     "FORECAST": (20, 110, 230),
     "CLAIM": (230, 150, 0),
 }
 
-# num, region, topic, source, status, headline, deck, art big, art small, art key
+# num, region, topic, source, status, headline, deck, art big, art small,
+# art key, verification tag — CONFIRMED where research-v5.md shows 2+
+# named outlets agreeing (Kyiv Reuters+CNN; COP31 Carbon Brief+CNN;
+# markets Reuters+Informist; UK-EU AP+Reuters; Kenya Capital FM+People
+# Daily+Tukio; Italy Reuters+CGIL+ETUC; Seoul JoongAng+Seoul Economic
+# Daily+Asia Daily; Phillips ICC+AP+Reuters; Bukele Reuters+BusinessWorld;
+# Poland Reuters+Polish DefMin; Akvan row says "ALL CONFIRMED", IMD via
+# Hindu BusinessLine + CSR Journal). REPORTED where single-outlet:
+# Iraq (Reuters only), CPI (Reuters only, Japan Statistics Bureau data).
 FRONT = [
     (1, "ODISHA", "STORM", "IMD", "REPORTED",
      "Cyclone Akvan slams into Odisha",
      "Landfall 8:00–11:20am, gusts 90 km/h; 370,000 evacuated, 209mm rain.",
-     "AKVAN", "370,000 EVACUATED", "akvan"),
+     "AKVAN", "370,000 EVACUATED", "akvan", "CONFIRMED"),
     (2, "KYIV", "WAR", "REUTERS", "REPORTED",
      "Russian missiles strike Kyiv's bridges",
      "110+ missiles, 400+ drones; three Dnipro bridges hit; 9 killed, 28 hurt, power cut.",
-     "KYIV BRIDGES", "110+ MISSILES · 400+ DRONES", "kyiv"),
+     "KYIV BRIDGES", "110+ MISSILES · 400+ DRONES", "kyiv", "CONFIRMED"),
     (3, "ANTALYA", "CLIMATE", "CARBON BRIEF", "REPORTED",
      "COP31's final day ends in fossil-fuel deadlock",
      "Draft 2 drops fossil fuels and the $120bn target; '35 by 35' electrification survives.",
-     "COP31", "DRAFT DROPS PHASE-OUT", "cop31"),
+     "COP31", "DRAFT DROPS PHASE-OUT", "cop31", "CONFIRMED"),
     (4, "TOKYO", "MARKETS", "REUTERS", "REPORTED",
      "AI sell-off sinks Asia",
      "Four Asian indexes sink; Taiex worst week since 1990.",
-     "ASIA SINKS", "4 INDEXES DOWN", "selloff"),
+     "ASIA SINKS", "4 INDEXES DOWN", "selloff", "CONFIRMED"),
     (5, "BRUSSELS", "DEAL", "AP · REUTERS", "REPORTED",
      "UK and EU agree post-Brexit reset",
      "Youth mobility ~100,000 a year; food and emissions links.",
-     "UK–EU DEAL", "RESET AGREED", "ukeu"),
+     "UK–EU DEAL", "RESET AGREED", "ukeu", "CONFIRMED"),
     (6, "TURKANA", "OIL", "CAPITAL FM", "REPORTED",
      "Kenya spuds first commercial oil well",
      "Amosing 1 well, Turkana; first oil 1 Dec, 20,000 bpd.",
-     "FIRST OIL", "AMOSING 1 SPUDDED", "kenya"),
+     "FIRST OIL", "AMOSING 1 SPUDDED", "kenya", "CONFIRMED"),
     (7, "ROME", "LABOUR", "REUTERS", "REPORTED",
      "Italy's general strike fills 100 squares",
      "CGIL 24-hr strike; >1m march; vs €26bn 2027 budget.",
-     "ON STRIKE", "100+ SQUARES", "italy"),
+     "ON STRIKE", "100+ SQUARES", "italy", "CONFIRMED"),
     (8, "BAGHDAD", "SECURITY", "REUTERS", "REPORTED",
      "Iraqi forces move on militia stronghold",
      "Troops enter Jurf al-Sakhar, Kataib Hezbollah's base.",
-     "JURF AL-SAKHAR", "MILITIA BASE", "iraq"),
+     "JURF AL-SAKHAR", "MILITIA BASE", "iraq", "REPORTED"),
     (9, "SEOUL", "POLITICS", "JOONGANG DAILY", "REPORTED",
      "Seoul moves to impeach chief justice",
      "Ruling party votes to impeach Jo Hee-de.",
-     "IMPEACH", "CHIEF JUSTICE JO", "seoul"),
+     "IMPEACH", "CHIEF JUSTICE JO", "seoul", "CONFIRMED"),
     (10, "TOKYO", "ECONOMY", "REUTERS", "REPORTED",
      "Japan inflation stays above target",
      "Core CPI 2.2%, headline 2.3%; BoJ hike case cements.",
-     "CPI 2.3%", "ABOVE 2% TARGET", "cpi"),
+     "CPI 2.3%", "ABOVE 2% TARGET", "cpi", "REPORTED"),
     (11, "WELLINGTON", "SPORT", "ICC · AP", "REPORTED",
      "Phillips' 118 makes history",
      "118 off 216; first 100s in all 3 formats vs India in one year.",
-     "PHILLIPS 118", "FIRST IN ALL FORMATS", "cricket"),
+     "PHILLIPS 118", "FIRST IN ALL FORMATS", "cricket", "CONFIRMED"),
     (12, "SAN SALVADOR", "POLITICS", "REUTERS", "REPORTED",
      "Bukele registers for third term",
      "Filed 19 Nov for 28 Feb 2027 vote; vs 4 rivals; polls 55–70%.",
-     "THIRD TERM", "BUKELE FILES", "bukele"),
+     "THIRD TERM", "BUKELE FILES", "bukele", "CONFIRMED"),
     (13, "WARSAW", "SECURITY", "REUTERS", "REPORTED",
      "Russian missile lands in Poland",
      "Kh-101 down in Poland; 3 objects in its airspace.",
-     "MISSILE IN POLAND", "NATO ALERT", "poland"),
+     "MISSILE IN POLAND", "NATO ALERT", "poland", "CONFIRMED"),
 ]
 
 # num, city, text, source — every item carries its outlet (the top-3 pattern);
@@ -179,7 +199,7 @@ ALSO = [
     (24, "Washington", "Senate passes energy bill 62-33", "AP"),
     (25, "Washington", "US sanctions Comancheros", "OFAC"),
     (26, "Siberia", "An-12 crash kills 19", "REUTERS"),
-    (27, "Mercury", "BepiColombo's 8-yr trip ends Saturday", "ESA"),
+    (27, "Mercury", "BepiColombo trip ends Sat [FORECAST]", "ESA"),
     (28, "Naypyidaw", "Myanmar calls ICJ ruling unfair", "REUTERS"),
     (29, "Gaza", "Israeli strikes kill 6 despite truce", "AFP"),
     (30, "Yenne", "Boat: 4 dead, dozens missing", "AL JAZEERA"),
@@ -226,7 +246,10 @@ REGIONS = [
 ]
 
 LEGEND = [
-    ("REPORTED", "confirmed, with named sources"),
+    # v8: CONFIRMED joins the legend (the per-card pill now shows the
+    # verification tag, not the old status word).
+    ("CONFIRMED", "two named sources agree"),
+    ("REPORTED", "one named source"),
     ("FORECAST", "a landfall, schedule or draft"),
     ("CLAIM", "one side's claim, unverified"),
 ]
@@ -1082,35 +1105,46 @@ def draw_map(d, x0, y0, mw, mh):
 
 
 def hero_card(img, d, story, x, y, w):
-    """One hero card: v4 105px art (was 90), navy kicker strip with status
-    pill, a 2-line Times headline and a 2-line serif deck, all inside a 1px
-    ink box whose bottom is fixed per row, like the top-1 entry. The card
-    interior is near-white on the cream page, like the top 3."""
-    num, reg, topic, src, status, head, deck, big, small, key = story
+    """One hero card: v8 84px art (was 105 — shrunk so the hero text can
+    grow), navy kicker strip with the verification-tag pill, a 2-line
+    27px Times headline and a 2-line serif deck, all inside a 1px ink box
+    whose bottom is fixed per row, like the top-1 entry. The card interior
+    is near-white on the cream page, like the top 3. The art is rendered
+    at 105px and LANCZOS-downscaled to 84px (labels drawn before the
+    resize, so they scale with the art and cover nothing new); the
+    headline+deck block is vertically centred in the text area below the
+    kicker strip, so a 1-line headline (Akvan) does not leave a void at
+    the card bottom. Budget (2-line headline): kicker 84-100, headline
+    106-168, deck 170-198, card bottom 205."""
+    num, reg, topic, src, status, head, deck, big, small, key, vtag = story
     d.rectangle([x, y, x + w, y + 205], fill=NEARWHITE)
     art = art_image(key, w, 105)
     art_d = ImageDraw.Draw(art)
     art_text(art, art_d, 0, 0, w, 105, big, small, F_LBL, F_LBL_S)
+    art = art.resize((w, 84), Image.LANCZOS)
     img.paste(art, (x, y))
-    # navy kicker strip: status pill left, "N. REGION · TOPIC" after it,
-    # source right in gold. Strip text is centred on the glyph centre.
-    d.rectangle([x, y + 105, x + w, y + 121], fill=NAVY)
-    pill_w = d.textlength(status, font=F_PILL) + 10
-    d.rounded_rectangle([x + 8, y + 108, x + 8 + pill_w, y + 118],
-                        radius=2, fill=PILL_COL[status])
-    # v5.4: strip text vertically centred on the strip centre (y+113)
-    # with middle anchors, not top-anchored at y+106/y+107.
-    d.text((x + 13, y + 113), status, font=F_PILL, fill="white",
+    # navy kicker strip: verification-tag pill left, "N. REGION · TOPIC"
+    # after it, source right in gold. Strip text is centred on the glyph
+    # centre (strip centre y+92).
+    d.rectangle([x, y + 84, x + w, y + 100], fill=NAVY)
+    pill_w = d.textlength(vtag, font=F_PILL) + 10
+    d.rounded_rectangle([x + 8, y + 87, x + 8 + pill_w, y + 97],
+                        radius=2, fill=PILL_COL[vtag])
+    d.text((x + 13, y + 92), vtag, font=F_PILL, fill="white",
            anchor="lm")
-    d.text((x + 14 + pill_w, y + 113), "%d. %s · %s" % (num, reg, topic),
+    d.text((x + 14 + pill_w, y + 92), "%d. %s · %s" % (num, reg, topic),
            font=F_KICK, fill="white", anchor="lm")
-    d.text((x + w - 8, y + 113), src, font=F_SRC, fill=GOLD, anchor="rm")
+    d.text((x + w - 8, y + 92), src, font=F_SRC, fill=GOLD, anchor="rm")
     head_lines = wrap(d, head, F_HEAD_H, w - 16, max_lines=2)
-    for j, line in enumerate(head_lines):
-        d.text((x + 8, y + 125 + j * 24), line, font=F_HEAD_H, fill=INK)
     deck_lines = wrap(d, deck, F_DECK, w - 16, max_lines=2)
+    # centre the text block in the 105px text area (kicker bottom y+100
+    # to card bottom y+205): 2+2 lines = 92px, 1+2 lines = 61px.
+    block_h = len(head_lines) * 31 + 2 + len(deck_lines) * 14
+    text_y = y + 100 + (105 - block_h) // 2
+    for j, line in enumerate(head_lines):
+        d.text((x + 8, text_y + j * 31), line, font=F_HEAD_H, fill=INK)
     for j, line in enumerate(deck_lines):
-        d.text((x + 8, y + 125 + len(head_lines) * 24 + 2 + j * 14),
+        d.text((x + 8, text_y + len(head_lines) * 31 + 2 + j * 14),
                line, font=F_DECK, fill=(60, 60, 60))
     d.rectangle([x, y, x + w, y + 205], outline=INK, width=1)
 
@@ -1118,10 +1152,14 @@ def hero_card(img, d, story, x, y, w):
 def small_card(img, d, story, x, y):
     """One small card: 80px art with a v4 SOLID colour banner at its top
     (red, navy for the court/rates cards) carrying the art label in white,
-    navy kicker strip with the status pill on the right, a 2-line Times
-    headline and a 2-line serif deck + source, all inside a 1px ink box
-    with a fixed bottom per row. Card interior near-white on cream."""
-    num, reg, topic, src, status, head, deck, big, small, key = story
+    navy kicker strip with the verification-tag pill on the right, a 2-line
+    Times headline and a 2-line serif deck + source, all inside a 1px ink
+    box with a fixed bottom per row. Card interior near-white on cream.
+    v8: the pill shows the verification tag (CONFIRMED/REPORTED), and the
+    kicker font auto-shrinks 9 -> 8px when kicker + pill would overflow
+    the 196px card (card 12 only: 132+59+12=203 at 9px, 188 at 8px) —
+    the same pattern art_banner uses for long label pairs."""
+    num, reg, topic, src, status, head, deck, big, small, key, vtag = story
     w = 196
     d.rectangle([x, y, x + w, y + 161], fill=NEARWHITE)
     art = art_image(key, w, 80)
@@ -1132,12 +1170,16 @@ def small_card(img, d, story, x, y):
     d.rectangle([x, y + 80, x + w, y + 95], fill=NAVY)
     # v5.4: strip text vertically centred on the strip centre (y+87.5)
     # with middle anchors, not top-anchored at y+81.
-    d.text((x + 4, y + 87.5), "%d. %s · %s" % (num, reg, topic),
-           font=F_KICK_S, fill="white", anchor="lm")
-    pill_w = d.textlength(status, font=F_PILL) + 10
+    kick_text = "%d. %s · %s" % (num, reg, topic)
+    pill_w = d.textlength(vtag, font=F_PILL) + 10
+    f_kick = F_KICK_S
+    if d.textlength(kick_text, font=f_kick) + pill_w + 12 > w:
+        f_kick = F_KICK_S8
+    d.text((x + 4, y + 87.5), kick_text,
+           font=f_kick, fill="white", anchor="lm")
     d.rounded_rectangle([x + w - 4 - pill_w, y + 82, x + w - 4, y + 92],
-                        radius=2, fill=PILL_COL[status])
-    d.text((x + w + 1 - pill_w, y + 87.5), status, font=F_PILL,
+                        radius=2, fill=PILL_COL[vtag])
+    d.text((x + w + 1 - pill_w, y + 87.5), vtag, font=F_PILL,
            fill="white", anchor="lm")
     head_lines = wrap(d, head, F_HEAD_S, w - 16, max_lines=2)
     for j, line in enumerate(head_lines):
@@ -1159,7 +1201,9 @@ def main():
     d.text((12, 1), "THE WORLD IN ONE DAY", font=F_EYE, fill=RED)
     # thin ink rule above the title, with equal gaps to the kicker and title
     d.line([12, 20, 1012, 20], fill=INK, width=1)
-    d.text((12, 11), "Friday 20 November 2026", font=F_TITLE, fill=INK)
+    # v8: title 68->72px, anchor y=11->8 (ink ~22-88: 2px clear of the
+    # rule at 20 and of the deck line's ink top at ~90).
+    d.text((12, 8), "Friday 20 November 2026", font=F_TITLE, fill=INK)
     deck_line = ("Akvan hits Odisha · Russian missiles strike Kyiv's bridges · "
                  "COP31 deadlocks on fossil fuels · Asia's AI sell-off sinks markets")
     d.text((12, 84), deck_line, font=F_DECKLINE, fill=RED)
@@ -1215,7 +1259,9 @@ def main():
         ly = map_y + 176 + li * 12
         d.rectangle([12, ly, 20, ly + 8], fill=PILL_COL[st])
         d.text((24, ly - 1), st, font=F_LEGEND, fill=INK)
-        d.text((86, ly - 1), expl, font=F_LEGEND, fill=GREY)
+        # v8: explanation at x=92 (was 86) — "CONFIRMED" is wider than
+        # "REPORTED" and would leave only a 1px gap at x=86.
+        d.text((92, ly - 1), expl, font=F_LEGEND, fill=GREY)
 
     also_x = 364
     d.text((also_x, map_y), "ALSO ON FRIDAY 20 NOVEMBER", font=F_SEC, fill=INK)
