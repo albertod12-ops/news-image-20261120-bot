@@ -47,13 +47,20 @@ def load_font(filename, size, base=FD):
 
 # (name, file, size, base) — one table instead of thirty near-identical calls.
 _FONT_TABLE = [
-    # v9: masthead scaled up — title 72->90px. MEASURED first: at 90px the
-    # title is 996px wide in the 1000px slot; 92px = 1018px, OVERFLOW.
-    # 90px is the largest clean size with this typeface and the full
-    # "Friday 20 November 2026" text (no shortening allowed). It matches
-    # #3/#10 (~90px), beats #5 (~85px) and #6 (~70px); #1/#8 (~110px)
-    # are unreachable without a narrower face or shorter text.
-    ("F_TITLE", "LiberationSerif-Bold.ttf", 90, FLIB),
+    # v10: masthead title 90->108px SQUEEZED. MEASURED first: no installed
+    # condensed serif is actually narrower than LiberationSerif-Bold per
+    # point (NotoSerif-CondensedBold 1113px at 100px vs Liberation 1107px;
+    # Display ExtraCondensedBold 1032px at 100px -> only 96px fits, ink
+    # ~85px). So the title is rendered at 108px and LANCZOS-squeezed
+    # horizontally to 996px (0.834x) — a condensed newspaper masthead,
+    # our own text and font, no other entry's image involved. Ink height
+    # 80px (v9) -> 99px on the page, matching #3 (100px) and beating #1
+    # (84px) and #2 (94px); the squeeze reads clean at 2x (prototype
+    # /tmp/title-proto-108.png). Ink top stays 22 (2px clear of the rule
+    # at 20); deck line moves to y=118 (2px clear of the title's
+    # descenders), bottom rule to 142-144; everything below shifts +8,
+    # footer ink ends 1021 (2px slack, measured).
+    ("F_TITLE", "LiberationSerif-Bold.ttf", 108, FLIB),
     ("F_EYE", "NotoSans-Black.ttf", 15, FNOTO),
     ("F_DECKLINE", "NotoSerif-Italic.ttf", 17, FNOTO),
     ("F_DATE", "NotoSans-Black.ttf", 30, FNOTO),
@@ -1110,11 +1117,10 @@ def draw_map(d, x0, y0, mw, mh):
                    font=fnt, fill="white")
 
 
-# v9 layout constants: hero art back up (140px, was 84) while keeping the
-# 27px headlines, and the masthead title at 90px. The space comes from
-# compressing the stats strip (28px), region bar (12px), small-card art
-# (68px, rendered at 80 and LANCZOS-downscaled like the heroes), the map
-# (92px) and tighter section gaps (4-6px) — no story, source or fact cut.
+# v10 layout constants: masthead title 108px squeezed (was 90px); hero
+# art 140px, 27px headlines, stats strip 28px, region bar 12px,
+# small-card art 68px, map 92px — everything below the masthead shifts
+# +7px from v9, nothing else shrinks (footer ink ends ~1021, 3px slack).
 HERO_ART_H = 140
 HERO_CARD_H = HERO_ART_H + 16 + 105
 SMALL_ART_H = 68
@@ -1218,32 +1224,43 @@ def main():
     img = Image.new("RGB", (W, H), PAPER)
     d = ImageDraw.Draw(img)
 
-    # ---- masthead 0-136 (v9): title 90px — the largest clean size
-    # (996px in the 1000px slot; 92px = 1018px overflow). Anchor y=4:
-    # ink 22-105, 2px clear of the rule at 20; deck line at y=109
-    # (ink ~112-126); bottom rule 134-136. Kicker/rule unchanged. ----
-    d.text((12, 1), "THE WORLD IN ONE DAY", font=F_EYE, fill=RED)
-    # thin ink rule above the title, with equal gaps to the kicker and title
-    d.line([12, 20, 1012, 20], fill=INK, width=1)
-    d.text((12, 4), "Friday 20 November 2026", font=F_TITLE, fill=INK)
+    # ---- masthead 0-144 (v10): title 108px squeezed to 996px (see the
+    # F_TITLE comment) — ink 23-121 (99px tall), top 2px clear of the
+    # rule at 20; deck line at y=118 (ink 124-140, 2px clear of the
+    # title descenders); bottom rule 142-144 (1px clear of the deck
+    # descenders). Kicker unchanged. The +8 rule shift is funded by
+    # 7px of gap tightening below (heroes→smalls 6→4, smalls pitch
+    # 155→153, legend→date-check 6→4), so the footer lands at 998
+    # with ink ending 1021 (2px slack, measured). ----
+    # v10: render the title at 108px on its own layer, squeeze it
+    # horizontally to 996px (LANCZOS), paste so its ink top sits at 22.
+    # Vertical scale is untouched, so the ink stays 100px tall.
+    _title = "Friday 20 November 2026"
+    _tw = int(d.textlength(_title, font=F_TITLE)) + 8
+    _layer = Image.new("RGBA", (_tw, 150), (0, 0, 0, 0))
+    _lt = ImageDraw.Draw(_layer)
+    _lt.text((4, 0), _title, font=F_TITLE, fill=INK + (255,))
+    _tbb = _layer.getbbox()
+    _sq = _layer.resize((996, 150), Image.LANCZOS)
+    img.paste(_sq, (12, 22 - _tbb[1]), _sq)
     deck_line = ("Akvan hits Odisha · Russian missiles strike Kyiv's bridges · "
                  "COP31 deadlocks on fossil fuels · Asia's AI sell-off sinks markets")
-    d.text((12, 109), deck_line, font=F_DECKLINE, fill=RED)
+    d.text((12, 118), deck_line, font=F_DECKLINE, fill=RED)
     d.text((1012, 1), "36 STORIES · 7 REGIONS · EVERY ONE DATED FRIDAY 20 NOVEMBER 2026",
            font=F_EYE, fill=INK, anchor="ra")
-    d.rectangle([0, 134, W, 136], fill=INK)
+    d.rectangle([0, 142, W, 144], fill=INK)
 
-    # ---- big-numbers strip 140-168 (v9: compressed 36->28px to fund the
-    # masthead + hero art — value 18px, caption 9px) ----
+    # ---- big-numbers strip 148-176 (v10: +8 rule shift, 7px recovered
+    # from the gaps below; value 18px, caption 9px, unchanged) ----
     slot_w = (W - 24) / len(STATS)
     for i, (value, caption) in enumerate(STATS):
         x = 12 + i * slot_w
-        d.rectangle([x, 144, x + 3, 168], fill=RED)
-        d.text((x + 10, 141), value, font=F_STATB18, fill=INK)
-        d.text((x + 10, 158), caption, font=F_STATC9, fill=GREY)
+        d.rectangle([x, 152, x + 3, 176], fill=RED)
+        d.text((x + 10, 149), value, font=F_STATB18, fill=INK)
+        d.text((x + 10, 166), caption, font=F_STATC9, fill=GREY)
 
-    # ---- region bar 172-184 (v9: 20->12px) ----
-    bar_x, bar_y, bar_w, bar_h = 12, 172, 1000, 12
+    # ---- region bar 180-192 (v10) ----
+    bar_x, bar_y, bar_w, bar_h = 12, 180, 1000, 12
     seg_w = bar_w / len(REGIONS)
     for i, (label, count, fill, ink) in enumerate(REGIONS):
         sx = bar_x + i * seg_w
@@ -1253,22 +1270,22 @@ def main():
         d.text((sx + seg_w / 2, bar_y + 6), "%s %d" % (label, count),
                font=F_SRC, fill=ink, anchor="mm")
 
-    # ---- heroes 190-451: lead 396 wide, rails 294; each card boxed like top 1 ----
-    hero_y = 190
+    # ---- heroes 198-459 (v10): lead 396 wide, rails 294; each card boxed like top 1 ----
+    hero_y = 198
     hero_widths = [396, 294, 294]
     hero_x = 12
     for i, story in enumerate(FRONT[:3]):
         hero_card(img, d, story, hero_x, hero_y, hero_widths[i])
         hero_x += hero_widths[i] + 8
 
-    # ---- smalls 457-761 (v9: 2 rows x 5, cards 149 tall, image 196x68) ----
+    # ---- smalls 463-765 (v10: row pitch 155->153, gap 6->4; 2 rows x 5, cards 149 tall, image 196x68) ----
     for r in range(2):
         for c in range(5):
             k = 3 + r * 5 + c
-            small_card(img, d, FRONT[k], 12 + c * 204, 457 + r * 155)
+            small_card(img, d, FRONT[k], 12 + c * 204, 463 + r * 153)
 
-    # ---- map + also 767-956 (v9: map 92 tall, was 120) ----
-    map_y = 767
+    # ---- map + also 771-960 (v10: map 92 tall) ----
+    map_y = 771
     d.text((12, map_y), "WHERE IT HAPPENED", font=F_SEC, fill=INK)
     d.line([12, map_y + 16, 348, map_y + 16], fill=INK, width=1)
     d.rectangle([12, map_y + 22, 348, map_y + 114], fill=NAVY_DARK,
@@ -1302,21 +1319,21 @@ def main():
         lines = wrap(d, full, F_ALSO, col_w - 22, max_lines=1)
         d.text((x + 20, y), lines[0] if lines else "", font=F_ALSO, fill=INK)
 
-    # ---- date check 962-990: thin 2-line band (was a 40px box) ----
-    chk_y = 962
+    # ---- date check 964-992 (v10: gap to legend 6->4; thin 2-line band) ----
+    chk_y = 964
     d.rectangle([12, chk_y, 1012, chk_y + 28], outline=RED, width=2)
     chk = ("DATE CHECK — Left out, first reported Thursday 19 November: Shenzhen "
            "trilateral summit · Anthropic's $83 IPO debut · ICJ genocide ruling read · "
            "GTA VI launch · Senate's Iran vote. Not yet news: COP31's final agreed text "
            "(talks run on) · BepiColombo's Mercury orbit (Saturday).")
     chk_lines = wrap(d, chk, F_DATECHK, 976, max_lines=2)
-    # v5.4: the 2 lines sit centred in the 28px box (block 966-988 vs
-    # box 964-992), not top-anchored at chk_y.
+    # v5.4: the 2 lines sit centred in the 28px box (block 968-990 vs
+    # box 966-992), not top-anchored at chk_y.
     for j, ln in enumerate(chk_lines):
         d.text((20, chk_y + 2 + j * 12), ln, font=F_DATECHK, fill=INK)
 
-    # ---- footer 996-1016 (v9: 2 lines, 10px pitch) ----
-    foot_y = 996
+    # ---- footer 998-1021 (v10: 2 lines, 10px pitch; ink ends ~1021, 3px slack) ----
+    foot_y = 998
     d.text((512, foot_y), "Reads at three sizes: the date and 3 leads at thumbnail size · "
            "13 pictures at half size · all 36 stories at full size.",
            font=F_FOOT, fill=GREY, anchor="ma")
