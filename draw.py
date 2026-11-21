@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""news-image-20261120 v11: 36 stories, newspaper front page, top-10 chase.
+"""news-image-20261120 v8: 36 stories, newspaper front page, top-10 chase.
 Draws entry.png (1024x1024, deterministic) from world.geo.json only.
-v11 (on the v10 design — cream paper, black serif masthead 108px squeezed,
-6-number strip, region bar, solid art banners): ONE change — card 10 is
-now BepiColombo drawn (Mercury + spacecraft + orbit, original PIL vector
-art, FORECAST pill: orbit insertion is Saturday 21 Nov, not 20 Nov) in
-place of Japan CPI, which drops to also-list 27 (its 2.3% stays in the
-stats strip). Pin 10 leaves the map (no Earth dot); 27 becomes the Tokyo
-CPI dot. Region counts net unchanged (ASIA 10, GLOBAL 3).
+v8 (on the v7 design — cream paper, black serif masthead, 6-number strip,
+region bar, solid art banners): the TOP-10 rebuild — masthead + hero
+headlines scaled up (title 68->72px, kicker/deckline up a step, hero
+headlines 22->27px with the art shrunk 105->84px to fit and the hero text
+block vertically centred), per-card verification tags (CONFIRMED where
+research-v5.md shows 2+ named outlets agree, REPORTED where single-outlet;
+BepiColombo flagged [FORECAST] in the also-list), legend gains CONFIRMED.
 All facts verified live 2026-11-21; see research-v5.md + NOTES.md. Design
 baseline (user-approved 2026-11-20): boxed 1px INK cards,
 LiberationSerif-Bold headlines + LiberationSerif decks. CONTENT ONLY changed
@@ -140,9 +140,7 @@ PILL_COL = {
 # Daily+Asia Daily; Phillips ICC+AP+Reuters; Bukele Reuters+BusinessWorld;
 # Poland Reuters+Polish DefMin; Akvan row says "ALL CONFIRMED", IMD via
 # Hindu BusinessLine + CSR Journal). REPORTED where single-outlet:
-# Iraq (Reuters only). BepiColombo is FORECAST (a schedule: ESA +
-# Wikipedia + EarthSky agree insertion is Sat 21 Nov, not 20 Nov);
-# CPI (Reuters only, Japan Statistics Bureau data) is now also-list 27.
+# Iraq (Reuters only), CPI (Reuters only, Japan Statistics Bureau data).
 FRONT = [
     (1, "ODISHA", "STORM", "IMD", "REPORTED",
      "Cyclone Akvan slams into Odisha",
@@ -180,10 +178,10 @@ FRONT = [
      "Seoul moves to impeach chief justice",
      "Ruling party votes to impeach Jo Hee-de.",
      "IMPEACH", "CHIEF JUSTICE JO", "seoul", "CONFIRMED"),
-    (10, "MERCURY", "SPACE", "ESA", "REPORTED",
-     "BepiColombo's 8-year trip ends Saturday",
-     "Orbit insertion Saturday; 8-year trip ends, 590×11,640 km orbit.",
-     "BEPICOLOMBO", "ORBIT SATURDAY", "bepi", "FORECAST"),
+    (10, "TOKYO", "ECONOMY", "REUTERS", "REPORTED",
+     "Japan inflation stays above target",
+     "Core CPI 2.2%, headline 2.3%; BoJ hike case cements.",
+     "CPI 2.3%", "ABOVE 2% TARGET", "cpi", "REPORTED"),
     (11, "WELLINGTON", "SPORT", "ICC · AP", "REPORTED",
      "Phillips' 118 makes history",
      "118 off 216; first 100s in all 3 formats vs India in one year.",
@@ -214,7 +212,7 @@ ALSO = [
     (24, "Washington", "Senate passes energy bill 62-33", "AP"),
     (25, "Washington", "US sanctions Comancheros", "OFAC"),
     (26, "Siberia", "An-12 crash kills 19", "REUTERS"),
-    (27, "Tokyo", "Japan CPI 2.2% core, 2.3% headline", "REUTERS"),
+    (27, "Mercury", "BepiColombo trip ends Sat [FORECAST]", "ESA"),
     (28, "Naypyidaw", "Myanmar calls ICJ ruling unfair", "REUTERS"),
     (29, "Gaza", "Israeli strikes kill 6 despite truce", "AFP"),
     (30, "Yenne", "Boat: 4 dead, dozens missing", "AL JAZEERA"),
@@ -239,16 +237,15 @@ STATS = [
 # list (FRONT 1-13 + ALSO 14-36), assigned by subject, not dateline city.
 # EUROPE 9: 2 Kyiv, 5 UK-EU, 7 Italy strike, 13 Poland, 15 Brussels,
 #   16 London, 17 Paris, 31 Barcelona, 36 youth strike.
-# ASIA 10: 1 Akvan, 4 Nikkei, 9 Seoul, 18 Taipei,
-#   19 Tokyo, 26 An-12, 27 Japan CPI, 28 Myanmar reaction, 32 Beijing,
-#   35 Shenzhen.
+# ASIA 10: 1 Akvan, 4 Nikkei, 9 Seoul, 10 Japan CPI, 18 Taipei,
+#   19 Tokyo, 26 An-12, 28 Myanmar reaction, 32 Beijing, 35 Shenzhen.
 # AMERICAS 7: 12 Bukele, 21 Nvidia probe, 22 Argentina risk, 23 AI chips,
 #   24 Senate, 25 sanctions, 34 Las Vegas.
 # MIDDLE EAST 3: 8 Iraq, 14 Riyadh, 29 Gaza strikes.
 # AFRICA 3: 6 Kenya oil, 30 Yenne, 33 Blantyre.
 # OCEANIA 1: 11 Phillips (Wellington).
-# GLOBAL 3: 3 COP31 (global climate summit), 10 BepiColombo,
-#   20 IMF debt warning.
+# GLOBAL 3: 3 COP31 (global climate summit), 20 IMF debt warning,
+#   27 BepiColombo.
 # Total 9+10+7+3+3+1+3 = 36.
 # (label, count, fill, text colour)
 REGIONS = [
@@ -273,7 +270,7 @@ LEGEND = [
 PINS = {
     1: (85.0, 19.3), 2: (30.5, 50.4), 3: (30.7, 36.9), 4: (139.7, 35.7),
     5: (4.4, 50.8), 6: (35.9, 3.1), 7: (12.5, 41.9), 8: (44.2, 32.8),
-    9: (127.0, 37.5), 11: (174.8, -41.3),
+    9: (127.0, 37.5), 10: (139.7, 35.7), 11: (174.8, -41.3),
     12: (-89.2, 13.7), 13: (21.0, 52.2),
 }
 DOTS = {
@@ -281,14 +278,12 @@ DOTS = {
     18: (121.6, 25.0), 19: (139.7, 35.7), 20: (-77.0, 38.9),
     21: (-74.0, 40.7), 22: (-58.4, -34.6), 23: (-77.0, 38.9),
     24: (-77.0, 38.9), 25: (-77.0, 38.9), 26: (96.0, 60.0),
-    27: (139.7, 35.7),
     28: (96.2, 19.8), 29: (34.4, 31.5), 30: (-17.2, 14.7),
     31: (2.2, 41.4), 32: (116.4, 39.9), 33: (35.0, -15.8),
     34: (-115.1, 36.2), 35: (114.1, 22.5), 36: (4.4, 50.8),
 }
-# v11: 10 BepiColombo has no Earth location (Mercury orbit insertion) —
-# it gets no pin, by design (like 27 before the swap); 27 is now the
-# Tokyo CPI dot.
+# v5: 27 BepiColombo has no Earth location (Mercury orbit insertion) —
+# it gets no dot, by design.
 
 PROBLEMS = []
 
@@ -699,7 +694,7 @@ def art_image(key, w, h):
         d.polygon([(166, 52), (160, 62), (172, 62)], fill=(20, 20, 20))
     elif key == "selloff":
         # v5.2: user rejected the v5.1 3D blue bars — redraw as the
-        # VERTICAL MIRROR of the old card-10 CPI rising chart (which the
+        # VERTICAL MIRROR of card 10 (the CPI rising chart, which the
         # user likes): same style — rainbow bars + ONE thick dark
         # curved arrow — but flipped: bars DESCEND left to right and
         # the arrow curves DOWN from top-left to bottom-right. Same
@@ -849,55 +844,39 @@ def art_image(key, w, h):
         d.polygon([(156, 42), (176, 34), (182, 44), (162, 52)],
                   fill=(120, 80, 40))
         d.ellipse([140, 64, 162, 72], fill=(100, 65, 30))
-    elif key == "bepi":
-        # v11: BepiColombo's 8-year trip ends at Mercury — a drawn space
-        # panel: deep-space field, the cratered Mercury disc on its
-        # elliptical orbit, and the ESA craft (gold body, blue solar
-        # wings, white dish) riding the orbit up to it. Insertion is
-        # Saturday 21 Nov, so the card carries the FORECAST pill.
+    elif key == "cpi":
+        # v5.1: per the user's new reference (5 ascending rainbow bars +
+        # one thick dark curved arrow rising) — the v5 navy bars + red
+        # zigzag are gone. Same verified CPI data (core 2.2%, headline
+        # 2.3%). Light card background kept (not the reference's black).
         # Original PIL vector code.
-        d.rectangle([0, 0, w, h], fill=(10, 16, 40))
-        # stars, deterministic fixed positions (banner covers y0-18)
-        for sx, sy, sr, scol in (
-                (8, 24, 1, "white"), (22, 44, 1, (255, 220, 120)),
-                (30, 66, 2, "white"), (44, 28, 1, "white"),
-                (52, 58, 1, (180, 200, 255)), (66, 72, 1, "white"),
-                (96, 22, 1, "white"), (104, 64, 2, (255, 220, 120)),
-                (120, 70, 1, "white"), (172, 26, 1, "white"),
-                (180, 58, 2, "white"), (188, 40, 1, (180, 200, 255)),
-                (14, 56, 1, "white"), (58, 34, 1, "white")):
-            d.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=scol)
-        # the orbit: a pale ellipse around Mercury, drawn BEFORE the disc
-        # so the line passes behind it
-        d.ellipse([80, 26, 196, 74], outline=(200, 200, 220), width=1)
-        # Mercury: cratered grey-tan disc, right of centre
-        d.ellipse([110, 22, 166, 78], fill=(168, 152, 128),
-                  outline=(120, 105, 85), width=1)
-        for cx, cy, cr in ((122, 38, 5), (146, 32, 4), (132, 58, 6),
-                           (152, 52, 3), (124, 64, 4), (140, 44, 3)):
-            d.ellipse([cx - cr, cy - cr, cx + cr, cy + cr],
-                      fill=(120, 105, 85))
-        # pale highlight on the sunlit top-left rim
-        d.ellipse([114, 24, 136, 40], fill=(190, 175, 150))
-        # the craft, riding the orbit's upper-left arc: gold body,
-        # blue solar wings with panel lines, white dish on top
-        d.rectangle([60, 38, 76, 46], fill=(40, 80, 180),
-                    outline=(20, 50, 130), width=1)
-        d.line([64, 38, 64, 46], fill=(20, 50, 130), width=1)
-        d.line([68, 38, 68, 46], fill=(20, 50, 130), width=1)
-        d.line([72, 38, 72, 46], fill=(20, 50, 130), width=1)
-        d.rectangle([92, 38, 108, 46], fill=(40, 80, 180),
-                    outline=(20, 50, 130), width=1)
-        d.line([96, 38, 96, 46], fill=(20, 50, 130), width=1)
-        d.line([100, 38, 100, 46], fill=(20, 50, 130), width=1)
-        d.line([104, 38, 104, 46], fill=(20, 50, 130), width=1)
-        d.rectangle([76, 36, 92, 48], fill=GOLD,
-                    outline=(180, 130, 20), width=1)
-        d.line([80, 36, 80, 48], fill=(180, 130, 20), width=1)
-        d.line([88, 36, 88, 48], fill=(180, 130, 20), width=1)
-        d.line([84, 36, 84, 30], fill=(200, 200, 200), width=2)
-        d.ellipse([80, 24, 88, 32], fill="white",
-                  outline=(150, 150, 150), width=1)
+        d.rectangle([0, 0, w, h], fill=(245, 240, 228))
+        for gy in range(18, h, 12):
+            d.line([0, gy, w, gy], fill=(210, 205, 190), width=1)
+        for gx in range(0, w, 24):
+            d.line([gx, 18, gx, h], fill=(228, 223, 208), width=1)
+        # five rainbow bars, ascending left to right, baseline y68
+        cols = ((60, 180, 80), (250, 200, 40), (240, 130, 30),
+                (220, 50, 50), (40, 140, 220))
+        for i, col in enumerate(cols):
+            bx = 10 + i * 36
+            top = 68 - (12 + i * 7)
+            d.rectangle([bx, top, bx + 24, 68], fill=col)
+            light = tuple(min(255, c + 60) for c in col)
+            d.rectangle([bx, top, bx + 24, top + 2], fill=light)
+        # v5.4: arrowhead pulled back for clearance — 17px from the
+        # "2.3%" focal (was 9px), tail 6px above the coins, head top
+        # 14px below the banner. Same smooth tapered style and colour.
+        smooth_arrow(img, (8, 62), (44, 60), (90, 52), (134, 33),
+                     (30, 30, 40))
+        # red 2.3% focal, top-right, clear of the arrowhead (ends x148)
+        d.text((192, 24), "2.3%", font=F_ART2, fill=RED, anchor="ra",
+               stroke_width=1, stroke_fill="white")
+        # gold coins along the bottom
+        for cx in (14, 44, 74, 104, 134, 164):
+            d.ellipse([cx, 72, cx + 12, 80], fill=GOLD,
+                      outline=(180, 130, 20), width=1)
+            d.ellipse([cx + 3, 74, cx + 9, 78], fill=(255, 220, 80))
     elif key == "cricket":
         # v5.6: Glenn Phillips 118 at the Basin Reserve — a full match
         # scene, not a bare pitch: packed crowd stands + floodlights
@@ -1054,19 +1033,18 @@ def art_image(key, w, h):
 # Seven pins crowd Europe + the Levant (Kyiv/Antalya/Brussels/The Hague/Rome/
 # Gaza/Iraq within ~40x30px), so they are fanned out radially: 6 north-west,
 # 7 west, 5 south-west, 2 north-east, 3 south, 9 south, 8 east.
-# v5: 11 (Wellington) sits at the map's right edge, pulled left; 13
-# (Warsaw) sits ~9px from Kyiv's true spot, pushed south-west.
+# v5: 10 (Tokyo CPI) shares 4's spot, so it is pushed south-east; 11
+# (Wellington) sits at the map's right edge, pulled left; 13 (Warsaw) sits
+# ~9px from Kyiv's true spot, pushed south-west.
 # v5.6: 4 (Tokyo markets) shared its exact spot with 10 AND sat on the
 # coastline with the white Seoul dot touching its left edge, so at page
 # size it read as half-covered; it is pushed north-east into the open
-# Pacific, clear of the Seoul dot.
+# Pacific, clear of 10's circle and leader line.
 # v6: 6 (Turkana) sits in open central Africa and 9 (Seoul) sits ~12px
 # west of Tokyo's true spot with both Tokyo pins fanned away, so neither
 # needs an offset any more.
-# v11: 10 is gone (BepiColombo has no Earth dot), so 4 no longer shares
-# its spot with a second Tokyo pin.
 PIN_OFF = {2: (18, -16), 3: (2, 14), 4: (20, -14), 5: (-6, 26),
-           7: (-30, 8), 8: (16, -14),
+           7: (-30, 8), 8: (16, -14), 10: (18, 14),
            11: (-14, 0), 13: (-18, 12)}
 
 
@@ -1139,27 +1117,30 @@ def draw_map(d, x0, y0, mw, mh):
                    font=fnt, fill="white")
 
 
-# v10 layout constants: masthead title 108px squeezed (was 90px); hero
-# art 140px, 27px headlines, stats strip 28px, region bar 12px,
-# small-card art 68px, map 92px — everything below the masthead shifts
-# +7px from v9, nothing else shrinks (footer ink ends ~1021, 3px slack).
-HERO_ART_H = 140
+# v12 layout constants: timeline strip added (28px, see main) funded by
+# hero art 140->112px (Option A — measured vs Option B, smalls 68->54px:
+# /tmp/optB-v12 prototype; A wins, see NOTES.md). Hero card 233 tall,
+# heroes bottom stays 459, everything below unchanged (footer ink ~1021).
+# Masthead 108px squeezed, stats 28px, region bar 12px, small-card art
+# 68px, map 92px.
+HERO_ART_H = 112
 HERO_CARD_H = HERO_ART_H + 16 + 105
 SMALL_ART_H = 68
 SMALL_CARD_H = SMALL_ART_H + 81
 
 
 def hero_card(img, d, story, x, y, w):
-    """One hero card: v9 140px art (was 84 — the v8 head-to-head measured
-    the top 10's hero art at ~150-220px tall vs our 84px), navy kicker
+    """One hero card: v12 112px art (was 140 — the 28px funds the UTC
+    timeline strip; the v10 head-to-head measured the top 10's hero art
+    at ~110-220px, so 112px is still in range), navy kicker
     strip with the verification-tag pill, a 2-line 27px Times headline
     and a 2-line serif deck, all inside a 1px ink box. The art is rendered
-    at 105px and LANCZOS-resized to 140px (labels drawn before the resize,
+    at 105px and LANCZOS-resized to 112px (labels drawn before the resize,
     so they scale with the art and cover nothing new); the headline+deck
     block is vertically centred in the 105px text area below the kicker
     strip, so a 1-line headline (Akvan) does not leave a void at the card
-    bottom. Budget (2-line headline): art 0-140, kicker 140-156,
-    headline 162-224, deck 226-254, card bottom 261."""
+    bottom. Budget (2-line headline): art 0-112, kicker 112-128,
+    headline 134-196, deck 198-226, card bottom 233."""
     num, reg, topic, src, status, head, deck, big, small, key, vtag = story
     d.rectangle([x, y, x + w, y + HERO_CARD_H], fill=NEARWHITE)
     art = art_image(key, w, 105)
@@ -1213,7 +1194,7 @@ def small_card(img, d, story, x, y):
     d.rectangle([x, y, x + w, y + SMALL_CARD_H], fill=NEARWHITE)
     art = art_image(key, w, 80)
     art_d = ImageDraw.Draw(art)
-    banner_fill = RED
+    banner_fill = NAVY if key == "cpi" else RED
     art_banner(art, art_d, 0, 0, w, 80, big, small, banner_fill)
     art = art.resize((w, SMALL_ART_H), Image.LANCZOS)
     img.paste(art, (x, y))
@@ -1292,8 +1273,37 @@ def main():
         d.text((sx + seg_w / 2, bar_y + 6), "%s %d" % (label, count),
                font=F_SRC, fill=ink, anchor="mm")
 
-    # ---- heroes 198-459 (v10): lead 396 wide, rails 294; each card boxed like top 1 ----
-    hero_y = 198
+    # ---- UTC timeline 195-224 (v12: the #2 device — the day's events
+    # anchored to the clock, evenly spaced columns, NOT to scale: the
+    # morning cluster 04:30-06:30 would collide on a true 24h axis.
+    # Times verified live 2026-11-21, conversions in NOTES.md:
+    # 02:30 Akvan landfall (8:00 IST, IMD); 04:30 Kyiv barrage ends
+    # (last blasts ~06:30 Kyiv, Kyiv Independent); 05:30 missile in
+    # Poland (~06:30 CET, Polish DefMin); 06:30 Nikkei closes -5.1%
+    # (15:30 JST close, JPX); 20:00 Italy rail strike (21:00 CET,
+    # railfreight.com / US Embassy Rome); 21:00 Wall St closes
+    # (16:00 EST, NYSE). Label 72.5px, longest event 94.5px in the
+    # 148.7px column — probe-measured before building. ----
+    tl_y = 195
+    d.text((12, tl_y), "FRIDAY IN UTC", font=F_TTEXT, fill=RED)
+    tl_x0, tl_x1 = 120, 1012
+    tl_col = (tl_x1 - tl_x0) / 6
+    d.line([12, 210, tl_x1, 210], fill=RULE, width=1)
+    for ti, (tt, ev) in enumerate([
+            ("02:30", "Akvan landfall"),
+            ("04:30", "Kyiv barrage ends"),
+            ("05:30", "Missile in Poland"),
+            ("06:30", "Nikkei closes -5.1%"),
+            ("20:00", "Italy rail strike"),
+            ("21:00", "Wall St closes")]):
+        cx = tl_x0 + ti * tl_col
+        d.text((cx, tl_y), tt, font=F_ALSO_N, fill=INK)
+        d.ellipse([cx - 3, 207, cx + 3, 213], fill=RED)
+        d.text((cx, 215), ev, font=F_TTEXT, fill=INK)
+
+    # ---- heroes 226-459 (v12: +28 for the timeline, art 140->112 so the
+    # bottom stays 459; lead 396 wide, rails 294; each card boxed like top 1) ----
+    hero_y = 226
     hero_widths = [396, 294, 294]
     hero_x = 12
     for i, story in enumerate(FRONT[:3]):
@@ -1313,7 +1323,7 @@ def main():
     d.rectangle([12, map_y + 22, 348, map_y + 114], fill=NAVY_DARK,
                 outline=RULE, width=1)
     draw_map(d, 12, map_y + 22, 336, 92)
-    d.text((12, map_y + 118), "Red numbers 1–9, 11–13, white dots 14–36 (10 has no Earth dot).",
+    d.text((12, map_y + 118), "Red numbers 1–13, white dots 14–36 (27 has no Earth dot).",
            font=F_TTEXT, fill=GREY)
     # how-sure-are-we legend under the map (was the stats row)
     d.text((12, map_y + 130), "HOW SURE ARE WE?", font=F_SEC, fill=INK)
