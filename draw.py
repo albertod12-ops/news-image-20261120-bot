@@ -1398,7 +1398,8 @@ def draw_map(d, x0, y0, mw, mh):
 
 # v19 layout constants: HERO-DOMINANT broadsheet (ROUND 3 iteration 1).
 # ONE decisive change: giant hero art 150px (matches #8's ~150px scale) +
-# the FRIDAY IN UTC timeline strip restored (v12/v13 device, 6 points,
+# the FRIDAY IN UTC timeline strip restored (v12/v13 device, 7 points
+# since v21 — 08:00 Hang Seng closes -1.9% added),
 # 3 figures), funded by smalls art 40px + map 72px + also-list 11 rows
 # at pitch 11 + legend header dropped + hero/small text pitches tightened
 # (all probe-measured, see NOTES.md v19 space audit). 40 stories, 18
@@ -1563,30 +1564,45 @@ def main():
         d.text((sx + seg_w / 2, bar_y + 6), "%s %d" % (label, count),
                font=F_SRC, fill=ink, anchor="mm")
 
-    # ---- FRIDAY IN UTC timeline 176-206 (v20: tl_y 172->176 — the
-    # +5 masthead shift minus the 1px funder: the region-bar -> label
-    # gap was 4 blank rows (171-174), now 3 (176-178). RESTORED in v19
-    # — the v12/v13 device, code verbatim from v13: 6 evenly spaced columns, NOT to
+    # ---- FRIDAY IN UTC timeline 176-206 (v21: 7 points — the 7th is
+    # "08:00 Hang Seng closes -1.9%", inserted between 06:30 Nikkei and
+    # 20:00 Italy; tl_col (1012-120)/7 = 127.43px. Probe-measured: longest
+    # event "Hang Seng closes -1.9%" 115.4px in the 127.4px column (12.0px
+    # clearance to the next column — the tightest of the seven; all others
+    # 33-55px); last event ends 980.6, 31.4px inside the 1012 edge. No
+    # other geometry changes: strip height, heroes, map, footer untouched.
+    # VERIFIED live 2026-11-21: Hang Seng closed -1.89% at 22,410.80 Fri
+    # 20 Nov (Morningstar/Dow Jones Data Talk; CNBC regional data via
+    # marketspeaker; Longbridge) — the figure already sits on our page in
+    # card 4's 4-index table as "Hong Kong -1.9%". Close 16:00 HKT =
+    # 08:00 UTC (HKEX afternoon session 13:00-16:00 HKT; Chainlink
+    # market-hours docs give the UTC equivalent 05:00-08:00 UTC).
+    # REJECTED 7th-point candidates, with reasons: 00:00 Kyiv bridges hit
+    # (#2's point) — explosions began 01:25 EET = 23:25 UTC Thu 19 Nov
+    # (Kyiv Independent), NOT a Fri-20-UTC point, so #2's 00:00 matches
+    # no verified UTC time; 05:50 Poland (#2's point) — the Kh-101 came
+    # down ~06:30 CET = 05:30 UTC (Reuters; Polish DefMin Kosiniak-Kamysz),
+    # which duplicates our 05:30 TAIEX slot, and no named source gives
+    # 05:50; 19:10 Nvidia probe (#2's point) — the Reuters article is dated
+    # 20 Nov but carries no publish timestamp (page crawled 19:22 UTC), so
+    # 19:10 is unverifiable to the minute. RESTORED in v19 — the v12/v13
+    # device, code verbatim from v13: evenly spaced columns, NOT to
     # scale; time bold 11px above a ruled line with red dots, event bold
     # 10px below. "02:30 Akvan landfall · 04:30 Kyiv barrage ends ·
-    # 05:30 TAIEX closes -6.2% · 06:30 Nikkei closes -5.1% · 20:00 Italy
-    # rail strike · 21:00 Wall St closes -3.7%" — all verified live in
-    # v12/v13 NOTES (Akvan 8:00 IST = 02:30 UTC; Kyiv last explosions
-    # ~06:30 EET = 04:30 UTC; TAIEX close 13:30 TST = 05:30 UTC, -6.23%;
-    # Nikkei close 15:30 JST = 06:30 UTC, -5.06%; Italy rail strike
-    # 21:00 CET = 20:00 UTC; Wall St close 16:00 EST = 21:00 UTC,
-    # S&P -3.70%). Longest event "Wall St closes -3.7%" 96.0px in the
-    # 148.7px column. No Hormuz "shut". ----
+    # 05:30 TAIEX closes -6.2% · 06:30 Nikkei closes -5.1% · 08:00 Hang
+    # Seng closes -1.9% · 20:00 Italy rail strike · 21:00 Wall St closes
+    # -3.7%". No Hormuz "shut". ----
     tl_y = 176
     d.text((12, tl_y), "FRIDAY IN UTC", font=F_TTEXT, fill=RED)
     tl_x0, tl_x1 = 120, 1012
-    tl_col = (tl_x1 - tl_x0) / 6
+    tl_col = (tl_x1 - tl_x0) / 7
     d.line([12, tl_y + 15, tl_x1, tl_y + 15], fill=RULE, width=1)
     for ti, (tt, ev) in enumerate([
             ("02:30", "Akvan landfall"),
             ("04:30", "Kyiv barrage ends"),
             ("05:30", "TAIEX closes -6.2%"),
             ("06:30", "Nikkei closes -5.1%"),
+            ("08:00", "Hang Seng closes -1.9%"),
             ("20:00", "Italy rail strike"),
             ("21:00", "Wall St closes -3.7%")]):
         cx = tl_x0 + ti * tl_col
