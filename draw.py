@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""news-image-20261120 v5: 36 stories, newspaper front page, top-3 selection rebuild.
+"""news-image-20261120 v6: 36 stories, newspaper front page, top-1 chase.
 Draws entry.png (1024x1024, deterministic) from world.geo.json only.
-v5 (on the v4 design — cream paper, black serif masthead, 6-number strip,
-region bar, solid art banners): the SELECTION is rebuilt from the live
-research in research-v5.md — the 5 stories no top-3 entry draws are out
-(An-12 demoted to also-list 26; Sri Lanka rates, California quake, Rikers
-dropped), 5 verified missing stories are drawn (Japan CPI, Phillips 118,
-Bukele third term, Poland missile, Italy CGIL strike replacing the wrong
-"25+ nations" framing), Kyiv/COP31/markets facts corrected, also-list
-rebuilt 11-out/11-in, 7 regions (Oceania new). Design baseline (user-approved
+v6 (on the v5 design — cream paper, black serif masthead, 6-number strip,
+region bar, solid art banners): the TOP-3 rebuild — per-item sources on all
+23 also-list items, Kenya oil + Seoul impeachment drawn (Myanmar reaction
+and Gaza strikes demoted to also-list), Nvidia probe + Argentina risk replace
+the two stale also-list items (Meta fine 14 Nov, FAA stop 13 Nov), stats
+"0 fossil-fuel mentions" -> "60.7%" trial response, DATE CHECK rewritten to
+top-3 consensus, masthead subline to 4 items. All facts verified live
+2026-11-21; see research-v5.md + NOTES.md. Design baseline (user-approved
 2026-11-20): boxed 1px INK cards, LiberationSerif-Bold headlines +
 LiberationSerif decks. CONTENT ONLY changed for Friday 20 Nov 2026.
 NOTE: the first draw.py run right after an edit can render the pre-edit file
@@ -126,10 +126,10 @@ FRONT = [
      "UK and EU agree post-Brexit reset",
      "Youth mobility ~100,000 a year; food and emissions links.",
      "UK–EU DEAL", "RESET AGREED", "ukeu"),
-    (6, "THE HAGUE", "LAW", "ICJ", "REPORTED",
-     "World reacts to Myanmar genocide ruling",
-     "First state held liable; capitals and Rohingya groups respond.",
-     "MYANMAR GUILTY", "9–6 · FIRST STATE LIABLE", "icj"),
+    (6, "TURKANA", "OIL", "CAPITAL FM", "REPORTED",
+     "Kenya spuds first commercial oil well",
+     "Amosing 1 well, Turkana; first oil 1 Dec, 20,000 bpd.",
+     "FIRST OIL", "AMOSING 1 SPUDDED", "kenya"),
     (7, "ROME", "LABOUR", "REUTERS", "REPORTED",
      "Italy's general strike fills 100 squares",
      "CGIL 24-hr strike; >1m march; vs €26bn 2027 budget.",
@@ -138,10 +138,10 @@ FRONT = [
      "Iraqi forces move on militia stronghold",
      "Troops enter Jurf al-Sakhar, Kataib Hezbollah's base.",
      "JURF AL-SAKHAR", "MILITIA BASE", "iraq"),
-    (9, "GAZA", "WAR", "REUTERS", "REPORTED",
-     "Israeli tanks cross Gaza truce line",
-     "First ground operation since the ceasefire began.",
-     "GAZA LINE", "FIRST SINCE TRUCE", "gaza"),
+    (9, "SEOUL", "POLITICS", "JOONGANG DAILY", "REPORTED",
+     "Seoul moves to impeach chief justice",
+     "Ruling party votes to impeach Jo Hee-de.",
+     "IMPEACH", "CHIEF JUSTICE JO", "seoul"),
     (10, "TOKYO", "ECONOMY", "REUTERS", "REPORTED",
      "Japan inflation stays above target",
      "Core CPI 2.2%, headline 2.3%; BoJ hike case cements.",
@@ -160,31 +160,32 @@ FRONT = [
      "MISSILE IN POLAND", "NATO ALERT", "poland"),
 ]
 
-# num, city, text
+# num, city, text, source — every item carries its outlet (the top-3 pattern);
+# texts are terse (probe-measured) so "City: text (SRC)" fits one 298px line.
 ALSO = [
-    (14, "Riyadh", "Saudis intercept 2 Houthi missiles"),
-    (15, "Brussels", "EU to summon Russian envoy over Kyiv"),
-    (16, "London", "UK pledges 1,000+ drones, £260m for Kyiv"),
-    (17, "Paris", "France seeks UN Security Council meeting"),
-    (18, "Taipei", "Stocks suffer worst week since 1990 (-17.5%)"),
-    (19, "Tokyo", "SoftBank falls more than 16%"),
-    (20, "Washington", "IMF warns debt near 100% of GDP"),
-    (21, "Rome", "Italy fines Meta €805m over photo access"),
-    (22, "Washington", "FAA ground stop strands 1.5m flyers"),
-    (23, "Washington", "879,000 AI chips cleared for China"),
-    (24, "Washington", "Senate passes energy-permit bill 62-33"),
-    (25, "Washington", "US sanctions Comancheros, 'Ndrangheta"),
-    (26, "Siberia", "An-12 crash kills 19 in Siberia"),
-    (27, "Mercury", "BepiColombo's 8-yr trip ends Saturday"),
-    (28, "Seoul", "Ruling party votes to impeach chief justice Jo"),
-    (29, "Turkana", "Kenya spuds first commercial oil well"),
-    (30, "Yenne", "Senegal migrant boat: 4 dead, dozens missing"),
-    (31, "Barcelona", "Cancer pill shrinks tumours in 60.7%"),
-    (32, "Beijing", "China holds rates (3.0% / 3.5%)"),
-    (33, "Blantyre", "Malawi fuel queues run all night"),
-    (34, "Las Vegas", "Russell fastest in wet F1 practice, 1:47.272"),
-    (35, "Shenzhen", "Xi hails 'full turnaround' with Albanese"),
-    (36, "Europe", "Youth strike in 25+ countries"),
+    (14, "Riyadh", "Saudis stop 2 missiles, drones", "REUTERS"),
+    (15, "Brussels", "EU to summon Russian envoy", "REUTERS"),
+    (16, "London", "UK gives 1,000+ drones, £260m", "UK GOVT"),
+    (17, "Paris", "France seeks UNSC meeting", "REUTERS"),
+    (18, "Taipei", "Worst week since 1990, -17.5%", "REUTERS"),
+    (19, "Tokyo", "SoftBank falls more than 16%", "CNBC"),
+    (20, "Washington", "IMF warns debt near 100% of GDP", "IMF"),
+    (21, "New York", "Nvidia -14% on SEC probe", "REUTERS"),
+    (22, "Buenos Aires", "Argentina risk at 1,070", "J.P. MORGAN"),
+    (23, "Washington", "879k AI chips OK'd for China", "REUTERS"),
+    (24, "Washington", "Senate passes energy bill 62-33", "AP"),
+    (25, "Washington", "US sanctions Comancheros", "OFAC"),
+    (26, "Siberia", "An-12 crash kills 19", "REUTERS"),
+    (27, "Mercury", "BepiColombo's 8-yr trip ends Saturday", "ESA"),
+    (28, "Naypyidaw", "Myanmar calls ICJ ruling unfair", "REUTERS"),
+    (29, "Gaza", "Israeli strikes kill 6 despite truce", "AFP"),
+    (30, "Yenne", "Boat: 4 dead, dozens missing", "AL JAZEERA"),
+    (31, "Barcelona", "Cancer pill shrinks tumours", "ECANCER"),
+    (32, "Beijing", "China holds rates (3.0% / 3.5%)", "XINHUA"),
+    (33, "Blantyre", "Malawi fuel queues all night", "AL JAZEERA"),
+    (34, "Las Vegas", "Russell fastest, 1:47.272", "FORMULA1.COM"),
+    (35, "Shenzhen", "Xi hails turnaround", "REUTERS"),
+    (36, "Europe", "Youth strike in 25+ countries", "REUTERS"),
 ]
 
 STATS = [
@@ -193,28 +194,28 @@ STATS = [
     ("-6.2%", "Taipei's fall"),
     ("2.3%", "Japan CPI headline"),
     ("118", "Phillips in Wellington"),
-    ("0", "fossil-fuel mentions"),
+    ("60.7%", "cancer-pill trial response"),
 ]
 
-# v5 region bar: per-region story counts counted from OUR actual 36-story
+# v6 region bar: per-region story counts counted from OUR actual 36-story
 # list (FRONT 1-13 + ALSO 14-36), assigned by subject, not dateline city.
-# EUROPE 10: 2 Kyiv, 5 UK-EU, 7 Italy strike, 13 Poland, 15 Brussels,
-#   16 London, 17 Paris, 21 Rome, 31 Barcelona, 36 youth strike.
-# ASIA 10: 1 Akvan, 4 Nikkei, 6 ICJ Myanmar, 10 Japan CPI, 18 Taipei,
-#   19 Tokyo, 26 An-12, 28 Seoul, 32 Beijing, 35 Shenzhen.
-# AMERICAS 6: 12 Bukele, 22 FAA, 23 AI chips, 24 Senate, 25 sanctions,
-#   34 Las Vegas.
-# MIDDLE EAST 3: 8 Iraq, 9 Gaza, 14 Riyadh.
-# AFRICA 3: 29 Turkana, 30 Yenne, 33 Blantyre.
-# OCEANIA 1: 11 Phillips (Wellington) — NEW, 7th region (matches #1).
+# EUROPE 9: 2 Kyiv, 5 UK-EU, 7 Italy strike, 13 Poland, 15 Brussels,
+#   16 London, 17 Paris, 31 Barcelona, 36 youth strike.
+# ASIA 10: 1 Akvan, 4 Nikkei, 9 Seoul, 10 Japan CPI, 18 Taipei,
+#   19 Tokyo, 26 An-12, 28 Myanmar reaction, 32 Beijing, 35 Shenzhen.
+# AMERICAS 7: 12 Bukele, 21 Nvidia probe, 22 Argentina risk, 23 AI chips,
+#   24 Senate, 25 sanctions, 34 Las Vegas.
+# MIDDLE EAST 3: 8 Iraq, 14 Riyadh, 29 Gaza strikes.
+# AFRICA 3: 6 Kenya oil, 30 Yenne, 33 Blantyre.
+# OCEANIA 1: 11 Phillips (Wellington).
 # GLOBAL 3: 3 COP31 (global climate summit), 20 IMF debt warning,
 #   27 BepiColombo.
-# Total 10+10+6+3+3+1+3 = 36.
+# Total 9+10+7+3+3+1+3 = 36.
 # (label, count, fill, text colour)
 REGIONS = [
-    ("EUROPE", 10, (16, 62, 150), "white"),
+    ("EUROPE", 9, (16, 62, 150), "white"),
     ("ASIA", 10, (179, 34, 44), "white"),
-    ("AMERICAS", 6, (90, 60, 140), "white"),
+    ("AMERICAS", 7, (90, 60, 140), "white"),
     ("MIDDLE EAST", 3, (196, 142, 8), (17, 17, 17)),
     ("AFRICA", 3, (30, 130, 80), "white"),
     ("OCEANIA", 1, (0, 120, 140), "white"),
@@ -229,16 +230,16 @@ LEGEND = [
 
 PINS = {
     1: (85.0, 19.3), 2: (30.5, 50.4), 3: (30.7, 36.9), 4: (139.7, 35.7),
-    5: (4.4, 50.8), 6: (4.3, 52.1), 7: (12.5, 41.9), 8: (44.2, 32.8),
-    9: (34.4, 31.5), 10: (139.7, 35.7), 11: (174.8, -41.3),
+    5: (4.4, 50.8), 6: (35.9, 3.1), 7: (12.5, 41.9), 8: (44.2, 32.8),
+    9: (127.0, 37.5), 10: (139.7, 35.7), 11: (174.8, -41.3),
     12: (-89.2, 13.7), 13: (21.0, 52.2),
 }
 DOTS = {
     14: (46.7, 24.7), 15: (4.4, 50.8), 16: (-0.1, 51.5), 17: (2.4, 48.9),
     18: (121.6, 25.0), 19: (139.7, 35.7), 20: (-77.0, 38.9),
-    21: (12.5, 41.9), 22: (-77.0, 38.9), 23: (-77.0, 38.9),
+    21: (-74.0, 40.7), 22: (-58.4, -34.6), 23: (-77.0, 38.9),
     24: (-77.0, 38.9), 25: (-77.0, 38.9), 26: (96.0, 60.0),
-    28: (127.0, 37.5), 29: (35.9, 3.1), 30: (-17.2, 14.7),
+    28: (96.2, 19.8), 29: (34.4, 31.5), 30: (-17.2, 14.7),
     31: (2.2, 41.4), 32: (116.4, 39.9), 33: (35.0, -15.8),
     34: (-115.1, 36.2), 35: (114.1, 22.5), 36: (4.4, 50.8),
 }
@@ -614,44 +615,44 @@ def art_image(key, w, h):
                anchor="ma")
         d.text((247, 91), "DEADLOCK", font=F_ART2_S, fill="white",
                anchor="ma")
-    elif key == "icj":
-        # the World Court as a temple: pediment, 15 columns, steps.
-        # The first 9 columns are paper, the last 6 ink — the 9-6 vote.
-        # v4: pediment + flag shifted down so the solid top banner (y0-18)
-        # clears them (apex was y12, flag was y8-24).
-        d.rectangle([0, 0, w, h], fill=(226, 218, 196))
-        pediment = [(104, 44), (198, 20), (292, 44)]
-        d.polygon(pediment, fill=(120, 110, 95))
-        col_top, col_bottom, col_w = 44, 76, 7
-        for i in range(15):
-            col_x = 116 + i * 11
-            col_fill = (244, 239, 226) if i < 9 else NAVY
-            col_edge = (120, 110, 95) if i < 9 else "white"
-            d.rectangle([col_x, col_top, col_x + col_w, col_bottom],
-                        fill=col_fill, outline=col_edge)
-        # three steps, each wider than the one above it
-        step_fill = (240, 234, 220)
-        for step_x0, step_y0, step_x1, step_y1 in ((110, 76, 282, 80),
-                                                   (104, 80, 288, 84),
-                                                   (98, 84, 292, 90)):
-            d.rectangle([step_x0, step_y0, step_x1, step_y1], fill=step_fill)
-        # red divider between the 9 paper and 6 ink columns (the 9-6 vote)
-        d.line([213, 44, 213, 76], fill=(179, 34, 44), width=3)
-        # Myanmar flag top left (yellow/green/red + white star), white outline
-        flag_bands = (((24, 29), (254, 203, 0)), ((29, 34), (0, 140, 60)),
-                      ((34, 40), (220, 40, 40)))
-        for (band_y0, band_y1), band_col in flag_bands:
-            d.rectangle([12, band_y0, 38, band_y1], fill=band_col)
-        d.rectangle([12, 24, 38, 40], outline="white", width=1)
-        _star(d, 25, 32, 5, 2)
-        # gold scales of justice, left, below the flag (the recognisable object)
-        scale_x = 60
-        d.line([scale_x, 34, scale_x, 58], fill=GOLD, width=2)
-        d.line([44, 38, 76, 38], fill=GOLD, width=2)
-        for pan_x in (48, 64):
-            d.polygon([(pan_x, 38), (pan_x + 8, 38), (pan_x + 4, 48)],
-                      fill=GOLD)
-        d.ellipse([56, 58, 64, 64], fill=GOLD)
+    elif key == "kenya":
+        # v6: Kenya spuds its first commercial oil well — a Turkana
+        # oilfield: a lattice derrick on the left, a pumpjack (nodding
+        # donkey) working the well in the middle, sun + dry scrub.
+        # Original PIL vector code.
+        d.rectangle([0, 0, w, h], fill=(238, 222, 178))
+        # sun, top-right, clear of the banner (y0-18)
+        d.ellipse([168, 22, 186, 40], fill=(255, 200, 60),
+                  outline=(230, 170, 40), width=2)
+        # dry scrub on the horizon
+        for sx, sy in ((8, 52), (60, 54), (150, 52), (185, 54)):
+            d.ellipse([sx, sy, sx + 10, sy + 4], fill=(120, 140, 70))
+        # the ground, lower third
+        d.rectangle([0, 56, w, h], fill=(190, 150, 95))
+        d.line([0, 56, w, 56], fill=(150, 115, 70), width=2)
+        # derrick: a lattice tower, left — two legs + crossbars + diagonals
+        d.line([24, 56, 34, 20], fill=(60, 50, 40), width=3)
+        d.line([48, 56, 38, 20], fill=(60, 50, 40), width=3)
+        for bx0, by, bx1 in ((32, 26, 40), (30, 34, 42), (28, 42, 44),
+                             (26, 50, 46)):
+            d.line([bx0, by, bx1, by], fill=(60, 50, 40), width=2)
+        d.line([32, 26, 42, 50], fill=(60, 50, 40), width=1)
+        d.line([40, 26, 28, 50], fill=(60, 50, 40), width=1)
+        d.rectangle([30, 18, 42, 22], fill=(60, 50, 40))
+        # pumpjack: A-frame, walking beam, horse head + counterweight,
+        # polished rod down to the wellhead
+        d.polygon([(104, 56), (112, 36), (120, 56)], fill=(40, 40, 40))
+        d.line([86, 34, 148, 42], fill=(30, 30, 30), width=4)
+        # horse head: the rounded end of the beam, left
+        d.ellipse([78, 28, 92, 42], fill=(30, 30, 30))
+        # counterweight box, right end of the beam
+        d.rectangle([144, 38, 156, 50], fill=(30, 30, 30))
+        # polished rod + wellhead
+        d.line([85, 36, 85, 56], fill=(80, 80, 80), width=2)
+        d.rectangle([78, 54, 92, 60], fill=(60, 60, 60))
+        # a black oil drop beside the wellhead
+        d.ellipse([160, 60, 172, 70], fill=(20, 20, 20))
+        d.polygon([(166, 52), (160, 62), (172, 62)], fill=(20, 20, 20))
     elif key == "selloff":
         # v5.2: user rejected the v5.1 3D blue bars — redraw as the
         # VERTICAL MIRROR of card 10 (the CPI rising chart, which the
@@ -779,52 +780,31 @@ def art_image(key, w, h):
             d.ellipse([tx + 24, ty + 8, tx + 29, ty + 11], fill=(40, 40, 40))
         d.ellipse([160, 18, 178, 30], fill=(240, 230, 200))
         d.ellipse([166, 20, 188, 28], fill=(240, 230, 200))
-    elif key == "gaza":
-        # v3: DENSITY — a desert scene filling the frame: sun + clouds,
-        # layered dunes, a distant wall with watchtower, a dust cloud
-        # behind the tracks, and a tank twice as big as v2, crossing the
-        # yellow truce dashes painted on the ground.
-        d.rectangle([0, 0, w, h], fill=(240, 215, 160))
-        # sun, top-right, and clouds — v4: moved down (y20+) so the solid
-        # top banner (y0-18) clears them; the wall top is y34
-        d.ellipse([168, 20, 186, 38], fill=(255, 220, 80),
-                  outline=(230, 180, 60), width=2)
-        d.ellipse([8, 20, 34, 28], fill=(250, 240, 220))
-        d.ellipse([20, 24, 48, 32], fill=(250, 240, 220))
-        d.ellipse([120, 20, 146, 28], fill=(250, 240, 220))
-        # distant wall with a watchtower, across the back
-        d.rectangle([0, 34, w, 44], fill=(190, 160, 110))
-        d.rectangle([0, 34, w, 38], fill=(160, 130, 85))
-        d.rectangle([150, 18, 172, 38], fill=(170, 140, 95))
-        d.rectangle([156, 23, 166, 29], fill=(60, 40, 20))
-        for wx in range(6, w, 20):
-            d.rectangle([wx, 40, wx + 8, 46], fill=(90, 70, 40))
-        # dunes: two layered bands
-        d.polygon([(0, 52), (60, 44), (120, 52), (196, 46), (196, 80),
-                   (0, 80)], fill=(222, 190, 130))
-        d.polygon([(0, 62), (80, 54), (140, 62), (196, 56), (196, 80),
-                   (0, 80)], fill=(205, 172, 112))
-        # the yellow truce line, painted on the ground, full width
-        for dx in range(0, w, 14):
-            d.line([dx, 66, dx + 8, 66], fill=YELLOW, width=4)
-        # the tank, bigger: hull, turret, long barrel, six track wheels
-        d.rectangle([34, 58, 158, 64], fill=(150, 128, 88))
-        d.rectangle([32, 48, 156, 58], fill=(60, 65, 50))
-        for wx in (42, 62, 82, 102, 122, 142):
-            d.ellipse([wx - 5, 50, wx + 5, 60], fill=(40, 40, 40))
-            d.ellipse([wx - 2, 53, wx + 2, 57], fill=(120, 120, 110))
-        d.polygon([(40, 36), (150, 36), (158, 42), (158, 48), (40, 48)],
-                  fill=(90, 100, 70))
-        d.rectangle([62, 24, 108, 36], fill=(90, 100, 70))
-        d.rectangle([68, 20, 102, 24], fill=(80, 90, 62))
-        d.ellipse([80, 25, 88, 33], fill=(70, 80, 55))
-        d.line([76, 20, 73, 8], fill=(50, 55, 40), width=2)
-        d.line([108, 27, 168, 27], fill=(50, 55, 40), width=5)
-        # dust cloud billowing behind the tracks + exhaust smoke
-        d.ellipse([4, 44, 22, 58], fill=(220, 200, 165))
-        d.ellipse([12, 38, 30, 52], fill=(230, 210, 175))
-        d.ellipse([22, 46, 36, 58], fill=(220, 200, 165))
-        d.ellipse([20, 30, 30, 40], fill=(200, 200, 200))
+    elif key == "seoul":
+        # v6: Seoul moves to impeach its chief justice — a modern
+        # courthouse (navy glass facade, pediment, steps) with a big
+        # gavel striking in the foreground and a small Korean flag.
+        # Original PIL vector code.
+        d.rectangle([0, 0, w, h], fill=(215, 222, 232))
+        # Korean flag on a pole, left — white field, red/blue taegeuk
+        d.line([14, 24, 14, 56], fill=(60, 40, 20), width=2)
+        d.rectangle([14, 24, 36, 38], fill="white", outline=INK, width=1)
+        d.ellipse([20, 28, 30, 34], fill=(200, 40, 40))
+        d.ellipse([20, 31, 30, 37], fill=(20, 60, 160))
+        # courthouse: pediment + navy facade + white columns + steps
+        d.polygon([(70, 34), (126, 20), (182, 34)], fill=(90, 100, 115))
+        d.rectangle([70, 34, 182, 62], fill=(30, 50, 90))
+        for cx0 in range(76, 176, 16):
+            d.rectangle([cx0, 36, cx0 + 6, 60], fill=(220, 228, 240))
+        d.rectangle([70, 62, 182, 66], fill=(200, 205, 215))
+        d.rectangle([64, 66, 188, 70], fill=(180, 185, 195))
+        # the gavel, foreground right: handle + head, striking the block
+        d.line([138, 68, 168, 44], fill=(120, 80, 40), width=5)
+        d.polygon([(160, 36), (180, 28), (186, 38), (166, 46)],
+                  fill=(150, 100, 50))
+        d.polygon([(156, 42), (176, 34), (182, 44), (162, 52)],
+                  fill=(120, 80, 40))
+        d.ellipse([140, 64, 162, 72], fill=(100, 65, 30))
     elif key == "cpi":
         # v5.1: per the user's new reference (5 ascending rainbow bars +
         # one thick dark curved arrow rising) — the v5 navy bars + red
@@ -1021,8 +1001,11 @@ def art_image(key, w, h):
 # coastline with the white Seoul dot touching its left edge, so at page
 # size it read as half-covered; it is pushed north-east into the open
 # Pacific, clear of 10's circle and leader line.
-PIN_OFF = {2: (18, -16), 3: (2, 14), 4: (20, -14), 5: (-6, 26), 6: (-28, -18),
-           7: (-30, 8), 8: (16, -14), 9: (-18, 20), 10: (18, 14),
+# v6: 6 (Turkana) sits in open central Africa and 9 (Seoul) sits ~12px
+# west of Tokyo's true spot with both Tokyo pins fanned away, so neither
+# needs an offset any more.
+PIN_OFF = {2: (18, -16), 3: (2, 14), 4: (20, -14), 5: (-6, 26),
+           7: (-30, 8), 8: (16, -14), 10: (18, 14),
            11: (-14, 0), 13: (-18, 12)}
 
 
@@ -1140,7 +1123,7 @@ def small_card(img, d, story, x, y):
     d.rectangle([x, y, x + w, y + 161], fill=NEARWHITE)
     art = art_image(key, w, 80)
     art_d = ImageDraw.Draw(art)
-    banner_fill = NAVY if key in ("icj", "cpi") else RED
+    banner_fill = NAVY if key == "cpi" else RED
     art_banner(art, art_d, 0, 0, w, 80, big, small, banner_fill)
     img.paste(art, (x, y))
     d.rectangle([x, y + 80, x + w, y + 95], fill=NAVY)
@@ -1175,7 +1158,7 @@ def main():
     d.line([12, 20, 1012, 20], fill=INK, width=1)
     d.text((12, 11), "Friday 20 November 2026", font=F_TITLE, fill=INK)
     deck_line = ("Akvan hits Odisha · Russian missiles strike Kyiv's bridges · "
-                 "COP31 deadlocks on fossil fuels")
+                 "COP31 deadlocks on fossil fuels · Asia's AI sell-off sinks markets")
     d.text((12, 84), deck_line, font=F_DECKLINE, fill=RED)
     d.text((1012, 1), "36 STORIES · 7 REGIONS · EVERY ONE DATED FRIDAY 20 NOVEMBER 2026",
            font=F_EYE, fill=INK, anchor="ra")
@@ -1221,7 +1204,7 @@ def main():
     d.rectangle([12, map_y + 22, 348, map_y + 142], fill=NAVY_DARK,
                 outline=RULE, width=1)
     draw_map(d, 12, map_y + 22, 336, 120)
-    d.text((12, map_y + 146), "Red numbers 1–13, white dots 14–36.",
+    d.text((12, map_y + 146), "Red numbers 1–13, white dots 14–36 (27 has no Earth dot).",
            font=F_TTEXT, fill=GREY)
     # how-sure-are-we legend under the map (was the stats row)
     d.text((12, map_y + 158), "HOW SURE ARE WE?", font=F_SEC, fill=INK)
@@ -1237,13 +1220,13 @@ def main():
     d.line([also_x, map_y + 16, 1012, map_y + 16], fill=INK, width=1)
     col_w = 320
     rows = 12
-    for i, (num, city, txt) in enumerate(ALSO):
+    for i, (num, city, txt, src) in enumerate(ALSO):
         col = 0 if i < rows else 1
         row = i if i < rows else i - rows
         x = also_x + col * (col_w + 8)
         y = map_y + 22 + row * 13
         d.text((x, y), "%d." % num, font=F_ALSO_N, fill=RED)
-        full = "%s: %s" % (city, txt)
+        full = "%s: %s (%s)" % (city, txt, src)
         lines = wrap(d, full, F_ALSO, col_w - 22, max_lines=1)
         d.text((x + 20, y), lines[0] if lines else "", font=F_ALSO, fill=INK)
 
@@ -1251,9 +1234,9 @@ def main():
     chk_y = 964
     d.rectangle([12, chk_y, 1012, chk_y + 28], outline=RED, width=2)
     chk = ("DATE CHECK — Left out, first reported Thursday 19 November: Shenzhen "
-           "trilateral summit + peace declaration · Anthropic's $2T Nasdaq debut · "
-           "Akvan's approach + evacuations · Kyiv embassy damage · ICJ genocide "
-           "ruling read. Not yet news: COP31's final agreed text (talks run on).")
+           "trilateral summit · Anthropic's $83 IPO debut · ICJ genocide ruling read · "
+           "GTA VI launch · Senate's Iran vote. Not yet news: COP31's final agreed text "
+           "(talks run on) · BepiColombo's Mercury orbit (Saturday).")
     chk_lines = wrap(d, chk, F_DATECHK, 976, max_lines=2)
     # v5.4: the 2 lines sit centred in the 28px box (block 966-988 vs
     # box 964-992), not top-anchored at chk_y.
@@ -1265,13 +1248,13 @@ def main():
     d.text((512, foot_y), "Reads at three sizes: the date and 3 leads at thumbnail size · "
            "13 pictures at half size · all 36 stories at full size.",
            font=F_FOOT, fill=GREY, anchor="ma")
-    # v5.5: footer line 2 was 1074px in a 1000px centred slot — it ran off
-    # BOTH page edges ("Pins" cut left, "Original illustrat…" cut right).
-    # Dropping the 2-word credit (965px) makes it fit whole; all 13 sources kept.
-    d.text((512, foot_y + 13), "Pins 1–13, dots 14–36 (27 BepiColombo has no Earth dot). "
-           "Sources: Reuters · AP · ICC · IMD · ICJ · Carbon Brief · ESA · "
+    # v6: the pins prefix duplicated the map caption, so it is gone; the
+    # BepiColombo note moved there too. Line 2 is now just the source list,
+    # which fits whole (929px) with the six new outlets added.
+    d.text((512, foot_y + 13), "Sources: Reuters · AP · ICC · IMD · Carbon Brief · ESA · "
            "Xinhua · Al Jazeera · Capital FM · ecancer · Formula1.com · "
-           "Korea JoongAng Daily.",
+           "Korea JoongAng Daily · CNBC · AFP · IMF · US Treasury · "
+           "J.P. Morgan · UK Govt.",
            font=F_FOOT, fill=GREY, anchor="ma")
 
     out_path = os.path.join(HERE, "entry.png")
