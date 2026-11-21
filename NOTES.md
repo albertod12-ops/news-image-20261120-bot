@@ -1,7 +1,7 @@
 # news-image-20261120 — entry notes (v4, NOT submitted)
 
 ## Entry v4 (parent brief 2026-11-21 ~08:40 WIB: top-3 pattern rebuild, same 36 stories + same verified facts)
-- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit TBD (v4: top-3 pattern rebuild — cream paper, region bar, 6-number strip, satellite Akvan).
+- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit e1555a2 (v4: top-3 pattern rebuild — cream paper, region bar, 6-number strip, satellite Akvan).
 - entry.png: 1024x1024, 256,306 bytes, sha256 23cbbd3b93b5c29ceff918cd5f88decb811cc15fb9a33c13249dfe4e9f0d60e0, deterministic (3x draw.py identical sha + `main.py --verify`).
 - NO fact/headline/deck/number/story changed vs v3.6 — only design + art. Japan CPI, Phillips, Bukele, BepiColombo, Italy strike specifics etc. deliberately NOT added (need fresh verification the brief does not authorise). All artwork is our own original PIL vector code; the top-3 images were studied for PATTERNS only (nothing copied, traced, or embedded).
 - Change vs v3.6, per item:
@@ -17,8 +17,11 @@
 - Recording: `makefun record` re-attempted fresh for v4 — HTTP 400 again, same explicit reason as every round (loose transcripts, not sealed recordings). Session: ffc4147e-d7f7-47a1-ae91-d66730826be1 (copy in ~/workspace/makefun/news-image-20261120-transcripts/ — NOTE: copy mid-session for the gate run; re-copy the final file before bundling.)
 - KNOWN GAP (carried from the TOP-3 ANALYSIS, not fixed by v4): selection — we still draw 5 stories no top-3 entry draws and miss the 5 all/most top-3 draw (Japan CPI, Phillips 118, Bukele, BepiColombo, Italy strike); the "25+ nations" strike figure is still flagged as a likely fact error (see analysis) and was NOT changed because the brief forbids changing facts — verify and fix before any resubmit. Also-list still has no per-item sources.
 
-## Gate v4 (pre-submit-gate.py, commit TBD, 2026-11-21, --entrypoint main.py --open 2026-11-20T00:00:00Z)
-- TBD — filled in after the gate run below.
+## Gate v4 (pre-submit-gate.py, commit e1555a2, 2026-11-21 ~08:51 WIB, --entrypoint main.py --open 2026-11-20T00:00:00Z, fresh kit)
+- GATE: DO NOT SUBMIT — same 2 FAILs as v3.6, both fixable only at submit time by the top-level agent:
+  1. thinking_priced — 0 usage rows for the Muse sessions in muse.db. At submit time the main agent must re-extract rows from muse.db (agent ids a0d7a9b0-d798-4cb8-8268-5e1f98e7b0b3 + b96cfac6-c393-4b9d-a411-084f3c27afc7 + cc7c6ebb-446f-4d54-8f32-d2a8ae19d817 + b408bc3c-f0a5-4716-b1b1-467834d3e561 + 7dcdaf36-780c-430e-af7e-1d9e257037ec + ad37eb7b-ae04-4758-899e-9e1841241431 + 86baa4d3-9197-4c41-9674-a859e8c584d0 + 477f7f37-4224-4e54-8ce0-b930b882456e + 8191913f-b8ba-4cfd-afd8-0ba81fcabe70 + f1c4a9b6-5ec8-403b-ad20-b79867693692 + ffc4147e-d7f7-47a1-ae91-d66730826be1 + its own aa7f29f8-0889-4b4b-bb01-3e6c8d34a124) into ~/.makefun/muse-usage-news-image-20261120.jsonl and re-run the gate.
+  2. transcripts_run_record — no bundle yet. Bundle command for the main agent: v3.6 command in the Gate v3.6 section above, plus --session /home/hatch/agents/agent-ffc4147e-d7f7-47a1-ae91-d66730826be1/sessions/ffc4147e-d7f7-47a1-ae91-d66730826be1.jsonl (copy in ~/workspace/makefun/news-image-20261120-transcripts/ — NOTE: copied mid-session for the gate run; re-copy the final file before bundling). Then re-run the gate with --bundle <bundle.tar.gz> and --entrypoint main.py.
+- PASS now: 9 PASS lines — transcripts_witnessed 8/8, thinking_reproduces 53.3% authored (819/1536; unwritten 14.2%, up from v3.6's 43.1% now that this session's file is in the transcripts dir), thinking_revised (draw.py 54 messages), thinking_turns 762, thinking_in_window, thinking_wellformed, thinking_own_work, entry-artifact-size (256,306 bytes), grader-sandbox PASS, quota (left today 3, can submit now yes), competition_open, snapshot, license_osi, entrypoint, transcripts_present/recorded, transcripts-meta (11 session files).
 
 # news-image-20261120 — entry notes (v3.6, NOT submitted)
 
