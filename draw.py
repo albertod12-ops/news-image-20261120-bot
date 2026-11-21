@@ -256,14 +256,20 @@ ALSO = [
     (44, "Mato Grosso", "Lula recognises Raoni's land", "AP"),
 ]
 
+# v16: S&P -3.7% dropped (weakest figure, US-only, the dropped timeline's
+# leftover — Kyiv keeps its strip figure) for the two #3 breadth figures:
+# cancer pill 60.7% ORR and China rates held 3.0%. 8 figures, 927px at
+# 12px in the 1000px slot (probe-measured). This is a 1-out/2-in strip
+# trade, not a 1-for-1 card swap: the strip now covers 8 top stories.
 STATS = [
     ("370,000", "evacuated"),
     ("3", "bridges hit"),
     ("-6.2%", "Taiex"),
-    ("-3.7%", "S&P 500"),
     ("2.3%", "Japan CPI"),
     ("118", "Phillips"),
     ("110+", "missiles"),
+    ("60.7%", "cancer pill"),
+    ("3.0%", "China rates"),
 ]
 
 # v15 region bar: per-region story counts counted from OUR actual 44-story
@@ -1271,6 +1277,31 @@ def draw_map(d, x0, y0, mw, mh):
            fill=(140, 180, 210), width=1)
     d.text((x0 + 148, y0 + 68), "SENEGAL · 4 DEAD", font=F_LABEL,
            fill="white", anchor="ma")
+    # v16: BepiColombo Mercury callout — the 20th drawn element (18 cards
+    # + Senegal boat + Mercury). Space audit (2026-11-21, measured): the
+    # v15 page has NO room for a full 19th card — the largest fully-empty
+    # row run is 7px, footer slack is 3px, and a 4th smalls row needs
+    # 137px; shrinking heroes/map/masthead to fund it costs more duels
+    # than the cards gain (worked in NOTES.md). The map's South Pacific
+    # is the only clean pictorial space left: probe-sampled v15 entry.png
+    # — zone x40-106, y862-890 is 0 non-NAVY pixels (nearest: pin 15 at
+    # x19-33, dot 39 at (72.6,837.5), Antarctica coast from y893). Grey
+    # cratered planet + orbit ellipse + spacecraft dot + white label,
+    # centred (x0+55, y0+61), label at y0+71 (ink to ~y0+79, 3px clear of
+    # the coast). Story 32 (Mercury: BepiColombo trip ends Sat [FORECAST],
+    # ESA) gets dual presence like the boat (callout + also-list 32).
+    # Facts: 8-year trip ends with Mercury orbit insertion Sat 21 Nov
+    # (ESA); also-list 32 already carries it as [FORECAST]. Original PIL
+    # vector code only.
+    d.ellipse([x0 + 29, y0 + 53, x0 + 81, y0 + 69], outline=(140, 180, 210),
+              width=1)  # orbit
+    d.ellipse([x0 + 47, y0 + 53, x0 + 63, y0 + 69], fill=(180, 180, 190),
+              outline=(140, 140, 150), width=1)  # Mercury
+    d.ellipse([x0 + 51, y0 + 57, x0 + 53, y0 + 59], fill=(140, 140, 150))
+    d.ellipse([x0 + 57, y0 + 62, x0 + 59, y0 + 64], fill=(140, 140, 150))
+    d.rectangle([x0 + 79, y0 + 59, x0 + 82, y0 + 62], fill="white")  # craft
+    d.text((x0 + 55, y0 + 71), "BEPICOLOMBO SAT", font=F_LABEL,
+           fill="white", anchor="ma")
     for n, (lon, lat) in PINS.items():
         px, py = project(lon, lat)
         dx, dy = PIN_OFF.get(n, (0, 0))
@@ -1505,7 +1536,7 @@ def main():
     # v15: caption names the boat callout (320.2px in the 336px column,
     # probe-measured at F_TTEXT); numbers renumbered for the 44-story
     # page (BepiColombo 32, Senegal boat 35).
-    d.text((12, map_y + 118), "Red 1–18, white dots 19–44 (32 no Earth dot). Boat = Senegal (35).",
+    d.text((12, map_y + 118), "Red 1–18, dots 19–44. Boat Senegal (35), planet BepiColombo (32).",
            font=F_TTEXT, fill=GREY)
     # how-sure-are-we legend under the map, 2x2 (v15: the 4-row legend
     # cost 44px; the 2x2 keeps every tag explained in 22px).
