@@ -367,6 +367,64 @@ def stamp(img, x, y, text, angle=-15, font=None, ink=(200, 16, 46, 255),
     tile = tile.rotate(angle, expand=True, resample=Image.BICUBIC)
     img.paste(tile, (x, y), tile)
 
+
+def _cubic(p0, p1, p2, p3, t):
+    mt = 1.0 - t
+    return (mt ** 3 * p0[0] + 3 * mt * mt * t * p1[0]
+            + 3 * mt * t * t * p2[0] + t ** 3 * p3[0],
+            mt ** 3 * p0[1] + 3 * mt * mt * t * p1[1]
+            + 3 * mt * t * t * p2[1] + t ** 3 * p3[1])
+
+
+def smooth_arrow(img, p0, p1, p2, p3, color, w_tail=8.0, w_tip=5.0,
+                 head_len=15.0, head_w=14.0, ss=4):
+    """A smooth tapered curved arrow: cubic-bezier centreline sampled at
+    81 points, band built from its two offset curves (width tapering
+    from w_tail at the tail to w_tip near the head), ending in a clean
+    filled arrowhead whose axis aligns with the curve tangent at the
+    tip (head ~2.2x band width wide, ~1.6x long). Drawn on a 4x
+    supersampled RGBA layer and downscaled with LANCZOS so the edges
+    are anti-aliased, not jagged."""
+    n = 81
+    pts = [_cubic(p0, p1, p2, p3, i / (n - 1)) for i in range(n)]
+    seg = [math.hypot(pts[i + 1][0] - pts[i][0],
+                      pts[i + 1][1] - pts[i][1]) for i in range(n - 1)]
+    back, hi = 0.0, n - 1
+    while hi > 0 and back < head_len:
+        back += seg[hi - 1]
+        hi -= 1
+
+    def tangent(i):
+        a = pts[max(0, i - 1)]
+        b = pts[min(n - 1, i + 1)]
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        m = math.hypot(dx, dy) or 1.0
+        return dx / m, dy / m
+
+    left, right = [], []
+    for i in range(hi + 1):
+        t = i / (n - 1)
+        hw = (w_tail / 2) * (1 - t) + (w_tip / 2) * t
+        tx, ty = tangent(i)
+        nx, ny = -ty, tx
+        left.append((pts[i][0] + nx * hw, pts[i][1] + ny * hw))
+        right.append((pts[i][0] - nx * hw, pts[i][1] - ny * hw))
+    tx, ty = tangent(n - 1)
+    nx, ny = -ty, tx
+    bx, by = pts[hi]
+    head = [(p3[0], p3[1]),
+            (bx + nx * head_w / 2, by + ny * head_w / 2),
+            (bx - nx * head_w / 2, by - ny * head_w / 2)]
+    w, h = img.size
+    layer = Image.new("RGBA", (w * ss, h * ss), (0, 0, 0, 0))
+    ld = ImageDraw.Draw(layer)
+    fill = color + (255,)
+    ld.polygon([(x * ss, y * ss) for x, y in left + right[::-1]], fill=fill)
+    ld.polygon([(x * ss, y * ss) for x, y in head], fill=fill)
+    layer = layer.resize((w, h), Image.LANCZOS)
+    img.paste(layer, (0, 0), layer)
+
+
 def art_image(key, w, h):
     """Flat-vector picture for one front story, drawn in code."""
     img = Image.new("RGB", (w, h), PAPER)
@@ -619,17 +677,11 @@ def art_image(key, w, h):
             d.rectangle([bx, top, bx + 32, base], fill=col)
             d.rectangle([bx, top, bx + 32, top + 2], fill=light)
         d.line([6, base, w - 4, base], fill=(180, 175, 160), width=1)
-        # one thick dark curved arrow swooping down from top-left to an
-        # arrowhead at the bottom-right (tip 188,58) — the mirror of
-        # card 10's rising arrow, same dark colour
-        pts = []
-        for ti in range(26):
-            t = ti / 25
-            qx = int((1 - t) ** 2 * 8 + 2 * (1 - t) * t * 110 + t ** 2 * 188)
-            qy = int((1 - t) ** 2 * 22 + 2 * (1 - t) * t * 20 + t ** 2 * 58)
-            pts.append((qx, qy))
-        d.line(pts, fill=(30, 30, 40), width=5, joint="curve")
-        d.polygon([(188, 58), (174, 55), (180, 47)], fill=(30, 30, 40))
+        # v5.3: smooth tapered curved arrow (supersampled) swooping down
+        # from top-left to an arrowhead at the bottom-right (tip 188,58)
+        # — the mirror of card 10's rising arrow, same dark colour
+        smooth_arrow(img, (8, 22), (55, 19), (120, 30), (188, 58),
+                     (30, 30, 40))
         # names + values in two lines under the bars; the last name is
         # clamped so it clears the right edge ("HONG KONG" is 51px wide)
         for i, (name, val, bh, col) in enumerate(bars):
@@ -789,16 +841,11 @@ def art_image(key, w, h):
             d.rectangle([bx, top, bx + 24, 68], fill=col)
             light = tuple(min(255, c + 60) for c in col)
             d.rectangle([bx, top, bx + 24, top + 2], fill=light)
-        # one thick dark curved arrow rising from bottom-left to an
-        # arrowhead at top-right, clear of the 2.3% focal (starts x151)
-        pts = []
-        for ti in range(26):
-            t = ti / 25
-            qx = int((1 - t) ** 2 * 8 + 2 * (1 - t) * t * 70 + t ** 2 * 142)
-            qy = int((1 - t) ** 2 * 64 + 2 * (1 - t) * t * 58 + t ** 2 * 30)
-            pts.append((qx, qy))
-        d.line(pts, fill=(30, 30, 40), width=5, joint="curve")
-        d.polygon([(142, 30), (132, 39), (128, 30)], fill=(30, 30, 40))
+        # v5.3: smooth tapered curved arrow (supersampled) rising from
+        # bottom-left to an arrowhead at top-right, clear of the 2.3%
+        # focal (starts x151)
+        smooth_arrow(img, (8, 64), (45, 62), (95, 54), (142, 30),
+                     (30, 30, 40))
         # red 2.3% focal, top-right, clear of the arrowhead (ends x148)
         d.text((192, 24), "2.3%", font=F_ART2, fill=RED, anchor="ra",
                stroke_width=1, stroke_fill="white")
