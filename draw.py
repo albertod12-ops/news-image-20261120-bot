@@ -591,47 +591,45 @@ def art_image(key, w, h):
                       fill=GOLD)
         d.ellipse([56, 58, 64, 64], fill=GOLD)
     elif key == "selloff":
-        # v5.1: per the user's new reference (3D blue bars + one thick
-        # red curved arrow swooping down) — the v5 4-row index table is
-        # gone. Same verified Friday data: Taipei -6.2, Seoul -5.2,
-        # Tokyo -5.1, Hong Kong -1.9 (tallest to shortest, last bar red).
-        # Art is 196x80 with the solid banner over y0-18; bars sit on
-        # baseline y56, names + values in two lines below. The arrow is
-        # drawn over the bars with a white halo so it reads on the blue
-        # and on the red last bar; its head ends just under the baseline,
-        # clear of the labels. Original PIL vector code.
+        # v5.2: user rejected the v5.1 3D blue bars — redraw as the
+        # VERTICAL MIRROR of card 10 (the CPI rising chart, which the
+        # user likes): same style — rainbow bars + ONE thick dark
+        # curved arrow — but flipped: bars DESCEND left to right and
+        # the arrow curves DOWN from top-left to bottom-right. Same
+        # verified Friday data: Taipei -6.2, Seoul -5.2, Tokyo -5.1,
+        # Hong Kong -1.9 (tallest to shortest, colours in the same
+        # rainbow palette order as card 10: green, yellow, orange,
+        # red). Art is 196x80 with the solid banner over y0-18; bars
+        # sit on baseline y56, names + values in two lines below.
+        # Original PIL vector code.
         d.rectangle([0, 0, w, h], fill=(246, 242, 233))
         for gy in range(20, 56, 12):
             d.line([0, gy, w, gy], fill=(228, 223, 208), width=1)
         base = 56
-        bars = (("TAIPEI", "-6.2%", 32, (0, 150, 210)),
-                ("SEOUL", "-5.2%", 27, (0, 150, 210)),
-                ("TOKYO", "-5.1%", 26, (0, 150, 210)),
-                ("HONG KONG", "-1.9%", 11, (220, 40, 40)))
-        # 3D look: lighter top face + darker right side face per bar
+        bars = (("TAIPEI", "-6.2%", 32, (60, 180, 80)),
+                ("SEOUL", "-5.2%", 27, (250, 200, 40)),
+                ("TOKYO", "-5.1%", 26, (240, 130, 30)),
+                ("HONG KONG", "-1.9%", 11, (220, 50, 50)))
+        # flat rainbow bars, descending left to right, lighter top
+        # strip per bar (same treatment as card 10's rising bars)
         for i, (name, val, bh, col) in enumerate(bars):
             bx = 12 + i * 48
             top = base - bh
-            light = tuple(min(255, c + 70) for c in col)
-            dark = tuple(max(0, c - 60) for c in col)
-            d.polygon([(bx + 32, top), (bx + 38, top - 4), (bx + 38, base - 4),
-                       (bx + 32, base)], fill=dark)
-            d.polygon([(bx, top), (bx + 6, top - 4), (bx + 38, top - 4),
-                       (bx + 32, top)], fill=light)
+            light = tuple(min(255, c + 60) for c in col)
             d.rectangle([bx, top, bx + 32, base], fill=col)
+            d.rectangle([bx, top, bx + 32, top + 2], fill=light)
         d.line([6, base, w - 4, base], fill=(180, 175, 160), width=1)
-        # one thick red curved arrow swooping down from top-left to an
-        # arrowhead at the bottom-right (tip 188,58)
+        # one thick dark curved arrow swooping down from top-left to an
+        # arrowhead at the bottom-right (tip 188,58) — the mirror of
+        # card 10's rising arrow, same dark colour
         pts = []
         for ti in range(26):
             t = ti / 25
             qx = int((1 - t) ** 2 * 8 + 2 * (1 - t) * t * 110 + t ** 2 * 188)
             qy = int((1 - t) ** 2 * 22 + 2 * (1 - t) * t * 20 + t ** 2 * 58)
             pts.append((qx, qy))
-        d.line(pts, fill="white", width=9, joint="curve")
-        d.line(pts, fill=RED, width=5, joint="curve")
-        d.polygon([(189, 59), (173, 55), (180, 46)], fill="white")
-        d.polygon([(188, 58), (174, 55), (180, 47)], fill=RED)
+        d.line(pts, fill=(30, 30, 40), width=5, joint="curve")
+        d.polygon([(188, 58), (174, 55), (180, 47)], fill=(30, 30, 40))
         # names + values in two lines under the bars; the last name is
         # clamped so it clears the right edge ("HONG KONG" is 51px wide)
         for i, (name, val, bh, col) in enumerate(bars):

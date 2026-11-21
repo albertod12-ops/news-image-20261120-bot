@@ -1,4 +1,14 @@
-# news-image-20261120 — entry notes (v5.1, NOT submitted)
+# news-image-20261120 — entry notes (v5.2, NOT submitted)
+
+## Entry v5.2 (user 2026-11-21 ~10:40 WIB: "Grafik yang turun masih ga bagus, coba buat seperti grafik naik tapi cuma di balik saja")
+- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit TBD (v5.2: falling chart mirrors rising chart — rainbow bars down + curved arrow down).
+- entry.png: 1024x1024, 258,178 bytes, sha256 c29c4b86f5e08338c2b7238f141945a94350340aa688c636a7c9344544ba7d46, deterministic (3x draw.py identical sha + `main.py --verify`, no truncation).
+- Change, card 4 ONLY — pixel diff vs v5.1: 4,817 px, all inside card 4's art box (bbox x 20–206, y 412–455), 0 px elsewhere. Layout/headlines/decks/numbers/other cards untouched; card 10 stays exactly as it is.
+  1. Card 4 TOKYO selloff (key "selloff") — the v5.1 3D blue bars + red arrow are gone. Redrawn as the VERTICAL MIRROR of card 10 (the CPI rising chart the user likes): same style — flat rainbow bars + ONE thick dark curved arrow — flipped: bars DESCEND left to right (green tallest → yellow → orange → red shortest, same palette order as card 10), arrow curves DOWN from top-left to an arrowhead at bottom-right (tip 188,58), same dark colour (30,30,40) as card 10's arrow. Same verified Friday data — Taipei −6.2%, Seoul −5.2%, Tokyo −5.1%, Hong Kong −1.9%; names + values in two lines under the bars, last name clamped so "HONG KONG" clears the right edge. All drawings ORIGINAL PIL vector code.
+- Verified at 2x zoom: reads as a mirror of card 10 (rainbow bars descending + dark curved arrow down); all 4 labels + values readable, no overlaps, nothing truncated.
+- Recording: `makefun record` re-attempted fresh for v5.2 — HTTP 400 again, same explicit reason as every round (loose transcripts, not sealed recordings). Session: 09f450e9-7a3b-464c-9509-51d9fa05ffd0 (copy in ~/workspace/makefun/news-image-20261120-transcripts/ — NOTE: copied mid-session for the gate run; re-copy the final file before bundling.)
+
+## Gate v5.2 (pre-submit-gate.py, commit TBD, 2026-11-21 ~10:45 WIB, --entrypoint main.py --open 2026-11-20T00:00:00Z, fresh kit level 29)
 
 ## Entry v5.1 (user 2026-11-21 ~10:32 WIB, with 2 new reference images: "Coba untuk grafik naik atau turun pakai ini")
 - Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit e7c7729 (v5.1: 3D falling bars + curved arrow; rainbow rising bars + curved arrow).
