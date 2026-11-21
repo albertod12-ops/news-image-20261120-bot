@@ -995,9 +995,14 @@ def draw_map(d, x0, y0, mw, mh):
             d.ellipse([px - 2, py - 2, px + 2, py + 2], fill=RED)
             px, py = px + dx, py + dy
         d.ellipse([px - 7, py - 7, px + 7, py + 7], fill=RED, outline="white")
+        # v5.5: number centred on the circle's exact centre by its measured
+        # ink box — the old top-anchored draw at py-5 sat every number ~2px
+        # too low (measured on v5.4: dy +1.8..+2.4 on all 13 pins).
         label = str(n)
-        label_w = d.textlength(label, font=F_PIN)
-        d.text((px - label_w / 2, py - 5), label, font=F_PIN, fill="white")
+        box = d.textbbox((0, 0), label, font=F_PIN)
+        tw, th = box[2] - box[0], box[3] - box[1]
+        d.text((px - tw / 2 - box[0], py - th / 2 - box[1]), label,
+               font=F_PIN, fill="white")
 
 
 def hero_card(img, d, story, x, y, w):
@@ -1170,10 +1175,13 @@ def main():
     d.text((512, foot_y), "Reads at three sizes: the date and 3 leads at thumbnail size · "
            "13 pictures at half size · all 36 stories at full size.",
            font=F_FOOT, fill=GREY, anchor="ma")
+    # v5.5: footer line 2 was 1074px in a 1000px centred slot — it ran off
+    # BOTH page edges ("Pins" cut left, "Original illustrat…" cut right).
+    # Dropping the 2-word credit (965px) makes it fit whole; all 13 sources kept.
     d.text((512, foot_y + 13), "Pins 1–13, dots 14–36 (27 BepiColombo has no Earth dot). "
            "Sources: Reuters · AP · ICC · IMD · ICJ · Carbon Brief · ESA · "
            "Xinhua · Al Jazeera · Capital FM · ecancer · Formula1.com · "
-           "Korea JoongAng Daily. Original illustrations.",
+           "Korea JoongAng Daily.",
            font=F_FOOT, fill=GREY, anchor="ma")
 
     out_path = os.path.join(HERE, "entry.png")
