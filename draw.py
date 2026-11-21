@@ -309,11 +309,12 @@ def art_banner(img, d, x, y, w, h, big, small, fill):
     else:
         f_big = F_LBL2_9
         PROBLEMS.append("ART BANNER TOO WIDE: %s / %s" % (big, small))
-    d.text((x + 6, y + 3), big, font=f_big, fill="white")
+    # v5.4: text vertically centred in the 18px strip — middle anchor
+    # at the strip centre (y+9), not top-anchored at y+3/y+5.
+    d.text((x + 6, y + 9), big, font=f_big, fill="white", anchor="lm")
     if small:
-        small_w = int(d.textlength(small, font=F_LBL2_S))
-        d.text((x + w - 6 - small_w, y + 5), small, font=F_LBL2_S,
-               fill="white")
+        d.text((x + w - 6, y + 9), small, font=F_LBL2_S, fill="white",
+               anchor="rm")
 
 
 def _star(d, cx, cy, r_out, r_in, fill="white"):
@@ -677,10 +678,10 @@ def art_image(key, w, h):
             d.rectangle([bx, top, bx + 32, base], fill=col)
             d.rectangle([bx, top, bx + 32, top + 2], fill=light)
         d.line([6, base, w - 4, base], fill=(180, 175, 160), width=1)
-        # v5.3: smooth tapered curved arrow (supersampled) swooping down
-        # from top-left to an arrowhead at the bottom-right (tip 188,58)
-        # — the mirror of card 10's rising arrow, same dark colour
-        smooth_arrow(img, (8, 22), (55, 19), (120, 30), (188, 58),
+        # v5.4: arrow path shrunk for clearance — tail top edge 6px
+        # below the banner (was touching it), head bottom 8px above the
+        # bar labels (was ~2px). Same smooth tapered style and colour.
+        smooth_arrow(img, (10, 28), (58, 26), (118, 34), (180, 50),
                      (30, 30, 40))
         # names + values in two lines under the bars; the last name is
         # clamped so it clears the right edge ("HONG KONG" is 51px wide)
@@ -841,10 +842,10 @@ def art_image(key, w, h):
             d.rectangle([bx, top, bx + 24, 68], fill=col)
             light = tuple(min(255, c + 60) for c in col)
             d.rectangle([bx, top, bx + 24, top + 2], fill=light)
-        # v5.3: smooth tapered curved arrow (supersampled) rising from
-        # bottom-left to an arrowhead at top-right, clear of the 2.3%
-        # focal (starts x151)
-        smooth_arrow(img, (8, 64), (45, 62), (95, 54), (142, 30),
+        # v5.4: arrowhead pulled back for clearance — 17px from the
+        # "2.3%" focal (was 9px), tail 6px above the coins, head top
+        # 14px below the banner. Same smooth tapered style and colour.
+        smooth_arrow(img, (8, 62), (44, 60), (90, 52), (134, 33),
                      (30, 30, 40))
         # red 2.3% focal, top-right, clear of the arrowhead (ends x148)
         d.text((192, 24), "2.3%", font=F_ART2, fill=RED, anchor="ra",
@@ -1016,11 +1017,13 @@ def hero_card(img, d, story, x, y, w):
     pill_w = d.textlength(status, font=F_PILL) + 10
     d.rounded_rectangle([x + 8, y + 108, x + 8 + pill_w, y + 118],
                         radius=2, fill=PILL_COL[status])
-    d.text((x + 13, y + 107), status, font=F_PILL, fill="white")
-    d.text((x + 14 + pill_w, y + 106), "%d. %s · %s" % (num, reg, topic),
-           font=F_KICK, fill="white")
-    src_w = d.textlength(src, font=F_SRC)
-    d.text((x + w - 8 - src_w, y + 106), src, font=F_SRC, fill=GOLD)
+    # v5.4: strip text vertically centred on the strip centre (y+113)
+    # with middle anchors, not top-anchored at y+106/y+107.
+    d.text((x + 13, y + 113), status, font=F_PILL, fill="white",
+           anchor="lm")
+    d.text((x + 14 + pill_w, y + 113), "%d. %s · %s" % (num, reg, topic),
+           font=F_KICK, fill="white", anchor="lm")
+    d.text((x + w - 8, y + 113), src, font=F_SRC, fill=GOLD, anchor="rm")
     head_lines = wrap(d, head, F_HEAD, w - 16, max_lines=2)
     for j, line in enumerate(head_lines):
         d.text((x + 8, y + 125 + j * 22), line, font=F_HEAD, fill=INK)
@@ -1046,12 +1049,15 @@ def small_card(img, d, story, x, y):
     art_banner(art, art_d, 0, 0, w, 80, big, small, banner_fill)
     img.paste(art, (x, y))
     d.rectangle([x, y + 80, x + w, y + 95], fill=NAVY)
-    d.text((x + 4, y + 81), "%d. %s · %s" % (num, reg, topic),
-           font=F_KICK_S, fill="white")
+    # v5.4: strip text vertically centred on the strip centre (y+87.5)
+    # with middle anchors, not top-anchored at y+81.
+    d.text((x + 4, y + 87.5), "%d. %s · %s" % (num, reg, topic),
+           font=F_KICK_S, fill="white", anchor="lm")
     pill_w = d.textlength(status, font=F_PILL) + 10
     d.rounded_rectangle([x + w - 4 - pill_w, y + 82, x + w - 4, y + 92],
                         radius=2, fill=PILL_COL[status])
-    d.text((x + w + 1 - pill_w, y + 81), status, font=F_PILL, fill="white")
+    d.text((x + w + 1 - pill_w, y + 87.5), status, font=F_PILL,
+           fill="white", anchor="lm")
     head_lines = wrap(d, head, F_HEAD_S, w - 16, max_lines=2)
     for j, line in enumerate(head_lines):
         d.text((x + 8, y + 99 + j * 17), line, font=F_HEAD_S, fill=INK)
@@ -1094,8 +1100,10 @@ def main():
     for i, (label, count, fill, ink) in enumerate(REGIONS):
         sx = bar_x + i * seg_w
         d.rectangle([sx, bar_y, sx + seg_w - 1, bar_y + bar_h], fill=fill)
-        d.text((sx + seg_w / 2, bar_y + 4), "%s %d" % (label, count),
-               font=F_SRC, fill=ink, anchor="ma")
+        # v5.4: label vertically centred in the 20px segment (bar_y+10),
+        # not top-anchored at bar_y+4.
+        d.text((sx + seg_w / 2, bar_y + 10), "%s %d" % (label, count),
+               font=F_SRC, fill=ink, anchor="mm")
 
     # ---- heroes 180-385: lead 396 wide, rails 294; each card boxed like top 1 ----
     hero_y = 180
@@ -1152,8 +1160,10 @@ def main():
            "Akvan's approach + evacuations · Kyiv embassy damage · ICJ genocide "
            "ruling read. Not yet news: COP31's final agreed text (talks run on).")
     chk_lines = wrap(d, chk, F_DATECHK, 976, max_lines=2)
+    # v5.4: the 2 lines sit centred in the 28px box (block 966-988 vs
+    # box 964-992), not top-anchored at chk_y.
     for j, ln in enumerate(chk_lines):
-        d.text((20, chk_y + j * 12), ln, font=F_DATECHK, fill=INK)
+        d.text((20, chk_y + 2 + j * 12), ln, font=F_DATECHK, fill=INK)
 
     # ---- footer 998-1021 ----
     foot_y = 998
