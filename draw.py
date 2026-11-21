@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""news-image-20261120 v4: 36 stories, newspaper front page, top-3 pattern rebuild.
+"""news-image-20261120 v5: 36 stories, newspaper front page, top-3 selection rebuild.
 Draws entry.png (1024x1024, deterministic) from world.geo.json only.
-v4 (same 36 stories, same verified facts as v3.6 — NO fact/headline/deck/story
-changes): cream paper, black serif masthead, 6-number strip, region bar with
-per-region counts, satellite Akvan, densified Kyiv, COP31 FINAL DAY · DEADLOCK
-banner, solid colour banners on small-card art, dark-navy map. Timeline row
-removed (clutter no top-3 entry has); its space goes to heroes + air.
-Design baseline (user-approved 2026-11-20): boxed 1px INK cards, LiberationSerif-Bold
-headlines + LiberationSerif decks. CONTENT ONLY changed for Friday 20 Nov 2026.
+v5 (on the v4 design — cream paper, black serif masthead, 6-number strip,
+region bar, solid art banners): the SELECTION is rebuilt from the live
+research in research-v5.md — the 5 stories no top-3 entry draws are out
+(An-12 demoted to also-list 26; Sri Lanka rates, California quake, Rikers
+dropped), 5 verified missing stories are drawn (Japan CPI, Phillips 118,
+Bukele third term, Poland missile, Italy CGIL strike replacing the wrong
+"25+ nations" framing), Kyiv/COP31/markets facts corrected, also-list
+rebuilt 11-out/11-in, 7 regions (Oceania new). Design baseline (user-approved
+2026-11-20): boxed 1px INK cards, LiberationSerif-Bold headlines +
+LiberationSerif decks. CONTENT ONLY changed for Friday 20 Nov 2026.
 NOTE: the first draw.py run right after an edit can render the pre-edit file
 — always verify with 2-3 runs and take the later sha.
 Run: python3 draw.py  -> writes entry.png in this directory."""
@@ -106,16 +109,16 @@ FRONT = [
      "AKVAN", "3.7 LAKH EVACUATED", "akvan"),
     (2, "KYIV", "WAR", "REUTERS", "REPORTED",
      "Russian missiles strike Kyiv's bridges",
-     "Three Dnipro crossings hit; 5–8 killed, 15 hurt; power 'extremely critical'.",
+     "110+ missiles, 400+ drones; three Dnipro crossings hit; 9 killed, 28 hurt.",
      "KYIV BRIDGES", "3 BRIDGES HIT", "kyiv"),
-    (3, "ANTALYA", "CLIMATE", "UNFCCC", "REPORTED",
+    (3, "ANTALYA", "CLIMATE", "CARBON BRIEF", "REPORTED",
      "COP31's final day ends in fossil-fuel deadlock",
-     "Revised draft drops the phase-out; ministers split as the summit runs late.",
+     "Draft 2 drops fossil fuels and the $120bn target; '35 by 35' electrification survives.",
      "COP31", "DRAFT DROPS PHASE-OUT", "cop31"),
     (4, "TOKYO", "MARKETS", "REUTERS", "REPORTED",
-     "AI sell-off sinks Nikkei 5%",
-     "Taiwan's worst week since 1991; Hong Kong 20% off its high.",
-     "NIKKEI -5%", "AI ROUT SPREADS", "selloff"),
+     "AI sell-off sinks Asia",
+     "Four Asian indexes sink; Taiex worst week since 1990.",
+     "ASIA SINKS", "4 INDEXES DOWN", "selloff"),
     (5, "BRUSSELS", "DEAL", "AP · REUTERS", "REPORTED",
      "UK and EU agree post-Brexit reset",
      "Youth mobility ~100,000 a year; food and emissions links.",
@@ -124,10 +127,10 @@ FRONT = [
      "World reacts to Myanmar genocide ruling",
      "First state held liable; capitals and Rohingya groups respond.",
      "MYANMAR GUILTY", "9–6 · FIRST STATE LIABLE", "icj"),
-    (7, "PARIS", "LABOUR", "REUTERS", "REPORTED",
-     "Cost-of-living strikes sweep Europe",
-     "General strike in 25+ nations, youth-led, over living costs.",
-     "ON STRIKE", "25+ COUNTRIES", "strike"),
+    (7, "ROME", "LABOUR", "REUTERS", "REPORTED",
+     "Italy's general strike fills 100 squares",
+     "CGIL 24-hr strike; >1m march; vs €26bn 2027 budget.",
+     "ON STRIKE", "100+ SQUARES", "italy"),
     (8, "BAGHDAD", "SECURITY", "REUTERS", "REPORTED",
      "Iraqi forces move on militia stronghold",
      "Troops enter Jurf al-Sakhar, Kataib Hezbollah's base.",
@@ -136,79 +139,83 @@ FRONT = [
      "Israeli tanks cross Gaza truce line",
      "First ground operation since the ceasefire began.",
      "GAZA LINE", "FIRST SINCE TRUCE", "gaza"),
-    (10, "SIBERIA", "DISASTER", "REUTERS", "REPORTED",
-     "Russian An-12 crashes in Siberia",
-     "19 killed in the cargo-plane crash.",
-     "AN-12 DOWN", "19 KILLED", "crash"),
-    (11, "COLOMBO", "ECONOMY", "REUTERS", "REPORTED",
-     "Sri Lanka raises rates to 9%",
-     "First hike in six months; main rate now 9%.",
-     "RATE 9%", "FIRST HIKE IN 6 MONTHS", "rates"),
-    (12, "CALIFORNIA", "QUAKE", "USGS", "REPORTED",
-     "Magnitude 5 quake shakes California",
-     "A magnitude 5 tremor in the San Andreas swarm.",
-     "QUAKE M5", "SAN ANDREAS SWARM", "quake"),
-    (13, "NEW YORK", "POLITICS", "AP", "REPORTED",
-     "Mamdani plans to close Rikers Island",
-     "The mayor-elect puts the jail's closure on his agenda.",
-     "CLOSE RIKERS", "JAIL TO SHUT", "rikers"),
+    (10, "TOKYO", "ECONOMY", "REUTERS", "REPORTED",
+     "Japan inflation stays above target",
+     "Core CPI 2.2%, headline 2.3%; BoJ hike case cements.",
+     "CPI 2.3%", "ABOVE 2% TARGET", "cpi"),
+    (11, "WELLINGTON", "SPORT", "ICC · AP", "REPORTED",
+     "Phillips' 118 makes history",
+     "118 off 216; first 100s in all 3 formats vs India in one year.",
+     "PHILLIPS 118", "FIRST IN ALL FORMATS", "cricket"),
+    (12, "SAN SALVADOR", "POLITICS", "REUTERS", "REPORTED",
+     "Bukele registers for third term",
+     "Filed 19 Nov for 28 Feb 2027 vote; vs 4 rivals; polls 55–70%.",
+     "THIRD TERM", "BUKELE FILES", "bukele"),
+    (13, "WARSAW", "SECURITY", "REUTERS", "REPORTED",
+     "Russian missile lands in Poland",
+     "Kh-101 down in Poland; 3 objects in its airspace.",
+     "MISSILE IN POLAND", "NATO ALERT", "poland"),
 ]
 
 # num, city, text
 ALSO = [
-    (14, "Riyadh", "Saudis intercept missile, five drones"),
-    (15, "Berlin", "Ukraine allies meet; Europe ready to talk"),
-    (16, "Brussels", "EU to summon Russian envoy over Kyiv"),
-    (17, "London", "UK pledges 1,000+ drones, £260m for Kyiv"),
-    (18, "Patrapur", "209mm of rain as Akvan makes landfall"),
-    (19, "Odisha", "423 rescue teams; 9,300 shelters open"),
-    (20, "Gopalpur", "third cyclone on this coast in 24 days"),
-    (21, "Paris", "France seeks UN Security Council meeting"),
-    (22, "Taipei", "stocks suffer worst week since 1991"),
-    (23, "Hong Kong", "shares 20% below their 2026 high"),
-    (24, "Tokyo", "SoftBank falls more than 16%"),
-    (25, "London", "copper at its lowest since March"),
-    (26, "Brussels", "tuition fees still the sticking point"),
-    (27, "Nairobi", "Kenya discharges its last Ebola patient"),
-    (28, "Washington", "IMF warns debt near 100% of GDP"),
-    (29, "Rome", "Italy fines Meta €805m over photo access"),
-    (30, "Washington", "FAA ground stop strands 1.5m flyers"),
-    (31, "Washington", "879,000 AI chips cleared for China"),
-    (32, "Washington", "Senate passes energy-permit bill 62–33"),
-    (33, "Washington", "Trump pardons Pete Rose posthumously"),
-    (34, "Washington", "US sanctions Comancheros, 'Ndrangheta"),
-    (35, "Buenos Aires", "Senate backs disability law, 71–0"),
-    (36, "Warsaw", "Poland probes unknown objects; alert lifted"),
+    (14, "Riyadh", "Saudis intercept 2 Houthi missiles"),
+    (15, "Brussels", "EU to summon Russian envoy over Kyiv"),
+    (16, "London", "UK pledges 1,000+ drones, £260m for Kyiv"),
+    (17, "Paris", "France seeks UN Security Council meeting"),
+    (18, "Taipei", "Stocks suffer worst week since 1990 (-17.5%)"),
+    (19, "Tokyo", "SoftBank falls more than 16%"),
+    (20, "Washington", "IMF warns debt near 100% of GDP"),
+    (21, "Rome", "Italy fines Meta €805m over photo access"),
+    (22, "Washington", "FAA ground stop strands 1.5m flyers"),
+    (23, "Washington", "879,000 AI chips cleared for China"),
+    (24, "Washington", "Senate passes energy-permit bill 62-33"),
+    (25, "Washington", "US sanctions Comancheros, 'Ndrangheta"),
+    (26, "Siberia", "An-12 crash kills 19 in Siberia"),
+    (27, "Mercury", "BepiColombo's 8-yr trip ends Saturday"),
+    (28, "Seoul", "Ruling party votes to impeach chief justice Jo"),
+    (29, "Turkana", "Kenya spuds first commercial oil well"),
+    (30, "Yenne", "Senegal migrant boat: 4 dead, dozens missing"),
+    (31, "Barcelona", "Cancer pill shrinks tumours in 60.7%"),
+    (32, "Beijing", "China holds rates (3.0% / 3.5%)"),
+    (33, "Blantyre", "Malawi fuel queues run all night"),
+    (34, "Las Vegas", "Russell fastest in wet F1 practice, 1:47.272"),
+    (35, "Shenzhen", "Xi hails 'full turnaround' with Albanese"),
+    (36, "Europe", "Youth strike in 25+ countries"),
 ]
 
 STATS = [
     ("370,000", "evacuated in Odisha"),
     ("3", "bridges hit in Kyiv"),
-    ("-5%", "Nikkei's fall"),
-    ("100k/yr", "UK-EU youth mobility"),
-    ("19", "killed in An-12 crash"),
-    ("209mm", "rain at Patrapur"),
+    ("-6.2%", "Taipei's fall"),
+    ("2.3%", "Japan CPI headline"),
+    ("118", "Phillips in Wellington"),
+    ("0", "fossil-fuel mentions"),
 ]
 
-# v4 region bar: per-region story counts counted from OUR actual 36-story
+# v5 region bar: per-region story counts counted from OUR actual 36-story
 # list (FRONT 1-13 + ALSO 14-36), assigned by subject, not dateline city.
-# EUROPE 11: 2 Kyiv, 5 UK-EU, 7 Paris, 15 Berlin, 16 Brussels, 17 London,
-#   21 Paris, 25 London, 26 Brussels, 29 Rome, 36 Warsaw.
-# ASIA 11: 1 Akvan, 4 Nikkei, 6 ICJ Myanmar, 10 Siberia, 11 Sri Lanka,
-#   18 Patrapur, 19 Odisha, 20 Gopalpur, 22 Taipei, 23 Hong Kong, 24 Tokyo.
-# AMERICAS 8: 12 California, 13 Rikers, 30 FAA, 31 AI chips, 32 Senate,
-#   33 Trump pardon, 34 sanctions, 35 Buenos Aires.
+# EUROPE 10: 2 Kyiv, 5 UK-EU, 7 Italy strike, 13 Poland, 15 Brussels,
+#   16 London, 17 Paris, 21 Rome, 31 Barcelona, 36 youth strike.
+# ASIA 10: 1 Akvan, 4 Nikkei, 6 ICJ Myanmar, 10 Japan CPI, 18 Taipei,
+#   19 Tokyo, 26 An-12, 28 Seoul, 32 Beijing, 35 Shenzhen.
+# AMERICAS 6: 12 Bukele, 22 FAA, 23 AI chips, 24 Senate, 25 sanctions,
+#   34 Las Vegas.
 # MIDDLE EAST 3: 8 Iraq, 9 Gaza, 14 Riyadh.
-# GLOBAL 2: 3 COP31 (global climate summit), 28 IMF debt warning.
-# AFRICA 1: 27 Nairobi. No OCEANIA story in our 36. Total 11+11+8+3+2+1 = 36.
+# AFRICA 3: 29 Turkana, 30 Yenne, 33 Blantyre.
+# OCEANIA 1: 11 Phillips (Wellington) — NEW, 7th region (matches #1).
+# GLOBAL 3: 3 COP31 (global climate summit), 20 IMF debt warning,
+#   27 BepiColombo.
+# Total 10+10+6+3+3+1+3 = 36.
 # (label, count, fill, text colour)
 REGIONS = [
-    ("EUROPE", 11, (16, 62, 150), "white"),
-    ("ASIA", 11, (179, 34, 44), "white"),
-    ("AMERICAS", 8, (90, 60, 140), "white"),
+    ("EUROPE", 10, (16, 62, 150), "white"),
+    ("ASIA", 10, (179, 34, 44), "white"),
+    ("AMERICAS", 6, (90, 60, 140), "white"),
     ("MIDDLE EAST", 3, (196, 142, 8), (17, 17, 17)),
-    ("GLOBAL", 2, (90, 90, 90), "white"),
-    ("AFRICA", 1, (30, 130, 80), "white"),
+    ("AFRICA", 3, (30, 130, 80), "white"),
+    ("OCEANIA", 1, (0, 120, 140), "white"),
+    ("GLOBAL", 3, (90, 90, 90), "white"),
 ]
 
 LEGEND = [
@@ -219,19 +226,21 @@ LEGEND = [
 
 PINS = {
     1: (85.0, 19.3), 2: (30.5, 50.4), 3: (30.7, 36.9), 4: (139.7, 35.7),
-    5: (4.4, 50.8), 6: (4.3, 52.1), 7: (2.4, 48.9), 8: (44.2, 32.8),
-    9: (34.4, 31.5), 10: (96.0, 60.0), 11: (79.9, 6.9), 12: (-120.0, 36.0),
-    13: (-74.0, 40.7),
+    5: (4.4, 50.8), 6: (4.3, 52.1), 7: (12.5, 41.9), 8: (44.2, 32.8),
+    9: (34.4, 31.5), 10: (139.7, 35.7), 11: (174.8, -41.3),
+    12: (-89.2, 13.7), 13: (21.0, 52.2),
 }
 DOTS = {
-    14: (46.7, 24.7), 15: (13.4, 52.5), 16: (4.4, 50.8), 17: (-0.1, 51.5),
-    18: (84.6, 19.1), 19: (85.8, 20.3), 20: (85.0, 19.3), 21: (2.4, 48.9),
-    22: (121.6, 25.0), 23: (114.2, 22.3), 24: (139.7, 35.7), 25: (-0.1, 51.5),
-    26: (4.4, 50.8), 27: (36.8, -1.3), 28: (-77.0, 38.9), 29: (12.5, 41.9),
-    30: (-77.0, 38.9), 31: (-77.0, 38.9), 32: (-77.0, 38.9),
-    33: (-77.0, 38.9), 34: (-77.0, 38.9), 35: (-58.4, -34.6),
-    36: (21.0, 52.2),
+    14: (46.7, 24.7), 15: (4.4, 50.8), 16: (-0.1, 51.5), 17: (2.4, 48.9),
+    18: (121.6, 25.0), 19: (139.7, 35.7), 20: (-77.0, 38.9),
+    21: (12.5, 41.9), 22: (-77.0, 38.9), 23: (-77.0, 38.9),
+    24: (-77.0, 38.9), 25: (-77.0, 38.9), 26: (96.0, 60.0),
+    28: (127.0, 37.5), 29: (35.9, 3.1), 30: (-17.2, 14.7),
+    31: (2.2, 41.4), 32: (116.4, 39.9), 33: (35.0, -15.8),
+    34: (-115.1, 36.2), 35: (114.1, 22.5), 36: (4.4, 50.8),
 }
+# v5: 27 BepiColombo has no Earth location (Mercury orbit insertion) —
+# it gets no dot, by design.
 
 PROBLEMS = []
 
@@ -582,37 +591,27 @@ def art_image(key, w, h):
                       fill=GOLD)
         d.ellipse([56, 58, 64, 64], fill=GOLD)
     elif key == "selloff":
-        # v3.5: redrawn per the user's new reference (image 2) — FIVE
-        # dark navy bars of the reference's exact relative heights on a
-        # baseline, with the thick RED zigzag arrow above them (small rise,
-        # deep V, rise, steep fall to an arrowhead at bottom-right). The
-        # old six bars, skyline and ticker tape are gone. The -5% focal
-        # stays top-right and the NIKKEI -5% scrim bottom-left.
-        # Original PIL vector code; the reference file is not used anywhere.
+        # v5: the 4-index table the top entries use — Friday closes, all
+        # down, with a red down-triangle before each value. The old five
+        # navy bars + red zigzag (v3.5, per the user's image 2) are gone;
+        # the deck carries the "worst week since 1990" line. Art is 196x80
+        # with the solid banner over y0-18, so rows start at y24.
+        # Original PIL vector code.
         d.rectangle([0, 0, w, h], fill=(246, 242, 233))
-        # five navy bars, heights = the reference's (baseline y72):
-        # tops 34, 42, 30, 48, 52 (ratios 0.90, 0.71, 1.00, 0.57, 0.48)
-        # v4: bars + zigzag shifted down 10px so the solid top banner
-        # (y0-18) clears them; the zigzag/bar geometry is unchanged
-        for bx, top in ((8, 34), (40, 42), (71, 30), (103, 48), (136, 52)):
-            d.rectangle([bx, top, bx + 22, 72], fill=(35, 55, 85))
-            d.rectangle([bx + 3, top + 3, bx + 8, top + 6], fill="white")
-        # baseline under the bars (ends x160 so the -5% focal fits right)
-        d.rectangle([4, 72, 160, 75], fill=(35, 55, 85))
-        # thick red zigzag arrow, the reference's shape — clear of the
-        # -5% focal (bottom-right now) and of the last bar's top. v3.5.1: the
-        # whole zigzag now sits INSIDE the art box with a clear margin
-        # from the top edge (peaks y=22-23, stroke top >= y=19) — the
-        # v3.5 peaks at y=5 sat flush on the edge and read as clipped.
-        d.line([(4, 27), (16, 23), (47, 36), (80, 22), (150, 51)],
-               fill=RED, width=6, joint="curve")
-        d.polygon([(156, 54), (144, 44), (151, 57)], fill=RED)
-        # big -5% focal, top-right, on the light background — v4: moved
-        # from the bottom-right (the navy baseline covered its minus sign)
-        # to the empty corner below the banner, clear of the zigzag
-        # (which passes x150 at y51) and of the last bar (top y52)
-        d.text((192, 22), "-5%", font=F_ART2, fill=RED, anchor="ra",
-               stroke_width=1, stroke_fill="white")
+        rows = (("TAIPEI", "-6.2%"), ("SEOUL", "-5.2%"),
+                ("TOKYO", "-5.1%"), ("HONG KONG", "-1.9%"))
+        for i, (name, val) in enumerate(rows):
+            ry = 24 + i * 14
+            d.text((10, ry), name, font=F_ART2_S, fill=(20, 20, 25))
+            vw = d.textlength(val, font=F_ART2_S)
+            # red down-triangle just left of the value
+            tx = w - 10 - vw - 12
+            d.polygon([(tx, ry + 2), (tx + 8, ry + 2), (tx + 4, ry + 9)],
+                      fill=RED)
+            d.text((w - 10, ry), val, font=F_ART2_S, fill=RED, anchor="ra")
+            if i < 3:
+                d.line([10, ry + 12, w - 10, ry + 12],
+                       fill=(210, 205, 190), width=1)
     elif key == "ukeu":
         # two flags, one deal: EU stars on the left, the Union Jack's cross
         # on the right, a gold link between them. v4: BIGGER flags — wider
@@ -630,38 +629,36 @@ def art_image(key, w, h):
         d.line([196, 0, 98, h], fill=(20, 40, 120), width=4)
         d.rectangle([90, 34, 106, 46], fill=GOLD)
         d.text((98, 40), "=", font=F_ART2, fill=(20, 20, 20), anchor="mm")
-    elif key == "strike":
-        # v3: DENSITY — a full street, not three figures on blank sky.
-        # Paris facades with windows across the top, six marchers filling
-        # the width in stride, the COST OF LIVING banner carried across
-        # the top by the front two, placards in hand, road + dashes below.
+    elif key == "italy":
+        # v5: Rome, not Paris — the CGIL general strike. St Peter's dome
+        # and colonnade across the back, a tricolour flag, and marchers
+        # with placards filling the street. The old "strike" branch (Paris
+        # facades, "25+ COUNTRIES" banner) is gone with the wrong framing.
+        # Original PIL vector code.
         d.rectangle([0, 0, w, h], fill=(205, 214, 226))
-        # Paris facades behind the march, windows lit
-        for fx, fw, fh in ((0, 34, 30), (38, 30, 38), (72, 36, 28),
-                           (112, 30, 36), (146, 28, 30), (178, 18, 34)):
-            d.rectangle([fx, 40 - fh, fx + fw, 40], fill=(150, 140, 120))
-            for wy in range(40 - fh + 5, 36, 10):
-                for wx in range(fx + 4, fx + fw - 4, 9):
-                    d.rectangle([wx, wy, wx + 4, wy + 5],
-                                fill=(255, 220, 130))
-            d.polygon([(fx, 40 - fh), (fx + fw, 40 - fh),
-                       (fx + fw // 2, 40 - fh - 8)], fill=(120, 60, 50))
+        # St Peter's dome, centre, behind the march (banner covers y0-18)
+        d.ellipse([68, 8, 128, 56], fill=(150, 140, 120))
+        d.rectangle([92, 2, 104, 16], fill=(150, 140, 120))
+        d.ellipse([94, -2, 102, 8], fill=(150, 140, 120))
+        # colonnade: a row of small columns under the dome
+        d.rectangle([52, 52, 144, 56], fill=(120, 110, 95))
+        for cx0 in range(56, 140, 12):
+            d.rectangle([cx0, 44, cx0 + 4, 52], fill=(200, 190, 170))
         # the road, full width, with dashes
         d.rectangle([0, 62, w, h], fill=(110, 110, 116))
         d.line([0, 62, w, 62], fill=(60, 60, 65), width=2)
         for dx in range(4, w, 20):
             d.line([dx, 71, dx + 10, 71], fill="white", width=2)
-        # v4: the in-art COST OF LIVING banner is gone — the solid top
-        # banner now carries ON STRIKE / 25+ COUNTRIES, and the old banner
-        # (y6-24) would sit half-hidden behind it. The front marchers keep
-        # their raised arms; the placards stay. Clouds removed too (they
-        # sat at y2-10, behind the banner).
-        # six marchers, bigger, filling the width, in stride
+        # tricolour flag on a pole, left — green/white/red vertical bands
+        d.line([14, 22, 14, 52], fill=(60, 40, 20), width=2)
+        for fi, fcol in enumerate(((0, 140, 60), "white", (200, 40, 40))):
+            d.rectangle([14 + fi * 6, 22, 14 + fi * 6 + 6, 32], fill=fcol)
+        # five marchers, in stride, placards up on the middle two
         skins = [(200, 140, 90), (220, 180, 140), (190, 130, 85),
-                 (210, 160, 110), (200, 140, 90), (220, 180, 140)]
+                 (210, 160, 110), (200, 140, 90)]
         shirts = [(40, 90, 160), (200, 40, 40), (30, 140, 80),
-                  (220, 170, 40), (90, 60, 140), (20, 120, 140)]
-        for i, x in enumerate((8, 40, 72, 104, 136, 168)):
+                  (220, 170, 40), (90, 60, 140)]
+        for i, x in enumerate((30, 62, 94, 126, 158)):
             d.ellipse([x + 3, 30, x + 15, 42], fill=skins[i])
             d.ellipse([x + 6, 35, x + 8, 37], fill=(20, 20, 20))
             d.ellipse([x + 10, 35, x + 12, 37], fill=(20, 20, 20))
@@ -669,10 +666,10 @@ def art_image(key, w, h):
             d.line([x + 5, 56, x + 1, 68], fill=(20, 20, 20), width=2)
             d.line([x + 9, 56, x + 15, 68], fill=(20, 20, 20), width=2)
             if i == 0:
-                d.line([x + 4, 44, 26, 40], fill=skins[i], width=2)
-            if i == 5:
-                d.line([x + 10, 44, 170, 40], fill=skins[i], width=2)
-            if i in (2, 3):
+                d.line([x + 4, 44, 46, 40], fill=skins[i], width=2)
+            if i == 4:
+                d.line([x + 10, 44, 156, 40], fill=skins[i], width=2)
+            if i in (1, 3):
                 # middle marchers hold small placards up
                 d.line([x + 12, 44, x + 16, 34], fill=(60, 40, 20), width=2)
                 d.rectangle([x + 10, 26, x + 24, 36], fill="white",
@@ -745,281 +742,134 @@ def art_image(key, w, h):
         d.ellipse([12, 38, 30, 52], fill=(230, 210, 175))
         d.ellipse([22, 46, 36, 58], fill=(220, 200, 165))
         d.ellipse([20, 30, 30, 40], fill=(200, 200, 200))
-    elif key == "crash":
-        # v3.5: redrawn per the user's NEW reference (image 1) — a crashed
-        # plane in the desert, seen from above: tan sand, a white plane
-        # diagonal across the frame (red tail + red wingtips + red stripe
-        # along the fuselage), one engine on fire, a dark shadow under
-        # the plane, small green cacti at the edges. The old diving-plane
-        # sky scene is gone. Original PIL vector code; the reference file
-        # (a stock illustration) is not used anywhere.
-        d.rectangle([0, 0, w, h], fill=(214, 168, 105))
-        # sand texture: darker patches and pebbles
-        for px0, py0, pw, ph in ((10, 30, 26, 7), (150, 66, 30, 7),
-                                 (60, 8, 22, 6)):
-            d.ellipse([px0, py0, px0 + pw, py0 + ph], fill=(200, 152, 92))
-        for px, py in ((18, 56), (52, 70), (96, 12), (140, 74), (176, 30),
-                       (120, 8), (70, 44)):
-            d.ellipse([px, py, px + 3, py + 2], fill=(180, 135, 80))
-        # a thin dark crack in the sand, like the reference's — clear of
-        # the up-wing tip (which ends x124)
-        d.line([(140, 0), (146, 6), (142, 12), (148, 18)],
-               fill=(120, 85, 45), width=1)
-        # v3.6: scorch mark on the sand under the fires (drawn before the
-        # plane so the wreck lies on it)
-        d.ellipse([98, 63, 126, 72], fill=(70, 50, 30))
-        # plane axis: tail (34,12) -> nose (172,54). P(t, s) = point at
-        # fraction t along the axis, offset s across it.
-        ax_, ay_, bx_, by_ = 34, 12, 172, 54
-        dx_, dy_ = bx_ - ax_, by_ - ay_
-        al_ = math.hypot(dx_, dy_)
-        ux_, uy_ = dx_ / al_, dy_ / al_
-        px_, py_ = -uy_, ux_
-
-        def _P(t, s):
-            return (ax_ + t * dx_ + s * px_, ay_ + t * dy_ + s * py_)
-
-        # the two wings: root chord at t=0.55 (half-chord 9), tip chord 4;
-        # up-wing 34 long, down-wing 30 (its tip stays right of the
-        # AN-12 DOWN scrim, which ends x96)
-        up_wing = [_P(0.6125, 0), _P(0.578, -34), _P(0.522, -34),
-                   _P(0.4875, 0)]
-        # v3.6: the down-wing is BROKEN — snapped off at the root, the outer
-        # fragment lying bent on the sand down-right of the break, its red
-        # tip still on it. The up-wing stays intact.
-        dn_stub = [_P(0.6125, 0), _P(0.578, 14), _P(0.522, 14),
-                   _P(0.4875, 0)]
-        dn_frag = [(114, 56), (128, 63), (124, 70), (110, 64)]
-        fus = [_P(0, -5), _P(0, 5), _P(0.97, 6), _P(1, 0), _P(0.97, -6)]
-        # shadow: the plane silhouette shifted down-right, dark brown
-        for poly in (up_wing, dn_stub, dn_frag, fus):
-            d.polygon([(x + 7, y + 9) for (x, y) in poly],
-                      fill=(110, 75, 40))
-        # wings, white with a dark outline; red tips on the outer fifth
-        d.polygon(up_wing, fill=(245, 245, 240), outline=(90, 90, 100))
-        d.polygon([(122.5, 11.2), (123.6, 3.7), (116, 1.3), (112.8, 8.2)],
-                  fill=RED)
-        d.polygon(dn_stub, fill=(245, 245, 240), outline=(90, 90, 100))
-        # jagged tear across the stub's snapped end
-        d.line([(102, 47), (105, 50), (107, 47), (110, 50)],
-               fill=(40, 40, 50), width=2)
-        # the snapped-off fragment, bent on the sand, red tip at its end
-        d.polygon(dn_frag, fill=(245, 245, 240), outline=(90, 90, 100))
-        d.polygon([(124, 66), (128, 63), (126, 61), (122, 64)], fill=RED)
-        # fuselage, white with a dark outline so it reads as a plane body
-        d.polygon(fus, fill=(245, 245, 240), outline=(90, 90, 100))
-        # red tail cone + red stripe along the fuselage
-        d.polygon([_P(0, -5), _P(0, 5), _P(0.14, 5.5), _P(0.14, -5.5)],
-                  fill=RED)
-        d.line([_P(0.16, -3.5), _P(0.94, -3.5)], fill=RED, width=2)
-        # red tail stabilisers: one up, one down, swept back from the tail
-        d.polygon([_P(0.03, -2), _P(0.03, -12), _P(0.09, -12),
-                   _P(0.09, -2)], fill=RED)
-        d.polygon([_P(0.03, 2), _P(0.03, 12), _P(0.09, 12), _P(0.09, 2)],
-                  fill=RED)
-        # v3.6: wreck damage on the fuselage — a jagged crack across the
-        # body mid-way plus a dark dent just ahead of it
-        d.line([(93, 25), (97, 29), (94, 32), (98, 36), (95, 39)],
-               fill=(40, 40, 50), width=2)
-        d.ellipse([84, 27, 90, 33], fill=(90, 90, 100))
-        # cabin windows along the upper side, cockpit near the nose, and
-        # a door just past the red tail cone
-        for wt in (0.22, 0.36, 0.50, 0.64, 0.78):
-            wx, wy = _P(wt, -3.5)
-            d.rectangle([wx - 1, wy - 1, wx + 1, wy + 1], fill=(40, 40, 50))
-        d.polygon([(156, 43), (163, 45), (161, 48), (154, 46)],
-                  fill=(40, 70, 110))
-        d.rectangle([55, 13, 59, 18], outline=(60, 60, 70), width=1)
-        # two engine nacelles on the wings; the lower one is on fire
-        d.ellipse([109, 19, 119, 24], fill=(200, 200, 205),
-                  outline=(90, 90, 100))
-        d.ellipse([101, 46, 111, 51], fill=(90, 90, 100))
-        # v3.6: MORE fire — bigger flames at the lower engine plus a second
-        # fire where the wing snapped
-        d.polygon([(100, 50), (96, 64), (101, 60), (104, 69), (109, 58),
-                   (113, 66), (116, 53)], fill=(255, 140, 40))
-        d.polygon([(102, 55), (104, 63), (108, 56)], fill=(255, 220, 80))
-        d.polygon([(112, 54), (110, 62), (114, 59), (117, 64), (120, 57),
-                   (121, 52)], fill=(255, 140, 40))
-        d.polygon([(114, 57), (116, 62), (119, 57)], fill=(255, 220, 80))
-        # thick smoke rising from both fires, drifting right so it clears
-        # the fuselage — clear of the scrim (ends x96)
-        for ex, ey, er, col in ((104, 43, 4, (110, 110, 110)),
-                                 (101, 36, 5, (90, 90, 90)),
-                                 (112, 42, 4, (110, 110, 110)),
-                                 (118, 34, 5, (90, 90, 90)),
-                                 (124, 26, 5, (130, 130, 130)),
-                                 (130, 18, 4, (140, 140, 140))):
-            d.ellipse([ex - er, ey - er, ex + er, ey + er], fill=col)
-        # v3.6: debris scattered on the sand around the wreck, clear of
-        # the scrim (ends x96, y55+)
-        d.polygon([(16, 36), (22, 40), (15, 42)], fill=(90, 90, 100))
-        d.polygon([(148, 68), (156, 66), (154, 72), (146, 71)],
-                  fill=(245, 245, 240), outline=(90, 90, 100))
-        d.polygon([(166, 56), (172, 60), (167, 63)], fill=(60, 60, 70))
-        d.polygon([(128, 72), (134, 74), (131, 77)], fill=(120, 120, 125))
-        d.rectangle([58, 28, 64, 31], fill=(70, 70, 80))
-        # small green cacti at the edges, clear of the scrim
-        for cx0, cy0 in ((10, 18), (186, 10), (184, 64)):
-            d.ellipse([cx0 - 3, cy0 + 10, cx0 + 6, cy0 + 12],
-                      fill=(180, 135, 80))
-            d.rectangle([cx0, cy0, cx0 + 3, cy0 + 10], fill=(35, 130, 60))
-            d.rectangle([cx0 - 4, cy0 + 3, cx0, cy0 + 5], fill=(35, 130, 60))
-            d.rectangle([cx0 + 3, cy0 + 5, cx0 + 7, cy0 + 7],
-                        fill=(35, 130, 60))
-    elif key == "rates":
-        # v3.5: redrawn to match the user's reference EXACTLY — the user
-        # asked why v3.4 was not the same. FIVE black bars with the
-        # reference's relative heights (0.34, 0.49, 0.42, 0.71, 1.00,
-        # measured off the reference file), and the zigzag arrow in BLACK
-        # — v3.4's red arrow was the mismatch — same zigzag shape rising
-        # to an arrowhead at top-right. The 9% focal, gold coins + Rs
-        # stamp and the RATE 9% scrim stay. Original PIL vector code;
-        # the reference file (watermarked) is not used anywhere.
+    elif key == "cpi":
+        # v5: Japan CPI — three ascending navy bars (2.1 / 2.2 / 2.3) on a
+        # light grid, a thick red zigzag arrow rising to the top-right, a
+        # red 2.3% focal, gold coins along the bottom. The old "crash"
+        # branch (desert An-12 wreck) is gone — the crash is also-list 26.
+        # Original PIL vector code.
         d.rectangle([0, 0, w, h], fill=(245, 240, 228))
-        for gy in range(0, h, 12):
+        for gy in range(18, h, 12):
             d.line([0, gy, w, gy], fill=(210, 205, 190), width=1)
         for gx in range(0, w, 24):
-            d.line([gx, 0, gx, h], fill=(228, 223, 208), width=1)
-        # five black bars, the reference's heights, baseline y70 —
-        # the last bar's top is y26 so it stays clear of the solid top
-        # banner (y0-18). v4: bars shifted down 8px for the banner.
-        for bx, top in ((8, 54), (39, 47), (70, 51), (101, 37), (132, 26)):
-            d.rectangle([bx, top, bx + 24, 70], fill=(20, 20, 25))
+            d.line([gx, 18, gx, h], fill=(228, 223, 208), width=1)
+        # three navy bars, baseline y70 — banner covers y0-18
+        for bx, top in ((12, 52), (48, 42), (84, 32)):
+            d.rectangle([bx, top, bx + 26, 70], fill=(35, 55, 85))
             d.rectangle([bx + 3, top + 3, bx + 8, top + 6], fill="white")
-        # thick BLACK zigzag arrow, the reference's shape, rising to the
-        # top-right — v4: shifted down 14px so the arrowhead (y19) clears
-        # the banner; where a V dips into a bar it merges, as in the
-        # reference (black on black). No baseline rect: the bars end at
-        # y70 and the coins sit below them.
-        d.line([(2, 63), (60, 29), (85, 50), (100, 33), (122, 52),
-                (148, 19)], fill=(20, 20, 25), width=6, joint="curve")
-        d.polygon([(148, 19), (136, 21), (146, 29)], fill=(20, 20, 25))
-        # big 9% focal, mid-right, on the grid — v4: moved from the
-        # top-right (now under the solid banner) to the empty corner
-        # right of the arrowhead and the last bar
-        d.text((192, 32), "9%", font=F_ART2, fill=RED, anchor="ra",
+        # thick red zigzag arrow rising to the top-right
+        d.line([(6, 64), (50, 38), (80, 52), (110, 30), (146, 22)],
+               fill=RED, width=5, joint="curve")
+        d.polygon([(146, 22), (134, 24), (144, 32)], fill=RED)
+        # red 2.3% focal, top-right, clear of the arrowhead (ends x146)
+        d.text((192, 24), "2.3%", font=F_ART2, fill=RED, anchor="ra",
                stroke_width=1, stroke_fill="white")
-        # gold coins along the bottom, one stamped Rs (right of the scrim)
+        # gold coins along the bottom
         for cx in (14, 44, 74, 104, 134, 164):
             d.ellipse([cx, 72, cx + 12, 80], fill=GOLD,
                       outline=(180, 130, 20), width=1)
             d.ellipse([cx + 3, 74, cx + 9, 78], fill=(255, 220, 80))
-        d.text((170, 76), "Rs", font=F_ART2_S, fill=(120, 80, 0),
-               anchor="mm")
-    elif key == "quake":
-        # v3.3: redrawn in the style of the user's reference 1 — an
-        # isometric earth block filling the frame: pale sage background,
-        # green top surface split by a thick orange zigzag fault crack,
-        # two small houses (one tilted, one with a collapsed roof), thin
-        # white concentric epicentre rings on the crack, debris, and
-        # orange block sides at the bottom. v3.4: the crack runs TOP to
-        # BOTTOM (was sideways), per the user. The red seismograph trace
-        # stays across the top. Original PIL vector code; the reference
-        # file is not used anywhere.
-        d.rectangle([0, 0, w, h], fill=(205, 220, 200))
-        # the seismograph trace on a white strip — v4: moved from the top
-        # (y0-14, now under the solid banner) to just below it (y18-28);
-        # the whole block below shifts down 10px to make room
-        d.rectangle([0, 18, w, 28], fill="white")
-        d.line([(2, 23), (16, 23), (22, 18), (28, 28), (34, 23), (52, 23),
-                (58, 17), (64, 29), (70, 23), (92, 23), (98, 19), (104, 27),
-                (110, 23), (130, 23), (136, 18), (142, 28), (148, 23),
-                (170, 23), (176, 20), (182, 26), (188, 23), (194, 23)],
-               fill=RED, width=2)
-        # the isometric block: green top, orange sides (shifted +10y)
-        d.polygon([(8, 48), (98, 28), (188, 48), (98, 68)],
-                  fill=(35, 150, 75))
-        d.polygon([(8, 48), (98, 68), (98, 86), (8, 66)],
-                  fill=(240, 120, 50))
-        d.polygon([(98, 68), (188, 48), (188, 66), (98, 86)],
-                  fill=(215, 100, 40))
-        # v3.5: the crack runs TOP-CENTRE to BOTTOM-CENTRE, per the user
-        # — down the middle of the top face from the top vertex (98,28),
-        # zigzagging down, then drifting right just enough to stay visible
-        # past the QUAKE M5 banner and on down the front face to the
-        # bottom edge. A thin dark seam line beside it reads
-        # as the split between the two halves. The white epicentre rings
-        # are centred on the crack and drawn UNDER it (v3.4 fix: rings
-        # over the crack hid its middle).
-        for rr in (5, 8, 11, 14):
-            d.ellipse([98 - rr, 48 - rr, 98 + rr, 48 + rr],
-                      outline="white", width=1)
-        d.ellipse([96, 46, 100, 50], fill="white")
-        crack = [(98, 30), (93, 37), (103, 43), (95, 49), (104, 55),
-                 (112, 61), (106, 67), (114, 73), (108, 79), (114, 84)]
-        d.line(crack, fill=(180, 60, 20), width=9, joint="curve")
-        d.line(crack, fill=(250, 125, 50), width=6, joint="curve")
-        d.line([(102, 30), (97, 37), (107, 43), (99, 49), (108, 55),
-                (116, 61), (110, 67), (118, 73), (112, 79), (118, 84)],
-               fill=(120, 40, 15), width=1, joint="curve")
-        # two houses: one tilted left, one with a collapsed roof right,
-        # on either side of the vertical crack (shifted +10y)
-        d.polygon([(28, 40), (52, 36), (52, 50), (28, 54)],
-                  fill=(240, 240, 235))
-        d.polygon([(26, 40), (54, 36), (40, 28)], fill=(40, 110, 200))
-        d.rectangle([34, 42, 38, 48], fill=(255, 180, 90))
-        d.rectangle([44, 40, 48, 46], fill=(255, 180, 90))
-        d.polygon([(152, 38), (176, 34), (176, 48), (152, 52)],
-                  fill=(240, 240, 235))
-        d.polygon([(150, 38), (164, 28), (178, 36), (170, 40),
-                   (158, 38)], fill=(40, 110, 200))
-        d.rectangle([158, 40, 162, 46], fill=(255, 180, 90))
-        d.rectangle([168, 38, 172, 44], fill=(255, 180, 90))
-        # debris on the top face, clear of the banner
-        d.rectangle([62, 51, 70, 54], fill=(250, 125, 50))
-        d.rectangle([120, 54, 128, 58], fill=(250, 125, 50))
-        d.rectangle([146, 58, 152, 61], fill=(40, 110, 200))
-        d.rectangle([122, 64, 130, 67], fill=(250, 125, 50))
-        d.rectangle([150, 64, 156, 67], fill=(40, 110, 200))
-    elif key == "rikers":
-        # v3: DENSITY — a full cell block, not bars on a grey wall. Brick
-        # texture top and bottom, bars across the whole frame, the RIKERS
-        # sign, the CLOSED stamp, a barred cell door with a small window,
-        # and the island's water strip along the bottom.
-        d.rectangle([0, 0, w, h], fill=(150, 155, 165))
-        # brick texture, top band and bottom band
-        d.rectangle([0, 0, w, 12], fill=(120, 90, 80))
-        for bx in range(0, w, 16):
-            d.line([bx, 0, bx, 12], fill=(90, 65, 55), width=1)
-        d.line([0, 6, w, 6], fill=(90, 65, 55), width=1)
-        d.rectangle([0, 68, w, h], fill=(110, 82, 72))
-        for bx in range(8, w, 16):
-            d.line([bx, 68, bx, 80], fill=(85, 60, 50), width=1)
-        d.line([0, 74, w, 74], fill=(85, 60, 50), width=1)
-        # bars across the whole frame
-        for bx in (10, 32, 54, 76, 98, 120, 142, 164, 186):
-            d.rectangle([bx, 12, bx + 8, 68], fill=(40, 42, 48))
-        # the RIKERS sign, high on the bars
-        d.rectangle([16, 18, 108, 40], fill=NAVY)
-        d.text((62, 29), "RIKERS", font=F_ART2, fill="white", anchor="mm")
-        # CLOSED stamp, fully inside the frame, top-right — v3.6: black
-        # text on a white box, per the user. v4: moved down (y20) so the
-        # solid top banner (y0-18) does not cover it; clear of the RIKERS
-        # sign (ends x108) and sitting on the bars
-        stamp(img, 122, 20, "CLOSED", angle=-10, ink=(0, 0, 0, 255),
-              fill=(255, 255, 255, 255))
-        # a barred cell door with a small window, bottom-right
-        d.rectangle([148, 44, 190, 68], fill=(70, 72, 80),
-                    outline=(40, 42, 48), width=2)
-        d.rectangle([156, 48, 182, 56], fill=(180, 200, 220),
-                    outline=(40, 42, 48), width=1)
-        d.line([169, 48, 169, 56], fill=(40, 42, 48), width=1)
-        d.line([148, 60, 190, 60], fill=(40, 42, 48), width=2)
-        d.ellipse([184, 62, 188, 66], fill=GOLD)
-        # water strip along the very bottom: Rikers is an island
-        d.rectangle([0, 76, w, h], fill=(30, 90, 150))
-        for wx in range(4, w, 18):
-            d.arc([wx, 76, wx + 10, 80], 180, 360, fill="white", width=1)
+    elif key == "cricket":
+        # v5: Glenn Phillips 118 at the Basin Reserve — green outfield, a
+        # tan pitch up the middle, stumps at the top, a batsman mid-shot
+        # and the red ball in the air, plus a small scoreboard. The old
+        # "rates" branch (Sri Lanka 9% black-bar chart) is gone with the
+        # story. Original PIL vector code.
+        d.rectangle([0, 0, w, h], fill=(60, 160, 90))
+        # mowing stripes across the outfield, clear of the banner (y0-18)
+        for sy in range(18, h, 16):
+            d.rectangle([0, sy, w, sy + 8], fill=(52, 148, 82))
+        # the pitch: tan strip up the middle, crease lines in white
+        d.rectangle([86, 30, 110, h], fill=(214, 186, 140))
+        d.line([86, 34, 110, 34], fill="white", width=2)
+        d.line([86, 74, 110, 74], fill="white", width=2)
+        # stumps at the top of the pitch, three pale sticks + bails
+        for sx in (93, 97, 101):
+            d.rectangle([sx, 30, sx + 2, 40], fill=(240, 220, 140))
+        d.line([93, 30, 103, 30], fill=(240, 220, 140), width=1)
+        # the batsman, mid-shot: dark figure, bat swung high
+        d.ellipse([118, 40, 128, 50], fill=(200, 140, 90))
+        d.rectangle([118, 50, 128, 64], fill=(30, 30, 40))
+        d.line([120, 64, 116, 76], fill=(30, 30, 40), width=3)
+        d.line([126, 64, 130, 76], fill=(30, 30, 40), width=3)
+        d.line([126, 52, 140, 38], fill=(150, 110, 60), width=4)
+        d.rectangle([138, 32, 146, 44], fill=(200, 170, 110))
+        # the red ball in the air, with a motion trail
+        d.ellipse([156, 26, 164, 34], fill=(200, 40, 40),
+                  outline="white", width=1)
+        d.line([(148, 32), (154, 30)], fill="white", width=1)
+        d.line([(142, 34), (147, 33)], fill="white", width=1)
+        # fielders: small white dots on the outfield
+        for fx, fy in ((30, 30), (60, 62), (170, 56)):
+            d.ellipse([fx - 3, fy - 3, fx + 3, fy + 3], fill="white")
+        # scoreboard, bottom-right: white box, "NZ 368"
+        d.rectangle([148, 62, 192, 78], fill="white", outline=INK, width=1)
+        d.text((170, 70), "NZ 368", font=F_LBL2_S, fill=INK, anchor="mm")
+    elif key == "bukele":
+        # v5: Bukele registers for a third term — the El Salvador flag
+        # (blue-white-blue bands) behind a ballot box, a ballot going
+        # into the slot, "2027" on the box front. The old "quake" branch
+        # (California M5 isometric block) is gone with the story.
+        # Original PIL vector code.
+        d.rectangle([0, 18, w, 38], fill=(0, 71, 171))
+        d.rectangle([0, 38, w, 58], fill="white")
+        d.rectangle([0, 58, w, h], fill=(0, 71, 171))
+        # the ballot box, centre, dark navy on the white band
+        d.rectangle([78, 40, 118, 72], fill=(20, 40, 90),
+                    outline="white", width=2)
+        d.rectangle([88, 40, 108, 44], fill=(10, 20, 50))
+        # a white ballot half-inserted into the slot, tilted
+        d.polygon([(90, 26), (104, 24), (106, 42), (92, 44)], fill="white",
+                  outline=(120, 120, 120))
+        d.line([94, 32, 102, 31], fill=RED, width=2)
+        # "2027" on the box front + a gold seal
+        d.text((98, 58), "2027", font=F_ART2_S, fill="white", anchor="mm")
+        d.ellipse([110, 62, 116, 68], fill=GOLD, outline="white", width=1)
+    elif key == "poland":
+        # v5: a Russian missile lands in Poland — a green field with a
+        # smoking crater, debris, an airport control tower, and a Polish
+        # white-over-red flag. Distinct from the Kyiv hero (night bridge
+        # scene). The old "rikers" branch (cell block + CLOSED stamp) is
+        # gone with the story. Original PIL vector code.
+        d.rectangle([0, 0, w, h], fill=(200, 210, 225))
+        # the field, lower half
+        d.rectangle([0, 42, w, h], fill=(90, 160, 90))
+        for fy in range(46, h, 12):
+            d.line([0, fy, w, fy], fill=(80, 145, 80), width=1)
+        # the crater: dark pit with a brown rim, left of centre
+        d.ellipse([38, 50, 86, 68], fill=(90, 70, 50))
+        d.ellipse([44, 53, 80, 65], fill=(40, 30, 22))
+        # debris scattered around the crater
+        for dx0, dy0, dw, dh in ((30, 48, 8, 3), (88, 56, 7, 3),
+                                 (56, 70, 9, 3), (96, 46, 6, 3)):
+            d.rectangle([dx0, dy0, dx0 + dw, dy0 + dh], fill=(40, 40, 40))
+        # smoke column rising from the crater, drifting right
+        for ex, ey, er, col in ((62, 44, 6, (150, 150, 150)),
+                                 (70, 34, 7, (130, 130, 130)),
+                                 (80, 26, 6, (160, 160, 160))):
+            d.ellipse([ex - er, ey - er, ex + er, ey + er], fill=col)
+        # Polish flag on a pole, left — white over red
+        d.line([14, 26, 14, 60], fill=(60, 40, 20), width=2)
+        d.rectangle([14, 26, 32, 33], fill="white")
+        d.rectangle([14, 33, 32, 40], fill=(220, 40, 40))
+        # airport control tower, right — grey shaft + glass cab
+        d.rectangle([150, 34, 162, 76], fill=(120, 125, 135))
+        d.rectangle([144, 24, 170, 34], fill=(90, 95, 105))
+        d.rectangle([148, 27, 166, 31], fill=(180, 220, 240))
+        d.ellipse([154, 20, 158, 24], fill=RED)
     return img
 
 # pixel nudges so clustered pins stay readable (map is small): the pin circle
 # moves by (dx, dy) and a thin leader line points back to the true spot.
-# Seven pins crowd Europe + the Levant (Kyiv/Antalya/Brussels/The Hague/Paris/
+# Seven pins crowd Europe + the Levant (Kyiv/Antalya/Brussels/The Hague/Rome/
 # Gaza/Iraq within ~40x30px), so they are fanned out radially: 6 north-west,
 # 7 west, 5 south-west, 2 north-east, 3 south, 9 south, 8 east.
+# v5: 10 (Tokyo CPI) shares 4's spot, so it is pushed south-east; 11
+# (Wellington) sits at the map's right edge, pulled left; 13 (Warsaw) sits
+# ~9px from Kyiv's true spot, pushed south-west.
 PIN_OFF = {2: (18, -16), 3: (2, 14), 5: (-6, 26), 6: (-28, -18),
-           7: (-30, 8), 8: (16, -14), 9: (-18, 20)}
+           7: (-30, 8), 8: (16, -14), 9: (-18, 20), 10: (18, 14),
+           11: (-14, 0), 13: (-18, 12)}
 
 
 def draw_map(d, x0, y0, mw, mh):
@@ -1107,7 +957,7 @@ def small_card(img, d, story, x, y):
     d.rectangle([x, y, x + w, y + 161], fill=NEARWHITE)
     art = art_image(key, w, 80)
     art_d = ImageDraw.Draw(art)
-    banner_fill = NAVY if key in ("icj", "rates") else RED
+    banner_fill = NAVY if key in ("icj", "cpi") else RED
     art_banner(art, art_d, 0, 0, w, 80, big, small, banner_fill)
     img.paste(art, (x, y))
     d.rectangle([x, y + 80, x + w, y + 95], fill=NAVY)
@@ -1141,7 +991,7 @@ def main():
     deck_line = ("Akvan hits Odisha · Russian missiles strike Kyiv's bridges · "
                  "COP31 deadlocks on fossil fuels")
     d.text((12, 84), deck_line, font=F_DECKLINE, fill=RED)
-    d.text((1012, 1), "36 STORIES · 6 REGIONS · EVERY ONE DATED FRIDAY 20 NOVEMBER 2026",
+    d.text((1012, 1), "36 STORIES · 7 REGIONS · EVERY ONE DATED FRIDAY 20 NOVEMBER 2026",
            font=F_EYE, fill=INK, anchor="ra")
     d.rectangle([0, 106, W, 108], fill=INK)
 
@@ -1225,8 +1075,10 @@ def main():
     d.text((512, foot_y), "Reads at three sizes: the date and 3 leads at thumbnail size · "
            "13 pictures at half size · all 36 stories at full size.",
            font=F_FOOT, fill=GREY, anchor="ma")
-    d.text((512, foot_y + 13), "Pins 1–13, dots 14–36. Sources: AP · Reuters · AFP · IMD · "
-           "ICJ · UNFCCC · USGS. Original illustrations.",
+    d.text((512, foot_y + 13), "Pins 1–13, dots 14–36 (27 BepiColombo has no Earth dot). "
+           "Sources: Reuters · AP · ICC · IMD · ICJ · Carbon Brief · ESA · "
+           "Xinhua · Al Jazeera · Capital FM · ecancer · Formula1.com · "
+           "Korea JoongAng Daily. Original illustrations.",
            font=F_FOOT, fill=GREY, anchor="ma")
 
     out_path = os.path.join(HERE, "entry.png")

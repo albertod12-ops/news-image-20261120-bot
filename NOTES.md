@@ -1,4 +1,20 @@
-# news-image-20261120 — entry notes (v4, NOT submitted)
+# news-image-20261120 — entry notes (v5, NOT submitted)
+
+## Entry v5 (user 2026-11-21 ~09:04 WIB: "Lanjut bangun v5" — explicit go-ahead after the runtime execution-risk flag stopped the first v5 builder on a routine read-only `ls` of this repo; user owns the repo, built here all night v1–v4 + v3.6 submit)
+- Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit TBD (v5: top-3 selection rebuild — verified missing stories, corrected strike, Kyiv scale, 4-index table).
+- entry.png: 1024x1024, 260,551 bytes, sha256 c2cff7e6a2eb5b722c868a7297b096b70f794cce9db185774feb6fdf7a5ace4a, deterministic (3x draw.py identical sha + `main.py --verify`, no truncation).
+- Research: ~/workspace/makefun/news-image-20261120/research-v5.md (all facts verified live 2026-11-21 ~09:00 WIB, sources named per story). Design base v4 (cream paper, black serif masthead, region bar, 6-number strip) — NOT reverted to v3.6 navy.
+- Swaps (drawn cards): OUT card 7 wrong "25+ nations" framing → Italy CGIL strike; OUT card 13 Rikers, card 11 Sri Lanka rates, card 12 California quake, card 10 An-12 (demoted to also-list 26). IN as drawn: Japan CPI (core 2.2%, headline 2.3%, Reuters), Phillips 118 off 216 vs India (ICC/AP), Bukele third-term registration (Reuters), Poland Kh-101 missile (Reuters), Italy CGIL 24-hr strike >1m, 100+ squares (Reuters/CGIL).
+- Fixes: Kyiv hero deck → 110+ missiles (27 ballistic) + 400+ drones, 9 killed, 28 hurt; COP31 deck → draft 2 drops fossil fuels AND $120bn target, "35 by 35" electrification survives (source now CARBON BRIEF); card 4 → 4-index table Taipei −6.2%, Seoul −5.2%, Tokyo −5.1%, Hong Kong −1.9%; Taiex worst week since 1990 (not 1991); "Hong Kong 20% off high" dropped.
+- Also-list 11-out/11-in per research-v5.md §4 (new: An-12 demoted, BepiColombo [FORECAST] "ends Saturday", Seoul chief-justice impeachment, Kenya oil well, Senegal boat, daraxonrasib 60.7%, China rates, Malawi fuel, F1 Las Vegas, Xi–Albanese, youth strike 25+ split). Hormuz "shut" NOT included anywhere (contested/unverified). Also-list has no per-item source field in the render — sources are in research-v5.md + this NOTES file, not invented onto the page.
+- New 36: regions Europe 10 · Asia 10 · Americas 6 · Middle East 3 · Africa 3 · Oceania 1 · Global 3 = 36, 7 regions (masthead "7 REGIONS"). Numbers strip: 370,000 · 3 · −6.2% Taiex · 2.3% Japan CPI · 118 Phillips · 0 fossil-fuel mentions. Map: pins 7 Rome, 10 Tokyo (offset SE off pin 4), 11 Wellington (pulled left off the edge), 12 San Salvador, 13 Warsaw (offset SW off Kyiv); dot 27 omitted by design (BepiColombo has no Earth location — footer says so).
+- New art (all original PIL vector code, v4 style): selloff = 4-row index table with red down-triangles; italy = St Peter's dome + colonnade + tricolour + 5 marchers; cpi = 3 ascending navy bars + red zigzag + 2.3% focal + coins; cricket = outfield + pitch + stumps + batsman + red ball + "NZ 368" scoreboard; bukele = El Salvador bands + ballot box "2027"; poland = crater + smoke + control tower + Polish flag.
+- First render had 8 TRUNCATED problems (card 13 deck 3 lines; also items 14/27/29/31/32/33/36 over 1 line) — all shortened to fit (card 13 deck now "Kh-101 down in Poland; 3 objects in its airspace."; also items trimmed, facts kept). Final render: no truncation. One more fix after 2x check: last stats caption "fossil-fuel mentions in COP31 draft 2" overflowed the right page edge — shortened to "fossil-fuel mentions".
+- Verified at 2x zoom: full page + every new/changed card (selloff, italy, cpi, cricket, bukele, poland, Kyiv/COP31 heroes, stats strip, region bar, map + also-list) — no overlaps, nothing truncated, all labels readable.
+- Recording: `makefun record` re-attempted fresh for v5 — HTTP 400 again, same explicit reason as every round (loose transcripts, not sealed recordings). Session: dd2d2248-054e-408c-a0b8-265882fa2110 (copy in ~/workspace/makefun/news-image-20261120-transcripts/ — NOTE: copied mid-session for the gate run; re-copy the final file before bundling.)
+
+## Gate v5 (pre-submit-gate.py, commit TBD, 2026-11-21 ~09:15 WIB, --entrypoint main.py --open 2026-11-20T00:00:00Z)
+- GATE: TBD — see run output below.
 
 ## Entry v4 (parent brief 2026-11-21 ~08:40 WIB: top-3 pattern rebuild, same 36 stories + same verified facts)
 - Repo: https://github.com/albertod12-ops/news-image-20261120-bot — commit e1555a2 (v4: top-3 pattern rebuild — cream paper, region bar, 6-number strip, satellite Akvan).
@@ -275,3 +291,26 @@
 - Heroes same 3, same facts, richer art: Akvan as SATELLITE spiral over Bay of Bengal + Gopalpur dot + "Landfall · 8 am" strip (replaces the line-art tornado — user asked to match top 3; flag to user that the tornado can be restored on request); Kyiv night skyline densified with missile trails; COP31 globe + thermometer + red "FINAL DAY · DEADLOCK" stamp.
 - Small cards: same 10 stories/facts; solid colour label banners on the art, denser pictorial art where cheap; keep quake isometric block, plane wreck, charts (user-approved in prior rounds).
 - Map restyled dark navy with red numbered pins (#2 style); also-list text unchanged (no fabricated per-item sources — gap noted for a later round); DATE CHECK and footer kept.
+
+## RESEARCH v5 (2026-11-21 ~09:00–09:30 WIB, researcher subagent; full file research-v5.md)
+- Verified LIVE (browser.search news vertical, 20 Nov 2026 sources named per story):
+  - Japan CPI: core 2.2%, headline 2.3% (Reuters, released Fri 20 Nov) — IN as drawn card.
+  - Phillips 118: 118 off 216, Basin Reserve, Day 2, 1st Test vs India; first player with 100s in all 3 formats vs India in one calendar year (ICC/AP) — IN as drawn card.
+  - Bukele: registered Thu 19 Nov night for 28 Feb 2027 vote, 3rd term, vs 4 rivals, polls 55–70% (Reuters) — IN as drawn card.
+  - Italy CGIL strike: 24-hr, Fri 20 Nov, >1m people, 100+ squares, vs €26bn 2027 budget (Reuters/CGIL) — IN as drawn card 7.
+  - Poland missile: Kh-101 near Nowy Lipowiec ~06:30 Fri 20 Nov, 3 objects in airspace, Rzeszów tower evacuated (Reuters/Polish DefMin) — IN as drawn card.
+  - Seoul chief justice: DP voted Fri 20 Nov to impeach Jo Hee-de (Korea JoongAng Daily) — IN also-list.
+  - Kenya oil: Amosing 1 spudded Fri 20 Nov, first oil 1 Dec, 20,000 bpd (Capital FM) — IN also-list.
+  - Senegal boat: 4 dead, capsized off Yenne 18 Nov, toll confirmed 19 Nov, reported 20 Nov (Al Jazeera) — IN also-list.
+  - Daraxonrasib: 60.7% ORR in 61 patients, presented Fri 20 Nov Barcelona (ecancer) — IN also-list.
+  - China rates: 1-yr 3.0%, 5-yr 3.5%, 18th month held (Xinhua) — IN also-list.
+  - Malawi fuel: night queues, 20 L/day ration, Al Jazeera pub. 20 Nov — IN also-list.
+  - F1 Las Vegas: Russell FP2 1:47.272, wet (formula1.com) — IN also-list.
+  - Xi–Albanese: met Fri 20 Nov Shenzhen, "comprehensive turnaround" (Reuters) — IN also-list.
+  - Houthi missile: 2 missiles + drones intercepted over Jazan Fri 20 Nov (Reuters) — KEEP, upgrade also-list 14.
+  - BepiColombo: insertion is Sat 21 Nov, NOT 20 Nov (ESA) — IN also-list ONLY as [FORECAST].
+- CORRECTIONS to our facts: Kyiv "5–8 killed, 15 hurt" UNDERCOUNTS — real toll 9 killed, 28 hurt; barrage 110+ missiles (27 ballistic) + 400+ drones. COP31 $120bn was DROPPED from draft 2 (not agreed); "35 by 35" is electrification, NOT clean power; 0 fossil-fuel mentions. Markets Fri closes: Taipei −6.23%, Seoul −5.21%, Nikkei −5.06%, Hang Seng −1.89%; Taiex worst week since 1990 (−17.5%), NOT 1991; drop "Hong Kong 20% off high" (not Friday's move). Akvan all confirmed (370,000; 209mm Patrapur; gusts 90; landfall 8:00–11:20).
+- "25+ nations general strike" is WRONG as framed: the 25+ figure is the International Youth & Student Strike (Reuters 20 Nov); the general strike was Italy-only (CGIL). Card 7 must SPLIT: Italy strike as drawn card, youth strike as also-list item.
+- NOT VERIFIED / not recommended: Hormuz "shut" + "46 ships" — Brent $92.57 Fri verified (WSJ) but closure contested by WSJ/EIA (flows resilient/rising); 46-ship count unconfirmed (44 on 19 Nov per straits.live). Do NOT draw; optional also-list only with [CLAIM].
+- Recommended v5 36: drawn OUT — Rikers, Sri Lanka rates, California quake, An-12 (demoted to also-list); drawn IN — Japan CPI, Phillips 118, Bukele, Poland missile, Italy CGIL strike (card 7 fix). Heroes unchanged (Akvan/Kyiv/COP31). Region counts: Europe 10 · Asia 10 · Americas 6 · Middle East 3 · Africa 3 · Oceania 1 (NEW, Phillips) · Global 3 = 36, 7 regions. Numbers strip: 370,000 · 3 bridges · −6.2% Taiex · 2.3% Japan CPI · 118 Phillips · 0 fossil-fuel mentions.
+- Dropped entirely (prominence, not falsity — NOT re-verified live): Sri Lanka rates, California quake, Rikers; also-list cuts: Patrapur/Odisha/Gopalpur Akvan details, HK "20% off high", copper, tuition fees, Nairobi Ebola, Rose pardon, Buenos Aires disability law, Berlin "allies meet", Warsaw "probes objects" (superseded by Poland card).
