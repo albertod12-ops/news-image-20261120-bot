@@ -66,6 +66,9 @@ _FONT_TABLE = [
     ("F_DECK_S", "LiberationSerif-Regular.ttf", 11, FLIB),
     ("F_LABEL", "NotoSans-Bold.ttf", 8, FNOTO),
     ("F_PIN", "NotoSans-Bold.ttf", 11, FNOTO),
+    # v5.6: two-digit pins ("12"/"13" = 12.6px at 11px) overflow the 14px
+    # circle; 9px (10.3px) leaves a real margin. Single digits stay 11px.
+    ("F_PIN2", "NotoSans-Bold.ttf", 9, FNOTO),
     ("F_ART", "NotoSans-Black.ttf", 24, FNOTO),
     ("F_ART_S", "NotoSans-Bold.ttf", 12, FNOTO),
     ("F_ART2", "NotoSans-Black.ttf", 17, FNOTO),
@@ -856,61 +859,122 @@ def art_image(key, w, h):
                       outline=(180, 130, 20), width=1)
             d.ellipse([cx + 3, 74, cx + 9, 78], fill=(255, 220, 80))
     elif key == "cricket":
-        # v5: Glenn Phillips 118 at the Basin Reserve — green outfield, a
-        # tan pitch up the middle, stumps at the top, a batsman mid-shot
-        # and the red ball in the air, plus a small scoreboard. The old
-        # "rates" branch (Sri Lanka 9% black-bar chart) is gone with the
-        # story. Original PIL vector code.
+        # v5.6: Glenn Phillips 118 at the Basin Reserve — a full match
+        # scene, not a bare pitch: packed crowd stands + floodlights
+        # behind, green outfield, tan pitch, stumps with bails, and the
+        # batsman BIG and mid-swing, bat connecting with the red ball
+        # (motion trail flying off it), scoreboard with both lines.
+        # The old v5 scene (small stick batsman, bare green, one-line
+        # scoreboard) is gone. Original PIL vector code.
         d.rectangle([0, 0, w, h], fill=(60, 160, 90))
-        # mowing stripes across the outfield, clear of the banner (y0-18)
-        for sy in range(18, h, 16):
+        # the stands, y20-34: dark stand band + two rows of crowd heads
+        d.rectangle([0, 20, w, 34], fill=(45, 55, 70))
+        crowd_cols = ((220, 180, 140), (180, 120, 80), (240, 200, 160),
+                      (200, 60, 60), (60, 120, 200), (240, 240, 240),
+                      (30, 30, 30), (250, 200, 40))
+        for row, cy in ((0, 25), (1, 30)):
+            for i, hx in enumerate(range(6, w - 4, 7)):
+                col = crowd_cols[(i + row * 3) % len(crowd_cols)]
+                d.ellipse([hx - 2, cy - 2, hx + 2, cy + 2], fill=col)
+        d.rectangle([0, 34, w, 36], fill=(220, 220, 220))
+        # floodlight poles at both edges, lamp heads + pale light cones
+        for px0 in (6, 190):
+            d.line([px0, 20, px0, 34], fill=(120, 125, 135), width=2)
+            d.rectangle([px0 - 5, 20, px0 + 5, 26], fill=(90, 95, 105))
+            for lx in (px0 - 3, px0 + 1):
+                d.ellipse([lx - 1, 21, lx + 1, 23], fill="white")
+        d.polygon([(4, 26), (14, 26), (30, 44), (0, 44)],
+                  fill=(235, 235, 195))
+        d.polygon([(182, 26), (192, 26), (196, 44), (166, 44)],
+                  fill=(235, 235, 195))
+        # mowing stripes across the outfield, below the stands
+        for sy in range(36, h, 16):
             d.rectangle([0, sy, w, sy + 8], fill=(52, 148, 82))
         # the pitch: tan strip up the middle, crease lines in white
-        d.rectangle([86, 30, 110, h], fill=(214, 186, 140))
-        d.line([86, 34, 110, 34], fill="white", width=2)
-        d.line([86, 74, 110, 74], fill="white", width=2)
+        d.rectangle([88, 38, 110, h], fill=(214, 186, 140))
+        d.line([88, 42, 110, 42], fill="white", width=2)
+        d.line([88, 74, 110, 74], fill="white", width=2)
         # stumps at the top of the pitch, three pale sticks + bails
-        for sx in (93, 97, 101):
-            d.rectangle([sx, 30, sx + 2, 40], fill=(240, 220, 140))
-        d.line([93, 30, 103, 30], fill=(240, 220, 140), width=1)
-        # the batsman, mid-shot: dark figure, bat swung high
-        d.ellipse([118, 40, 128, 50], fill=(200, 140, 90))
-        d.rectangle([118, 50, 128, 64], fill=(30, 30, 40))
-        d.line([120, 64, 116, 76], fill=(30, 30, 40), width=3)
-        d.line([126, 64, 130, 76], fill=(30, 30, 40), width=3)
-        d.line([126, 52, 140, 38], fill=(150, 110, 60), width=4)
-        d.rectangle([138, 32, 146, 44], fill=(200, 170, 110))
-        # the red ball in the air, with a motion trail
-        d.ellipse([156, 26, 164, 34], fill=(200, 40, 40),
+        for sx in (94, 98, 102):
+            d.rectangle([sx, 38, sx + 2, 48], fill=(240, 220, 140))
+        d.line([94, 38, 104, 38], fill=(240, 220, 140), width=1)
+        # the batsman, BIG and mid-swing: black NZ shirt, white pads,
+        # front leg planted, bat swung high through the ball
+        d.ellipse([120, 46, 130, 56], fill=(200, 140, 90))
+        d.rectangle([120, 56, 131, 70], fill=(20, 20, 25))
+        d.line([122, 70, 116, 79], fill="white", width=4)
+        d.line([129, 70, 135, 79], fill="white", width=4)
+        d.line([128, 58, 142, 48], fill=(200, 140, 90), width=3)
+        d.line([142, 48, 156, 34], fill=(200, 170, 110), width=5)
+        # the red ball AT the bat's tip (the moment of contact) + trail
+        d.ellipse([155, 29, 163, 37], fill=(200, 40, 40),
                   outline="white", width=1)
-        d.line([(148, 32), (154, 30)], fill="white", width=1)
-        d.line([(142, 34), (147, 33)], fill="white", width=1)
+        d.line([(166, 27), (172, 22)], fill="white", width=2)
         # fielders: small white dots on the outfield
-        for fx, fy in ((30, 30), (60, 62), (170, 56)):
+        for fx, fy in ((28, 58), (58, 70), (170, 52)):
             d.ellipse([fx - 3, fy - 3, fx + 3, fy + 3], fill="white")
-        # scoreboard, bottom-right: white box, "NZ 368"
-        d.rectangle([148, 62, 192, 78], fill="white", outline=INK, width=1)
-        d.text((170, 70), "NZ 368", font=F_LBL2_S, fill=INK, anchor="mm")
+        # scoreboard, bottom-right: white box, two lines "NZ 368" +
+        # "PHILLIPS 118" (51.7px at 8px bold in a 58px box — fits)
+        d.rectangle([136, 58, 194, 78], fill="white", outline=INK, width=1)
+        d.text((165, 63), "NZ 368", font=F_LBL2_S, fill=INK, anchor="mm")
+        d.text((165, 72), "PHILLIPS 118", font=F_LBL2_S, fill=INK,
+               anchor="mm")
     elif key == "bukele":
-        # v5: Bukele registers for a third term — the El Salvador flag
-        # (blue-white-blue bands) behind a ballot box, a ballot going
-        # into the slot, "2027" on the box front. The old "quake" branch
-        # (California M5 isometric block) is gone with the story.
-        # Original PIL vector code.
+        # v5.6: Bukele registers for a third term — a full rally scene,
+        # not a lone ballot box: the El Salvador flag fills the card, a
+        # stylised candidate (flat-vector figure, no likeness) at a
+        # podium with a microphone and one arm raised to the crowd,
+        # supporters with small flags along the bottom, and the ballot
+        # box "2027" with ballots at right. The old v5 scene (flag +
+        # box only) is gone. Original PIL vector code.
         d.rectangle([0, 18, w, 38], fill=(0, 71, 171))
         d.rectangle([0, 38, w, 58], fill="white")
         d.rectangle([0, 58, w, h], fill=(0, 71, 171))
-        # the ballot box, centre, dark navy on the white band
-        d.rectangle([78, 40, 118, 72], fill=(20, 40, 90),
+        # small coat-of-arms nod on the white band, left: green triangle
+        # + gold sun
+        d.polygon([(27, 42), (18, 54), (36, 54)], fill=(0, 120, 60))
+        d.ellipse([24, 37, 30, 43], fill=GOLD)
+        # supporters along the bottom, left: heads + two small flags
+        for hx, col in ((10, (220, 180, 140)), (22, (180, 120, 80)),
+                        (34, (240, 200, 160)), (46, (200, 140, 90)),
+                        (58, (170, 110, 70))):
+            d.ellipse([hx - 3, 71, hx + 3, 79], fill=col)
+            d.ellipse([hx - 3, 71, hx + 3, 74], fill=(30, 25, 20))
+        for fx, fy in ((46, 54), (58, 52)):
+            d.line([fx, fy + 6, fx, 72], fill=(60, 40, 20), width=1)
+            d.rectangle([fx, fy, fx + 12, fy + 3], fill=(0, 71, 171))
+            d.rectangle([fx, fy + 3, fx + 12, fy + 6], fill="white")
+        # one supporter + flag at the far right, past the ballot box
+        d.ellipse([185, 71, 191, 79], fill=(220, 180, 140))
+        d.ellipse([185, 71, 191, 74], fill=(30, 25, 20))
+        d.line([188, 60, 188, 72], fill=(60, 40, 20), width=1)
+        d.rectangle([188, 56, 196, 59], fill=(0, 71, 171))
+        d.rectangle([188, 59, 196, 62], fill="white")
+        # the candidate at the podium: dark suit, white shirt, red tie,
+        # one arm raised waving to the crowd (stylised, no likeness)
+        d.ellipse([83, 27, 99, 35], fill=(30, 25, 20))
+        d.ellipse([84, 31, 98, 44], fill=(200, 150, 110))
+        d.rectangle([74, 42, 108, 58], fill=(20, 30, 60))
+        d.polygon([(88, 42), (96, 42), (91, 52)], fill="white")
+        d.line([91, 44, 91, 54], fill=RED, width=2)
+        d.line([104, 46, 118, 32], fill=(20, 30, 60), width=4)
+        d.ellipse([115, 29, 121, 35], fill=(200, 150, 110))
+        # microphone on the podium, in front of the candidate
+        d.line([90, 58, 88, 46], fill=(60, 60, 60), width=2)
+        d.ellipse([86, 43, 90, 47], fill=(40, 40, 40))
+        # the podium: dark navy, white front panel + gold seal
+        d.rectangle([68, 58, 112, 80], fill=(10, 20, 50))
+        d.rectangle([74, 64, 106, 76], fill="white")
+        d.ellipse([87, 67, 93, 73], fill=GOLD)
+        # the ballot box, right: dark navy, slot, ballot half in, "2027"
+        d.rectangle([140, 44, 180, 72], fill=(20, 40, 90),
                     outline="white", width=2)
-        d.rectangle([88, 40, 108, 44], fill=(10, 20, 50))
-        # a white ballot half-inserted into the slot, tilted
-        d.polygon([(90, 26), (104, 24), (106, 42), (92, 44)], fill="white",
-                  outline=(120, 120, 120))
-        d.line([94, 32, 102, 31], fill=RED, width=2)
-        # "2027" on the box front + a gold seal
-        d.text((98, 58), "2027", font=F_ART2_S, fill="white", anchor="mm")
-        d.ellipse([110, 62, 116, 68], fill=GOLD, outline="white", width=1)
+        d.rectangle([150, 44, 170, 48], fill=(10, 20, 50))
+        d.polygon([(152, 28), (166, 26), (168, 44), (154, 46)],
+                  fill="white", outline=(120, 120, 120))
+        d.line([156, 32, 164, 31], fill=RED, width=2)
+        d.text((160, 58), "2027", font=F_ART2_S, fill="white", anchor="mm")
+        d.ellipse([172, 62, 178, 68], fill=GOLD, outline="white", width=1)
     elif key == "poland":
         # v5: a Russian missile lands in Poland — a green field with a
         # smoking crater, debris, an airport control tower, and a Polish
@@ -953,7 +1017,11 @@ def art_image(key, w, h):
 # v5: 10 (Tokyo CPI) shares 4's spot, so it is pushed south-east; 11
 # (Wellington) sits at the map's right edge, pulled left; 13 (Warsaw) sits
 # ~9px from Kyiv's true spot, pushed south-west.
-PIN_OFF = {2: (18, -16), 3: (2, 14), 5: (-6, 26), 6: (-28, -18),
+# v5.6: 4 (Tokyo markets) shared its exact spot with 10 AND sat on the
+# coastline with the white Seoul dot touching its left edge, so at page
+# size it read as half-covered; it is pushed north-east into the open
+# Pacific, clear of 10's circle and leader line.
+PIN_OFF = {2: (18, -16), 3: (2, 14), 4: (20, -14), 5: (-6, 26), 6: (-28, -18),
            7: (-30, 8), 8: (16, -14), 9: (-18, 20), 10: (18, 14),
            11: (-14, 0), 13: (-18, 12)}
 
@@ -999,10 +1067,13 @@ def draw_map(d, x0, y0, mw, mh):
         # ink box — the old top-anchored draw at py-5 sat every number ~2px
         # too low (measured on v5.4: dy +1.8..+2.4 on all 13 pins).
         label = str(n)
-        box = d.textbbox((0, 0), label, font=F_PIN)
+        # v5.6: two-digit labels use the smaller pin font so they sit
+        # fully INSIDE the 14px circle; single digits keep the 11px font.
+        fnt = F_PIN2 if len(label) == 2 else F_PIN
+        box = d.textbbox((0, 0), label, font=fnt)
         tw, th = box[2] - box[0], box[3] - box[1]
         d.text((px - tw / 2 - box[0], py - th / 2 - box[1]), label,
-               font=F_PIN, fill="white")
+               font=fnt, fill="white")
 
 
 def hero_card(img, d, story, x, y, w):
