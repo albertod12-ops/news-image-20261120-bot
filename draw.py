@@ -1072,8 +1072,27 @@ def draw_map(d, x0, y0, mw, mh):
         fnt = F_PIN2 if len(label) == 2 else F_PIN
         box = d.textbbox((0, 0), label, font=fnt)
         tw, th = box[2] - box[0], box[3] - box[1]
-        d.text((px - tw / 2 - box[0], py - th / 2 - box[1]), label,
-               font=fnt, fill="white")
+        if n in (12, 13):
+            # v5.7: optical centring on the RASTERIZED circle centre.
+            # PIL floors the ellipse bbox, so the drawn circle sits at
+            # (int(px), int(py)) while the v5.5 label was centred on the
+            # float (px, py) — measured on v5.6 as +1.0px right on both
+            # pins (margins L=4 R=2). Place the ink box by integers so
+            # its centre lands on the circle centre: the ink centre
+            # relative to the anchor is ((box0+box2-1)/2, (box1+box3-1)/2).
+            # The 10px ink box in the 15px disc can never centre exactly
+            # (0.5px either way); X uses floor because the "1" glyph's
+            # bright stem sits right of its ink-box edge, so the visible
+            # mass reads right-shifted at round() — floor nudges both
+            # pins 1px left onto the bright mass (pin 13's X is
+            # unchanged by floor: 176.5 -> 176, as round() gave).
+            icx = (box[0] + box[2] - 1) / 2
+            icy = (box[1] + box[3] - 1) / 2
+            d.text((math.floor(int(px) - icx), round(int(py) - icy)),
+                   label, font=fnt, fill="white")
+        else:
+            d.text((px - tw / 2 - box[0], py - th / 2 - box[1]), label,
+                   font=fnt, fill="white")
 
 
 def hero_card(img, d, story, x, y, w):
