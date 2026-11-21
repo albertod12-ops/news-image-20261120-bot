@@ -236,7 +236,7 @@ FRONT = [
     (17, "BARCELONA", "HEALTH", "ECANCER", "REPORTED",
      "Cancer pill shrinks tumours 60.7%",
      "Daraxonrasib: 60.7% response in 61 patients.",
-     "CANCER PILL", "60.7% RESPOND", "cancerpill", "REPORTED"),
+     "CANCER PILL", "60.7% RESPONSE", "cancerpill", "REPORTED"),
     (18, "YENNE", "RESCUE", "AL JAZEERA", "REPORTED",
      "Boat capsizes off Senegal; 4 dead",
      "Pirogue hits rock in transfer; dozens missing.",
@@ -1230,10 +1230,25 @@ def art_image(key, w, h):
 # neighbour. Pin 15's circle overhung the map's left edge by 2.5px
 # (the x-4.5 estimate was wrong: the circle spans 9.5-23.5 against a
 # box edge at 12); (10,0) pulls it fully inside the frame.
-PIN_OFF = {2: (18, -16), 3: (0, -16), 4: (20, -14), 5: (-6, 26),
-           7: (-30, 8), 8: (16, -14), 10: (18, 14),
+# v19: map is 72px tall (was 92) — the vertical compression squeezes
+# the Europe cluster, so the northward fan offsets shrink: 2 (18,-16)
+# -> (18,-8), 3 (0,-16) -> (-12,8) (south-west now — its true spot sits
+# 5.4px from pin 2's, so a north fan would hide pin 2's base dot behind
+# pin 3's circle), 8 (16,-14) -> (20,-8), 17 (-12,-16) -> (-12,-10).
+# The compression also creates two NEW pin-dot touches (6-dot 34 was
+# 9.7px, now 7.5px; 16-dot 31 was 11.5px, now 6.4px) and worsens one
+# old one (9-dot 23 was 8.1px, now 7.1px), so: 6 (0,0) -> (0,-6),
+# 16 (-14,-12) -> (-8,-12), 9 (0,0) -> (0,-4). (First try 6 (6,-6)
+# put pin 6 on top of dot 19 Riyadh, 4.9px, and 6 (0,-6) put it on
+# dot 33 Gaza, 5.5px — the numeric check caught both; (8,2) with 3 at
+# (-12,8) clears everything.) All centres
+# recomputed from PINS + PIN_OFF below (numeric check, not summary
+# arithmetic): ZERO pin-pin collisions <14px, ZERO pin-dot touches
+# <9px, every circle inside the box.
+PIN_OFF = {2: (18, -8), 3: (-12, 8), 4: (20, -14), 5: (-6, 26),
+           6: (8, 2), 7: (-30, 8), 8: (20, -8), 9: (0, -4), 10: (18, 14),
            11: (-14, 0), 13: (-18, 12),
-           15: (10, 0), 16: (-14, -12), 17: (-12, -16)}
+           15: (10, 0), 16: (-8, -12), 17: (-12, -10)}
 
 
 def draw_map(d, x0, y0, mw, mh):
@@ -1289,23 +1304,27 @@ def draw_map(d, x0, y0, mw, mh):
     # v15: boat coordinates now relative to the map box (x0, y0) — the
     # map moved down with the reflow, so the v14 absolute pixels no
     # longer apply. Offsets are the v14 values minus (12, 793).
+    # v19: map is 72px tall now (was 92) — every callout y-offset is the
+    # v18 value x72/92, and the Mercury callout shifts 3px further up so
+    # its label keeps 3px clear of the Antarctica coast (which rises to
+    # ~y0+66 at this height). Boat label keeps 4px+ clear of dot 27.
     _sx, _sy = project(-17.2, 14.7)  # Yenne / Dakar (dot 34 until v18)
     d.ellipse([_sx - 2, _sy - 2, _sx + 2, _sy + 2], fill=RED)
-    d.line([(_sx, _sy + 3), (x0 + 136, y0 + 53)], fill=RED, width=1)
-    d.line([(x0 + 148, y0 + 47), (x0 + 148, y0 + 54)], fill="white",
+    d.line([(_sx, _sy + 3), (x0 + 136, y0 + 41)], fill=RED, width=1)
+    d.line([(x0 + 148, y0 + 37), (x0 + 148, y0 + 42)], fill="white",
            width=1)  # mast
-    d.polygon([(x0 + 148, y0 + 47), (x0 + 148, y0 + 52),
-               (x0 + 154, y0 + 50)], fill=RED)  # flag
-    d.polygon([(x0 + 134, y0 + 54), (x0 + 162, y0 + 54),
-               (x0 + 158, y0 + 61), (x0 + 138, y0 + 61)],
+    d.polygon([(x0 + 148, y0 + 37), (x0 + 148, y0 + 41),
+               (x0 + 154, y0 + 39)], fill=RED)  # flag
+    d.polygon([(x0 + 134, y0 + 42), (x0 + 162, y0 + 42),
+               (x0 + 158, y0 + 48), (x0 + 138, y0 + 48)],
               fill="white")  # pirogue hull
-    d.line([(x0 + 137, y0 + 57), (x0 + 159, y0 + 57)], fill=RED,
+    d.line([(x0 + 137, y0 + 45), (x0 + 159, y0 + 45)], fill=RED,
            width=1)  # hull stripe
-    d.line([(x0 + 132, y0 + 64), (x0 + 164, y0 + 64)],
+    d.line([(x0 + 132, y0 + 50), (x0 + 164, y0 + 50)],
            fill=(140, 180, 210), width=1)
-    d.line([(x0 + 138, y0 + 66), (x0 + 158, y0 + 66)],
+    d.line([(x0 + 138, y0 + 52), (x0 + 158, y0 + 52)],
            fill=(140, 180, 210), width=1)
-    d.text((x0 + 148, y0 + 68), "SENEGAL · 4 DEAD", font=F_LABEL,
+    d.text((x0 + 148, y0 + 53), "SENEGAL · 4 DEAD", font=F_LABEL,
            fill="white", anchor="ma")
     # v16: BepiColombo Mercury callout — the 20th drawn element (18 cards
     # + Senegal boat + Mercury). Space audit (2026-11-21, measured): the
@@ -1324,14 +1343,14 @@ def draw_map(d, x0, y0, mw, mh):
     # (ESA); v17 promotes it to drawn card 14, so the also-list line is
     # gone and the callout is the card's map marker. Original PIL
     # vector code only.
-    d.ellipse([x0 + 29, y0 + 53, x0 + 81, y0 + 69], outline=(140, 180, 210),
+    d.ellipse([x0 + 29, y0 + 39, x0 + 81, y0 + 51], outline=(140, 180, 210),
               width=1)  # orbit
-    d.ellipse([x0 + 47, y0 + 53, x0 + 63, y0 + 69], fill=(180, 180, 190),
+    d.ellipse([x0 + 47, y0 + 37, x0 + 63, y0 + 53], fill=(180, 180, 190),
               outline=(140, 140, 150), width=1)  # Mercury
-    d.ellipse([x0 + 51, y0 + 57, x0 + 53, y0 + 59], fill=(140, 140, 150))
-    d.ellipse([x0 + 57, y0 + 62, x0 + 59, y0 + 64], fill=(140, 140, 150))
-    d.rectangle([x0 + 79, y0 + 59, x0 + 82, y0 + 62], fill="white")  # craft
-    d.text((x0 + 55, y0 + 71), "BEPICOLOMBO SAT", font=F_LABEL,
+    d.ellipse([x0 + 51, y0 + 41, x0 + 53, y0 + 43], fill=(140, 140, 150))
+    d.ellipse([x0 + 57, y0 + 46, x0 + 59, y0 + 48], fill=(140, 140, 150))
+    d.rectangle([x0 + 79, y0 + 43, x0 + 82, y0 + 46], fill="white")  # craft
+    d.text((x0 + 55, y0 + 53), "BEPICOLOMBO SAT", font=F_LABEL,
            fill="white", anchor="ma")
     for n, (lon, lat) in PINS.items():
         px, py = project(lon, lat)
@@ -1374,33 +1393,31 @@ def draw_map(d, x0, y0, mw, mh):
                    font=fnt, fill="white")
 
 
-# v15 layout constants: THIRD smalls row (5 more drawn cards, 18 total)
-# funded by the whole reflow — the timeline strip is DROPPED (its 3
-# figures survive: TAIEX -6.2% and Nikkei -5.1% in card 4's art, S&P
-# -3.7% in the numbers strip), the stats strip compresses to one line,
-# hero art 112->84px (v8's size), hero text area 105->96px, smalls art
-# 68->56px, legend to 2x2, also-list pitch stays 12, date-check 28->24px.
-# Hero card 196 tall, small card 137 tall, rows pitch 138, footer ink
-# ~1022 (probe-measured). Masthead 108px squeezed and map 92px unchanged.
-HERO_ART_H = 84
-HERO_CARD_H = HERO_ART_H + 16 + 96
-SMALL_ART_H = 56
-SMALL_CARD_H = SMALL_ART_H + 81
+# v19 layout constants: HERO-DOMINANT broadsheet (ROUND 3 iteration 1).
+# ONE decisive change: giant hero art 150px (matches #8's ~150px scale) +
+# the FRIDAY IN UTC timeline strip restored (v12/v13 device, 6 points,
+# 3 figures), funded by smalls art 40px + map 72px + also-list 11 rows
+# at pitch 11 + legend header dropped + hero/small text pitches tightened
+# (all probe-measured, see NOTES.md v19 space audit). 40 stories, 18
+# drawn cards kept. Hero card 256 tall, small card 117 tall, rows pitch
+# 118, footer ink ~1017 (probe-measured).
+HERO_ART_H = 150
+HERO_CARD_H = HERO_ART_H + 14 + 92
+SMALL_ART_H = 40
+SMALL_CARD_H = SMALL_ART_H + 77
 
 
 def hero_card(img, d, story, x, y, w):
-    """One hero card: v15 84px art (was 112 — the 28px funds the third
-    smalls row, with the timeline strip dropped for the rest; the v8
-    head-to-head measured 84px as the thinnest hero art on the board,
-    so this is a known cost, paid for 5 more drawn stories), navy kicker
-    strip with the verification-tag pill, a 2-line 27px Times headline
-    and a 2-line serif deck, all inside a 1px ink box. The art is rendered
-    at 105px and LANCZOS-resized to 112px (labels drawn before the resize,
-    so they scale with the art and cover nothing new); the headline+deck
-    block is vertically centred in the 105px text area below the kicker
-    strip, so a 1-line headline (Akvan) does not leave a void at the card
-    bottom. Budget (2-line headline): art 0-112, kicker 112-128,
-    headline 134-196, deck 198-226, card bottom 233."""
+    """One hero card: v19 150px art (the hero-dominant concept — matches
+    #8's ~150px scale; the art is rendered at 105px and LANCZOS-resized
+    to 150px, the v9 140px precedent, so flat vector shapes stretch
+    vertically 1.43x and stay clean), navy kicker strip (14px) with the
+    verification-tag pill, a 2-line 27px Times headline (30px pitch,
+    probe-measured ink 26px) and a 2-line serif deck (13px pitch, ink
+    12px), all inside a 1px ink box. The headline+deck block is
+    vertically centred in the 92px text area below the kicker strip.
+    Budget (2-line headline): art 0-150, kicker 150-164, headline
+    166-226, deck 228-254, card bottom 256."""
     num, reg, topic, src, status, head, deck, big, small, key, vtag = story
     d.rectangle([x, y, x + w, y + HERO_CARD_H], fill=NEARWHITE)
     art = art_image(key, w, 105)
@@ -1410,45 +1427,48 @@ def hero_card(img, d, story, x, y, w):
     img.paste(art, (x, y))
     # navy kicker strip: verification-tag pill left, "N. REGION · TOPIC"
     # after it, source right in gold. Strip text is centred on the glyph
-    # centre (strip centre y+HERO_ART_H+8).
-    d.rectangle([x, y + HERO_ART_H, x + w, y + HERO_ART_H + 16], fill=NAVY)
+    # centre (strip centre y+HERO_ART_H+7).
+    d.rectangle([x, y + HERO_ART_H, x + w, y + HERO_ART_H + 14], fill=NAVY)
     pill_w = d.textlength(vtag, font=F_PILL) + 10
-    d.rounded_rectangle([x + 8, y + HERO_ART_H + 3, x + 8 + pill_w,
-                         y + HERO_ART_H + 13],
+    d.rounded_rectangle([x + 8, y + HERO_ART_H + 2, x + 8 + pill_w,
+                         y + HERO_ART_H + 12],
                         radius=2, fill=PILL_COL[vtag])
-    d.text((x + 13, y + HERO_ART_H + 8), vtag, font=F_PILL, fill="white",
+    d.text((x + 13, y + HERO_ART_H + 7), vtag, font=F_PILL, fill="white",
            anchor="lm")
-    d.text((x + 14 + pill_w, y + HERO_ART_H + 8), "%d. %s · %s" % (num, reg, topic),
+    d.text((x + 14 + pill_w, y + HERO_ART_H + 7), "%d. %s · %s" % (num, reg, topic),
            font=F_KICK, fill="white", anchor="lm")
-    d.text((x + w - 8, y + HERO_ART_H + 8), src, font=F_SRC, fill=GOLD, anchor="rm")
+    d.text((x + w - 8, y + HERO_ART_H + 7), src, font=F_SRC, fill=GOLD, anchor="rm")
     head_lines = wrap(d, head, F_HEAD_H, w - 16, max_lines=2)
     deck_lines = wrap(d, deck, F_DECK, w - 16, max_lines=2)
-    # centre the text block in the 96px text area (kicker bottom
-    # y+HERO_ART_H+16 to card bottom y+HERO_CARD_H): 2+2 lines = 92px,
-    # 1+2 lines = 61px.
-    block_h = len(head_lines) * 31 + 2 + len(deck_lines) * 14
-    text_y = y + HERO_ART_H + 16 + (96 - block_h) // 2
+    # centre the text block in the 92px text area (kicker bottom
+    # y+HERO_ART_H+14 to card bottom y+HERO_CARD_H): 2+2 lines = 88px,
+    # 1+2 lines = 58px.
+    block_h = len(head_lines) * 30 + 2 + len(deck_lines) * 13
+    text_y = y + HERO_ART_H + 14 + (92 - block_h) // 2
     for j, line in enumerate(head_lines):
-        d.text((x + 8, text_y + j * 31), line, font=F_HEAD_H, fill=INK)
+        d.text((x + 8, text_y + j * 30), line, font=F_HEAD_H, fill=INK)
     for j, line in enumerate(deck_lines):
-        d.text((x + 8, text_y + len(head_lines) * 31 + 2 + j * 14),
+        d.text((x + 8, text_y + len(head_lines) * 30 + 2 + j * 13),
                line, font=F_DECK, fill=(60, 60, 60))
     d.rectangle([x, y, x + w, y + HERO_CARD_H], outline=INK, width=1)
 
 
 def small_card(img, d, story, x, y):
-    """One small card: v15 56px art (was 68 — rendered at 80 and
-    LANCZOS-downscaled to 56, the v8 hero technique, so the art code
-    itself is untouched), with a v4 SOLID colour banner at its top
-    (red, navy for the court/rates cards) carrying the art label in white,
-    navy kicker strip with the verification-tag pill on the right, a 2-line
-    Times headline and a 2-line serif deck + source, all inside a 1px ink
-    box with a fixed bottom per row. Card interior near-white on cream.
+    """One small card: v19 40px art (was 56 — rendered at 80 and
+    LANCZOS-downscaled to 40, so the art code itself is untouched; the
+    banner text displays at ~6px, a known cost of the hero-dominant
+    concept — the kicker/headline/deck stay full-res), with a v4 SOLID
+    colour banner at its top (red, navy for the court/rates cards)
+    carrying the art label in white, navy kicker strip with the
+    verification-tag pill on the right, a 2-line Times headline (16px
+    pitch, probe-measured ink 15px) and a 2-line serif deck (12px pitch,
+    ink 10px) + source, all inside a 1px ink box with a fixed bottom per
+    row. Card interior near-white on cream.
     v8: the pill shows the verification tag (CONFIRMED/REPORTED), and the
     kicker font auto-shrinks 9 -> 8px when kicker + pill would overflow
     the 196px card (card 12 only: 132+59+12=203 at 9px, 188 at 8px) —
-    the same pattern art_banner uses for long label pairs. Card 149 tall:
-    art 56, kicker 15, headline 2x17, deck 2x13."""
+    the same pattern art_banner uses for long label pairs. Card 117 tall:
+    art 40, kicker 15, headline 2x16, deck 2x12."""
     num, reg, topic, src, status, head, deck, big, small, key, vtag = story
     w = 196
     d.rectangle([x, y, x + w, y + SMALL_CARD_H], fill=NEARWHITE)
@@ -1475,10 +1495,10 @@ def small_card(img, d, story, x, y):
            fill="white", anchor="lm")
     head_lines = wrap(d, head, F_HEAD_S, w - 16, max_lines=2)
     for j, line in enumerate(head_lines):
-        d.text((x + 8, y + SMALL_ART_H + 19 + j * 17), line, font=F_HEAD_S, fill=INK)
+        d.text((x + 8, y + SMALL_ART_H + 19 + j * 16), line, font=F_HEAD_S, fill=INK)
     deck_lines = wrap(d, deck + " — " + src, F_DECK_S, w - 16, max_lines=2)
     for j, line in enumerate(deck_lines):
-        d.text((x + 8, y + SMALL_ART_H + 19 + len(head_lines) * 17 + 1 + j * 13),
+        d.text((x + 8, y + SMALL_ART_H + 19 + len(head_lines) * 16 + 1 + j * 12),
                line, font=F_DECK_S, fill=(60, 60, 60))
     d.rectangle([x, y, x + w, y + SMALL_CARD_H], outline=INK, width=1)
 
@@ -1513,24 +1533,23 @@ def main():
            font=F_EYE, fill=INK, anchor="ra")
     d.rectangle([0, 142, W, 144], fill=INK)
 
-    # ---- one-line numbers strip 148-160 (v15: the 6-box strip
-    # compressed to one line to fund the third smalls row; all 7 figures
-    # kept, S&P -3.7% added so the dropped timeline's figure survives
-    # on the page. Probe-measured 780px at 12px bold in the 1000px slot.
-    # Values red, captions ink, separators grey. ----
-    d.text((12, 148), "THE DAY IN NUMBERS:", font=F_TTIME, fill=RED)
+    # ---- one-line numbers strip 145-157 (v19: moved up 3px — masthead
+    # rule ends 144, text top 145, ink starts ~148; unchanged content,
+    # 8 figures, 927px at 12px in the 1000px slot. ----
+    d.text((12, 145), "THE DAY IN NUMBERS:", font=F_TTIME, fill=RED)
     _nx = 12 + int(d.textlength("THE DAY IN NUMBERS:  ", font=F_TTIME))
     for _i, (_value, _caption) in enumerate(STATS):
-        d.text((_nx, 148), _value, font=F_TTIME, fill=RED)
+        d.text((_nx, 145), _value, font=F_TTIME, fill=RED)
         _nx += int(d.textlength(_value, font=F_TTIME)) + 4
-        d.text((_nx, 148), _caption, font=F_TTIME, fill=INK)
+        d.text((_nx, 145), _caption, font=F_TTIME, fill=INK)
         _nx += int(d.textlength(_caption, font=F_TTIME))
         if _i < len(STATS) - 1:
-            d.text((_nx, 148), "  ·  ", font=F_TTIME, fill=GREY)
+            d.text((_nx, 145), "  ·  ", font=F_TTIME, fill=GREY)
             _nx += int(d.textlength("  ·  ", font=F_TTIME))
 
-    # ---- region bar 162-174 (v15: gaps above/below tightened 4->2) ----
-    bar_x, bar_y, bar_w, bar_h = 12, 162, 1000, 12
+    # ---- region bar 159-170 (v19: 11px tall, was 12 — the 9px segment
+    # text still fits with 1.5px padding; counts unchanged) ----
+    bar_x, bar_y, bar_w, bar_h = 12, 159, 1000, 11
     seg_w = bar_w / len(REGIONS)
     for i, (label, count, fill, ink) in enumerate(REGIONS):
         sx = bar_x + i * seg_w
@@ -1540,46 +1559,76 @@ def main():
         d.text((sx + seg_w / 2, bar_y + 6), "%s %d" % (label, count),
                font=F_SRC, fill=ink, anchor="mm")
 
-    # ---- heroes 176-372 (v15: timeline dropped, art 84, card 196;
-    # lead 396 wide, rails 294; each card boxed like top 1) ----
-    hero_y = 176
+    # ---- FRIDAY IN UTC timeline 172-202 (v19: RESTORED — the v12/v13
+    # device, code verbatim from v13: 6 evenly spaced columns, NOT to
+    # scale; time bold 11px above a ruled line with red dots, event bold
+    # 10px below. "02:30 Akvan landfall · 04:30 Kyiv barrage ends ·
+    # 05:30 TAIEX closes -6.2% · 06:30 Nikkei closes -5.1% · 20:00 Italy
+    # rail strike · 21:00 Wall St closes -3.7%" — all verified live in
+    # v12/v13 NOTES (Akvan 8:00 IST = 02:30 UTC; Kyiv last explosions
+    # ~06:30 EET = 04:30 UTC; TAIEX close 13:30 TST = 05:30 UTC, -6.23%;
+    # Nikkei close 15:30 JST = 06:30 UTC, -5.06%; Italy rail strike
+    # 21:00 CET = 20:00 UTC; Wall St close 16:00 EST = 21:00 UTC,
+    # S&P -3.70%). Longest event "Wall St closes -3.7%" 96.0px in the
+    # 148.7px column. No Hormuz "shut". ----
+    tl_y = 172
+    d.text((12, tl_y), "FRIDAY IN UTC", font=F_TTEXT, fill=RED)
+    tl_x0, tl_x1 = 120, 1012
+    tl_col = (tl_x1 - tl_x0) / 6
+    d.line([12, tl_y + 15, tl_x1, tl_y + 15], fill=RULE, width=1)
+    for ti, (tt, ev) in enumerate([
+            ("02:30", "Akvan landfall"),
+            ("04:30", "Kyiv barrage ends"),
+            ("05:30", "TAIEX closes -6.2%"),
+            ("06:30", "Nikkei closes -5.1%"),
+            ("20:00", "Italy rail strike"),
+            ("21:00", "Wall St closes -3.7%")]):
+        cx = tl_x0 + ti * tl_col
+        d.text((cx, tl_y), tt, font=F_ALSO_N, fill=INK)
+        d.ellipse([cx - 3, tl_y + 12, cx + 3, tl_y + 18], fill=RED)
+        d.text((cx, tl_y + 20), ev, font=F_TTEXT, fill=INK)
+
+    # ---- heroes 204-460 (v19: art 150, card 256; lead 396 wide, rails
+    # 294; each card boxed like top 1) ----
+    hero_y = 204
     hero_widths = [396, 294, 294]
     hero_x = 12
     for i, story in enumerate(FRONT[:3]):
         hero_card(img, d, story, hero_x, hero_y, hero_widths[i])
         hero_x += hero_widths[i] + 8
 
-    # ---- smalls 374-787 (v15: 3 rows x 5, cards 137 tall, image
-    # 196x56, row pitch 138, gaps 2-3; the third row is cards 14-18) ----
+    # ---- smalls 462-815 (v19: 3 rows x 5, cards 117 tall, image
+    # 196x40, row pitch 118, gaps 1; the third row is cards 14-18) ----
     for r in range(3):
         for c in range(5):
             k = 3 + r * 5 + c
-            small_card(img, d, FRONT[k], 12 + c * 204, 374 + r * 138)
+            small_card(img, d, FRONT[k], 12 + c * 204, 462 + r * 118)
 
-    # ---- map + also 789-966 (v15: map 92 tall, also-list 26 items in
-    # 13 rows at pitch 12; legend compressed to 2x2) ----
-    map_y = 789
+    # ---- map + also 817-963 (v19: map 72 tall, also-list 22 items in
+    # 11 rows at pitch 11; legend header dropped — the 4 swatch rows
+    # stay, directly under the caption) ----
+    map_y = 817
     d.text((12, map_y), "WHERE IT HAPPENED", font=F_SEC, fill=INK)
     d.line([12, map_y + 16, 348, map_y + 16], fill=INK, width=1)
-    d.rectangle([12, map_y + 22, 348, map_y + 114], fill=NAVY_DARK,
+    d.rectangle([12, map_y + 22, 348, map_y + 94], fill=NAVY_DARK,
                 outline=RULE, width=1)
-    draw_map(d, 12, map_y + 22, 336, 92)
+    draw_map(d, 12, map_y + 22, 336, 72)
     # v15: caption names the boat callout (320.2px in the 336px column,
     # probe-measured at F_TTEXT); numbers renumbered for the 44-story
     # page (BepiColombo 32, Senegal boat 35).
-    d.text((12, map_y + 118), "Red 1–18, dots 19–40. Boat Senegal (18), planet BepiColombo (14).",
+    d.text((12, map_y + 98), "Red 1–18, dots 19–40. Boat Senegal (18), planet BepiColombo (14).",
            font=F_TTEXT, fill=GREY)
-    # how-sure-are-we legend under the map, 2x2 (v15: the 4-row legend
-    # cost 44px; the 2x2 keeps every tag explained in 22px).
-    # Explanations shortened to fit the 168px columns (probe-measured).
-    d.text((12, map_y + 130), "HOW SURE ARE WE?", font=F_SEC, fill=INK)
+    # how-sure-are-we legend under the map, 2x2 (v19: the header is
+    # dropped to fund the heroes — the 4 swatch rows keep every tag
+    # explained in 22px; explanations probe-measured to fit the 168px
+    # columns).
     _leg = [("CONFIRMED", "2+ sources agree", 0, 0),
             ("FORECAST", "schedule / draft", 1, 0),
             ("REPORTED", "1 named source", 0, 1),
             ("CLAIM", "unverified claim", 1, 1)]
     for _st, _expl, _col, _row in _leg:
         _lx = 12 if _col == 0 else 184
-        _ly = map_y + 148 + _row * 11
+        _ly = map_y + 114 + _row * 11
         d.rectangle([_lx, _ly, _lx + 8, _ly + 8], fill=PILL_COL[_st])
         d.text((_lx + 12, _ly - 1), _st, font=F_LEGEND, fill=INK)
         _ex = _lx + 12 + int(d.textlength(_st, font=F_LEGEND)) + 4
@@ -1590,36 +1639,36 @@ def main():
     d.text((1012, map_y), "22 MORE STORIES", font=F_SEC, fill=INK, anchor="ra")
     d.line([also_x, map_y + 16, 1012, map_y + 16], fill=INK, width=1)
     col_w = 320
-    rows = 12
+    rows = 11
     for i, (num, city, txt, src) in enumerate(ALSO):
         col = 0 if i < rows else 1
         row = i if i < rows else i - rows
         x = also_x + col * (col_w + 8)
-        y = map_y + 22 + row * 12
+        y = map_y + 22 + row * 11
         d.text((x, y), "%d." % num, font=F_ALSO_N, fill=RED)
         full = "%s: %s (%s)" % (city, txt, src)
         lines = wrap(d, full, F_ALSO, col_w - 22, max_lines=1)
         d.text((x + 20, y), lines[0] if lines else "", font=F_ALSO, fill=INK)
 
-    # ---- date check 958-982 (v17: also-list is 12 rows now, so the
-    # box moves up 12px; the 2 lines sit at
-    # +1/+13, descenders kiss the bottom outline by ~1px, same class as
-    # the v10 kiss — verified visually) ----
-    chk_y = 958
-    d.rectangle([12, chk_y, 1012, chk_y + 24], outline=RED, width=2)
+    # ---- date check 965-992 (v19: box 27 tall, was 24 — the v18 defect
+    # fix: the 2nd line's descenders crossed the red bottom edge by 4px
+    # (11px font ink is 11px tall, lines at +1/+13 in a 24px box).
+    # Lines now at -1/+10 (11px pitch): line 1 ink +3..+13, line 2 ink
+    # +14..+24, 1px clear of both 2px outlines. Probe-verified.) ----
+    chk_y = 965
+    d.rectangle([12, chk_y, 1012, chk_y + 27], outline=RED, width=2)
     chk = ("DATE CHECK — Left out, first reported Thursday 19 November: Shenzhen "
            "trilateral summit · Anthropic's $83 IPO debut · ICJ genocide ruling read · "
            "GTA VI launch · Senate's Iran vote. Not yet news: COP31's final agreed text "
            "(talks run on) · BepiColombo's Mercury orbit (Saturday).")
     chk_lines = wrap(d, chk, F_DATECHK, 976, max_lines=2)
-    # v5.4: the 2 lines sit centred in the 28px box (block 968-990 vs
-    # box 966-992), not top-anchored at chk_y.
+    # lines at chk_y-1 / chk_y+10 (see the box comment above).
     for j, ln in enumerate(chk_lines):
-        d.text((20, chk_y + 1 + j * 12), ln, font=F_DATECHK, fill=INK)
+        d.text((20, chk_y - 1 + j * 11), ln, font=F_DATECHK, fill=INK)
 
-    # ---- footer 985-1008 (v17: moved up 12px with the date-check;
-    # 2 lines, 10px pitch; ink ends 1008, 15px slack) ----
-    foot_y = 985
+    # ---- footer 994-1017 (v19: moved with the reflow; 2 lines, 10px
+    # pitch; ink ends 1017, 4px slack to the 1021 safe limit) ----
+    foot_y = 994
     d.text((512, foot_y), "Reads at three sizes: the date and 3 leads at thumbnail size · "
            "18 pictures at half size · all 40 stories at full size.",
            font=F_FOOT, fill=GREY, anchor="ma")
