@@ -210,6 +210,17 @@ FRONT = [
     # re-opens a count gap vs #6 (44) — that is what this version
     # measures. Tonga 15 and Pete Rose 18 stay (drawn by #7, so swapping
     # them WOULD trade a duel).
+    # v18 SWAP: card 18 Pete Rose -> Senegal (full drawn card). Audit
+    # arithmetic: Senegal is drawn by #3 AND #7; Pete Rose by #7 only.
+    # The swap removes #3's LAST edge (Senegal card 11 vs our callout)
+    # and is neutral vs #7 (one match lost, one gained) and neutral on
+    # breadth vs the other eight (neither story drawn by them). The
+    # price: the Yenne also-list line leaves with the promotion (v17
+    # precedent — a story promoted to a full card leaves the also-list,
+    # no double-counting), so the count drops 41->40 and #6's count gap
+    # widens by one. Tonga stays (see the v18 note in NOTES.md: Pete
+    # Rose is the better outgoing card — it keeps OCEANIA at 2 and every
+    # region >=2).
     (14, "MERCURY", "SPACE", "ESA", "REPORTED",
      "BepiColombo reaches Mercury after 8 years",
      "Orbit burn Saturday; 8-year trip ends.",
@@ -226,10 +237,10 @@ FRONT = [
      "Cancer pill shrinks tumours 60.7%",
      "Daraxonrasib: 60.7% response in 61 patients.",
      "CANCER PILL", "60.7% RESPOND", "cancerpill", "REPORTED"),
-    (18, "WASHINGTON", "SPORT", "CNN", "REPORTED",
-     "Trump pardons late hit king Pete Rose",
-     "Posthumous pardon for 4,256-hit legend; banned in 1989.",
-     "PARDONED", "4,256 HITS", "peterose", "CONFIRMED"),
+    (18, "YENNE", "RESCUE", "AL JAZEERA", "REPORTED",
+     "Boat capsizes off Senegal; 4 dead",
+     "Pirogue hits rock in transfer; dozens missing.",
+     "BOAT RESCUE", "4 DEAD", "senegal", "REPORTED"),
 ]
 
 # num, city, text, source — every item carries its outlet (the top-3 pattern);
@@ -254,17 +265,20 @@ ALSO = [
     # 44->41). 23 items, 19-41; the also-list is 12 rows now.
     (32, "Naypyidaw", "Myanmar calls ICJ ruling unfair", "REUTERS"),
     (33, "Gaza", "Israeli strikes kill 6 despite truce", "AFP"),
-    (34, "Yenne", "Boat: 4 dead, dozens missing", "AL JAZEERA"),
-    (35, "Blantyre", "Malawi fuel queues all night", "AL JAZEERA"),
-    (36, "Las Vegas", "Russell fastest, 1:47.272", "FORMULA1.COM"),
-    (37, "Shenzhen", "Xi hails turnaround", "REUTERS"),
-    (38, "Europe", "Youth strike in 25+ countries", "REUTERS"),
+    # v18: 34 Yenne leaves the also-list — promoted to drawn card 18
+    # (the boat callout on the map is now the card's marker). The rest
+    # renumber (35->34, 36->35, 37->36, 38->37, 39->38, 40->39, 41->40).
+    # 22 items, 19-40.
+    (34, "Blantyre", "Malawi fuel queues all night", "AL JAZEERA"),
+    (35, "Las Vegas", "Russell fastest, 1:47.272", "FORMULA1.COM"),
+    (36, "Shenzhen", "Xi hails turnaround", "REUTERS"),
+    (37, "Europe", "Youth strike in 25+ countries", "REUTERS"),
     # v15: 3 new also-list lines (44 stories total). Pakistan 22
     # militants (AP, 19 Nov), Brazil $1bn sale (19 Nov, first spot sale
     # since Dec 2024), Raoni land recognised (AP, 19 Nov).
-    (39, "Islamabad", "Army says 22 militants killed in raids", "AP"),
-    (40, "Brasília", "Bank sells $1bn to defend the real", "REUTERS"),
-    (41, "Mato Grosso", "Lula recognises Raoni's land", "AP"),
+    (38, "Islamabad", "Army says 22 militants killed in raids", "AP"),
+    (39, "Brasília", "Bank sells $1bn to defend the real", "REUTERS"),
+    (40, "Mato Grosso", "Lula recognises Raoni's land", "AP"),
 ]
 
 # v16: S&P -3.7% dropped (weakest figure, US-only, the dropped timeline's
@@ -290,20 +304,21 @@ STATS = [
 # ASIA 11: 1 Akvan, 4 Nikkei, 9 Seoul, 10 Japan CPI, 16 China rates,
 #   23 Taipei, 24 Tokyo, 31 An-12, 32 Myanmar reaction, 37 Shenzhen,
 #   39 Pakistan raids. (Mongolia out.)
-# AMERICAS 10: 12 Bukele, 18 Pete Rose, 26 Nvidia probe, 27 Argentina
-#   risk, 28 AI chips, 29 Senate, 30 sanctions, 36 Las Vegas, 40 Brazil
-#   $1bn sale, 41 Raoni land.
+# AMERICAS 9: 12 Bukele, 26 Nvidia probe, 27 Argentina risk, 28 AI
+#   chips, 29 Senate, 30 sanctions, 35 Las Vegas, 39 Brazil $1bn sale,
+#   40 Raoni land. (Pete Rose out.)
 # MIDDLE EAST 3: 8 Iraq, 19 Riyadh, 33 Gaza strikes.
-# AFRICA 3: 6 Kenya oil, 34 Yenne, 35 Blantyre. (Sudan + Somalia out.)
+# AFRICA 3: 6 Kenya oil, 18 Yenne (card now, was also-list 34),
+#   34 Blantyre.
 # OCEANIA 2: 11 Phillips (Wellington), 15 Tonga drought.
 # GLOBAL 3: 3 COP31 (global climate summit), 14 BepiColombo, 25 IMF debt
 #   warning.
-# Total 9+11+10+3+3+2+3 = 41.
+# Total 9+11+9+3+3+2+3 = 40.
 # (label, count, fill, text colour)
 REGIONS = [
     ("EUROPE", 9, (16, 62, 150), "white"),
     ("ASIA", 11, (179, 34, 44), "white"),
-    ("AMERICAS", 10, (90, 60, 140), "white"),
+    ("AMERICAS", 9, (90, 60, 140), "white"),
     ("MIDDLE EAST", 3, (196, 142, 8), (17, 17, 17)),
     ("AFRICA", 3, (30, 130, 80), "white"),
     ("OCEANIA", 2, (0, 120, 140), "white"),
@@ -324,12 +339,14 @@ PINS = {
     5: (4.4, 50.8), 6: (35.9, 3.1), 7: (12.5, 41.9), 8: (44.2, 32.8),
     9: (127.0, 37.5), 10: (139.7, 35.7), 11: (174.8, -41.3),
     12: (-89.2, 13.7), 13: (21.0, 52.2),
-    # v15: 15 Nuku'alofa (-175.2, -21.1), 18 Washington (-77.0, 38.9).
+    # v15: 15 Nuku'alofa (-175.2, -21.1).
     # v17: 14 Sudan removed (card swapped out); 16 is now Beijing
     # (116.4, 39.9) for the China-rates card; 17 is now Barcelona
     # (2.2, 41.4) for the cancer-pill card.
+    # v18: 18 Washington removed (Pete Rose leaves). Card 18 Senegal
+    # gets NO pin: its map marker is the boat callout, like BepiColombo
+    # (card 14) has the Mercury callout instead of a pin.
     15: (-175.2, -21.1), 16: (116.4, 39.9), 17: (2.2, 41.4),
-    18: (-77.0, 38.9),
 }
 DOTS = {
     19: (46.7, 24.7), 20: (4.4, 50.8), 21: (-0.1, 51.5), 22: (2.4, 48.9),
@@ -339,10 +356,13 @@ DOTS = {
     # v17: 36 Barcelona and 37 Beijing removed (now pins 17/16); the rest
     # renumber (33->32, 34->33, 35->34, 38->35, 39->36, 40->37, 41->38,
     # 42->39, 43->40, 44->41).
-    32: (96.2, 19.8), 33: (34.4, 31.5), 34: (-17.2, 14.7),
-    35: (35.0, -15.8), 36: (-115.1, 36.2), 37: (114.1, 22.5),
-    38: (4.4, 50.8), 39: (73.1, 33.7), 40: (-47.9, -15.8),
-    41: (-56.5, -9.0),
+    32: (96.2, 19.8), 33: (34.4, 31.5),
+    # v18: 34 Yenne removed (now card 18; the boat callout is its
+    # marker). The rest renumber (35->34, 36->35, 37->36, 38->37,
+    # 39->38, 40->39, 41->40).
+    34: (35.0, -15.8), 35: (-115.1, 36.2), 36: (114.1, 22.5),
+    37: (4.4, 50.8), 38: (73.1, 33.7), 39: (-47.9, -15.8),
+    40: (-56.5, -9.0),
 }
 # v5: 32 BepiColombo has no Earth location (Mercury orbit insertion) —
 # it gets no dot, by design.
@@ -1109,25 +1129,6 @@ def art_image(key, w, h):
                                    (36, 22, 52, 14), (36, 22, 58, 28),
                                    (36, 22, 44, 34)):
             d.line([fx0, fy0, fx1, fy1], fill=(40, 140, 70), width=3)
-    elif key == "peterose":
-        # v15: Pete Rose, pardoned — a baseball diamond: green
-        # outfield, tan infield, white bases, a bat and a stitched ball.
-        # Original PIL vector code.
-        d.rectangle([0, 0, w, h], fill=(60, 160, 90))
-        for sy in range(20, h, 14):
-            d.rectangle([0, sy, w, sy + 7], fill=(52, 148, 82))
-        d.polygon([(98, 30), (150, 58), (98, 76), (46, 58)],
-                  fill=(214, 186, 140))
-        d.line([(98, 30), (150, 58), (98, 76), (46, 58), (98, 30)],
-               fill="white", width=1)
-        for bx, by in ((96, 28), (148, 56), (96, 74), (44, 56)):
-            d.rectangle([bx, by, bx + 5, by + 5], fill="white")
-        d.line([60, 70, 96, 40], fill=(200, 170, 110), width=5)
-        d.line([96, 40, 104, 34], fill=(200, 170, 110), width=3)
-        d.ellipse([160, 22, 180, 42], fill="white",
-                  outline=(200, 200, 200))
-        d.arc([162, 26, 178, 38], 300, 60, fill=RED, width=2)
-        d.arc([162, 26, 178, 38], 120, 240, fill=RED, width=2)
     elif key == "bepicolombo":
         # v17: BepiColombo at Mercury — starfield, the cratered planet on
         # its orbit, and the spacecraft. Original PIL vector code.
@@ -1175,6 +1176,22 @@ def art_image(key, w, h):
         d.line([62, 58, 98, 22], fill="white", width=14)
         d.ellipse([58, 18, 102, 62], outline=(120, 120, 120), width=1)
         d.line([80, 40, 80, 40], fill="white")
+    elif key == "senegal":
+        # v18: the Senegal boat rescue — pirogue on a dark sea under a
+        # pale sky, red flag, orange life-ring. Original PIL vector code.
+        d.rectangle([0, 0, w, h], fill=(12, 28, 58))
+        d.rectangle([0, 0, w, 26], fill=(220, 230, 240))
+        d.ellipse([160, 6, 182, 28], fill=(240, 200, 90))
+        d.line([0, 26, w, 26], fill=(140, 180, 210), width=1)
+        d.line([(118, 30), (118, 52)], fill="white", width=1)  # mast
+        d.polygon([(118, 30), (118, 38), (132, 35)], fill=RED)  # flag
+        d.polygon([(52, 52), (150, 52), (140, 64), (62, 64)],
+                  fill="white")  # pirogue hull
+        d.line([(56, 56), (146, 56)], fill=RED, width=2)  # hull stripe
+        d.ellipse([164, 48, 184, 68], outline=(240, 130, 40), width=3)
+        d.line([(10, 70), (90, 70)], fill=(140, 180, 210), width=1)
+        d.line([(110, 74), (186, 74)], fill=(140, 180, 210), width=1)
+        d.line([(30, 77), (120, 77)], fill=(100, 150, 190), width=1)
     return img
 
 # pixel nudges so clustered pins stay readable (map is small): the pin circle
@@ -1197,7 +1214,8 @@ def art_image(key, w, h):
 # (27.8px from Seoul, >=26px from every neighbour). 17 is now
 # Barcelona: the base sits 6.4px from the Warsaw pin, so (-12,-16)
 # pushes it N (25.1px from the Rome pin, >=14.5px from the London dot).
-# 18 Washington sits on four white dots (-77, 38.9), pushed NE.
+# v18: 18 Washington removed (Pete Rose leaves); card 18 Senegal has
+# no pin (boat callout is its marker), so no offset is needed.
 # BUILD SLIP (caught by the numeric check before viewing): apply7a
 # forgot PIN_OFF entirely, so the first v17 render reused Mongolia's
 # (2,-10) for Beijing (14.0px from Seoul — kissing circles) and
@@ -1215,7 +1233,7 @@ def art_image(key, w, h):
 PIN_OFF = {2: (18, -16), 3: (0, -16), 4: (20, -14), 5: (-6, 26),
            7: (-30, 8), 8: (16, -14), 10: (18, 14),
            11: (-14, 0), 13: (-18, 12),
-           15: (10, 0), 16: (-14, -12), 17: (-12, -16), 18: (16, -12)}
+           15: (10, 0), 16: (-14, -12), 17: (-12, -16)}
 
 
 def draw_map(d, x0, y0, mw, mh):
@@ -1261,14 +1279,18 @@ def draw_map(d, x0, y0, mw, mh):
     # dot 33 at (212.7,847.1)). So story 30 (Yenne boat, also-list
     # only until now) gets a drawn pirogue in that ocean + a red leader
     # to its dot + a white label, and the map caption names it. Zero
-    # reflow, zero shrinkage, nothing else moves. Facts re-verified
+    # reflow, zero shrinkage, nothing else moves. v18: the boat is now
+    # DRAWN CARD 18's map marker (the also-list line is gone, per the
+    # v17 promotion precedent); the leader keeps its red base dot at
+    # Yenne, like an offset pin's. Facts re-verified
     # live 2026-11-21: pirogue capsized off Yenne ~02:00 Wed 18 Nov,
     # 4 bodies recovered (Reuters via Al Jazeera, pub. 20 Nov 2026),
     # 50-100 aboard, dozens missing. Original PIL vector code only.
     # v15: boat coordinates now relative to the map box (x0, y0) — the
     # map moved down with the reflow, so the v14 absolute pixels no
     # longer apply. Offsets are the v14 values minus (12, 793).
-    _sx, _sy = project(-17.2, 14.7)  # dot 35, Yenne / Dakar
+    _sx, _sy = project(-17.2, 14.7)  # Yenne / Dakar (dot 34 until v18)
+    d.ellipse([_sx - 2, _sy - 2, _sx + 2, _sy + 2], fill=RED)
     d.line([(_sx, _sy + 3), (x0 + 136, y0 + 53)], fill=RED, width=1)
     d.line([(x0 + 148, y0 + 47), (x0 + 148, y0 + 54)], fill="white",
            width=1)  # mast
@@ -1487,7 +1509,7 @@ def main():
     deck_line = ("Akvan hits Odisha · Russian missiles strike Kyiv's bridges · "
                  "COP31 deadlocks on fossil fuels · Asia's AI sell-off sinks markets")
     d.text((12, 118), deck_line, font=F_DECKLINE, fill=RED)
-    d.text((1012, 1), "41 STORIES · 7 REGIONS · EVERY ONE DATED FRIDAY 20 NOVEMBER 2026",
+    d.text((1012, 1), "40 STORIES · 7 REGIONS · EVERY ONE DATED FRIDAY 20 NOVEMBER 2026",
            font=F_EYE, fill=INK, anchor="ra")
     d.rectangle([0, 142, W, 144], fill=INK)
 
@@ -1545,7 +1567,7 @@ def main():
     # v15: caption names the boat callout (320.2px in the 336px column,
     # probe-measured at F_TTEXT); numbers renumbered for the 44-story
     # page (BepiColombo 32, Senegal boat 35).
-    d.text((12, map_y + 118), "Red 1–18, dots 19–41. Boat Senegal (34), planet BepiColombo (14).",
+    d.text((12, map_y + 118), "Red 1–18, dots 19–40. Boat Senegal (18), planet BepiColombo (14).",
            font=F_TTEXT, fill=GREY)
     # how-sure-are-we legend under the map, 2x2 (v15: the 4-row legend
     # cost 44px; the 2x2 keeps every tag explained in 22px).
@@ -1565,7 +1587,7 @@ def main():
 
     also_x = 364
     d.text((also_x, map_y), "ALSO ON FRIDAY 20 NOVEMBER", font=F_SEC, fill=INK)
-    d.text((1012, map_y), "23 MORE STORIES", font=F_SEC, fill=INK, anchor="ra")
+    d.text((1012, map_y), "22 MORE STORIES", font=F_SEC, fill=INK, anchor="ra")
     d.line([also_x, map_y + 16, 1012, map_y + 16], fill=INK, width=1)
     col_w = 320
     rows = 12
@@ -1599,7 +1621,7 @@ def main():
     # 2 lines, 10px pitch; ink ends 1008, 15px slack) ----
     foot_y = 985
     d.text((512, foot_y), "Reads at three sizes: the date and 3 leads at thumbnail size · "
-           "18 pictures at half size · all 41 stories at full size.",
+           "18 pictures at half size · all 40 stories at full size.",
            font=F_FOOT, fill=GREY, anchor="ma")
     # v6: the pins prefix duplicated the map caption, so it is gone; the
     # BepiColombo note moved there too. Line 2 is now just the source list,
