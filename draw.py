@@ -1274,10 +1274,24 @@ def art_image(key, w, h):
 # recomputed from PINS + PIN_OFF below (numeric check, not summary
 # arithmetic): ZERO pin-pin collisions <14px, ZERO pin-dot touches
 # <9px, every circle inside the box.
-PIN_OFF = {2: (18, -8), 3: (-12, 8), 4: (20, -14), 5: (-6, 26),
-           6: (8, 2), 7: (-30, 8), 8: (20, -8), 9: (0, -4), 10: (18, 14),
-           11: (-14, 0), 13: (-18, 12),
-           15: (10, 0), 16: (-8, -12), 17: (-12, -10)}
+# v23: map is 120px tall (was 72) — the latitude spread opens the
+# Europe cluster up again, so the north/south fan offsets grow back by
+# x120/72 (dy only; the longitude scale is unchanged, so dx stays).
+# 2 (18,-8)->(18,-13), 3 (-12,8)->(-12,13), 4 (20,-14)->(20,-23),
+# 5 (-6,26)->(-6,43), 6 (8,2)->(8,3), 7 (-30,8)->(-30,13),
+# 8 (20,-8)->(20,-13), 9 (0,-4)->(0,-7), 10 (18,14)->(18,23),
+# 13 (-18,12)->(-18,20), 16 (-8,-12)->(-8,-20), 17 (-12,-10)->(-12,-17).
+# 11/15 dx-only offsets unchanged. Boat + Mercury callout y-offsets
+# scale x120/72 the same way (v19 precedent x72/92). Numeric check
+# (recomputed from PINS + PIN_OFF, /tmp/check_map_v23.py): ZERO pin-pin
+# collisions <14px (min 15.4, pins 3-13), ZERO pin-dot touches <9px
+# (min 10.5, pin 1-dot 32), every circle inside the box, boat/Mercury
+# zones clear of dots/pins, Mercury label 8px clear of the Antarctica
+# coast, boat label 4.9px clear of dot 27.
+PIN_OFF = {2: (18, -13), 3: (-12, 13), 4: (20, -23), 5: (-6, 43),
+           6: (8, 3), 7: (-30, 13), 8: (20, -13), 9: (0, -7), 10: (18, 23),
+           11: (-14, 0), 13: (-18, 20),
+           15: (10, 0), 16: (-8, -20), 17: (-12, -17)}
 
 
 def draw_map(d, x0, y0, mw, mh):
@@ -1333,27 +1347,25 @@ def draw_map(d, x0, y0, mw, mh):
     # v15: boat coordinates now relative to the map box (x0, y0) — the
     # map moved down with the reflow, so the v14 absolute pixels no
     # longer apply. Offsets are the v14 values minus (12, 793).
-    # v19: map is 72px tall now (was 92) — every callout y-offset is the
-    # v18 value x72/92, and the Mercury callout shifts 3px further up so
-    # its label keeps 3px clear of the Antarctica coast (which rises to
-    # ~y0+66 at this height). Boat label keeps 4px+ clear of dot 27.
+    # v23: map is 120px tall now (was 72) — every callout y-offset is the
+    # v19 value x120/72 (boat label keeps 4.9px clear of dot 27).
     _sx, _sy = project(-17.2, 14.7)  # Yenne / Dakar (dot 34 until v18)
     d.ellipse([_sx - 2, _sy - 2, _sx + 2, _sy + 2], fill=RED)
-    d.line([(_sx, _sy + 3), (x0 + 136, y0 + 41)], fill=RED, width=1)
-    d.line([(x0 + 148, y0 + 37), (x0 + 148, y0 + 42)], fill="white",
+    d.line([(_sx, _sy + 3), (x0 + 136, y0 + 68)], fill=RED, width=1)
+    d.line([(x0 + 148, y0 + 62), (x0 + 148, y0 + 70)], fill="white",
            width=1)  # mast
-    d.polygon([(x0 + 148, y0 + 37), (x0 + 148, y0 + 41),
-               (x0 + 154, y0 + 39)], fill=RED)  # flag
-    d.polygon([(x0 + 134, y0 + 42), (x0 + 162, y0 + 42),
-               (x0 + 158, y0 + 48), (x0 + 138, y0 + 48)],
+    d.polygon([(x0 + 148, y0 + 62), (x0 + 148, y0 + 68),
+               (x0 + 154, y0 + 65)], fill=RED)  # flag
+    d.polygon([(x0 + 134, y0 + 70), (x0 + 162, y0 + 70),
+               (x0 + 158, y0 + 80), (x0 + 138, y0 + 80)],
               fill="white")  # pirogue hull
-    d.line([(x0 + 137, y0 + 45), (x0 + 159, y0 + 45)], fill=RED,
+    d.line([(x0 + 137, y0 + 75), (x0 + 159, y0 + 75)], fill=RED,
            width=1)  # hull stripe
-    d.line([(x0 + 132, y0 + 50), (x0 + 164, y0 + 50)],
+    d.line([(x0 + 132, y0 + 83), (x0 + 164, y0 + 83)],
            fill=(140, 180, 210), width=1)
-    d.line([(x0 + 138, y0 + 52), (x0 + 158, y0 + 52)],
+    d.line([(x0 + 138, y0 + 87), (x0 + 158, y0 + 87)],
            fill=(140, 180, 210), width=1)
-    d.text((x0 + 148, y0 + 53), "SENEGAL · 4 DEAD", font=F_LABEL,
+    d.text((x0 + 148, y0 + 88), "SENEGAL · 4 DEAD", font=F_LABEL,
            fill="white", anchor="ma")
     # v16: BepiColombo Mercury callout — the 20th drawn element (18 cards
     # + Senegal boat + Mercury). Space audit (2026-11-21, measured): the
@@ -1372,14 +1384,21 @@ def draw_map(d, x0, y0, mw, mh):
     # (ESA); v17 promotes it to drawn card 14, so the also-list line is
     # gone and the callout is the card's map marker. Original PIL
     # vector code only.
-    d.ellipse([x0 + 29, y0 + 39, x0 + 81, y0 + 51], outline=(140, 180, 210),
+    # v23: Mercury callout y-offsets x120/72 (planet centre y0+45 ->
+    # y0+75, label y0+53 -> y0+88, ink to ~y0+96, 8px clear of the
+    # Antarctica coast which rises to ~y0+104 at this height). The planet
+    # itself stays a 16px CIRCLE centred on the rescaled centre — scaling
+    # its bbox x120/72 would stretch it into an egg (caught on the 4x
+    # view); the orbit ellipse keeps the scaled height (an ellipse may
+    # stretch, a planet may not).
+    d.ellipse([x0 + 29, y0 + 65, x0 + 81, y0 + 85], outline=(140, 180, 210),
               width=1)  # orbit
-    d.ellipse([x0 + 47, y0 + 37, x0 + 63, y0 + 53], fill=(180, 180, 190),
+    d.ellipse([x0 + 47, y0 + 67, x0 + 63, y0 + 83], fill=(180, 180, 190),
               outline=(140, 140, 150), width=1)  # Mercury
-    d.ellipse([x0 + 51, y0 + 41, x0 + 53, y0 + 43], fill=(140, 140, 150))
-    d.ellipse([x0 + 57, y0 + 46, x0 + 59, y0 + 48], fill=(140, 140, 150))
-    d.rectangle([x0 + 79, y0 + 43, x0 + 82, y0 + 46], fill="white")  # craft
-    d.text((x0 + 55, y0 + 53), "BEPICOLOMBO SAT", font=F_LABEL,
+    d.ellipse([x0 + 51, y0 + 68, x0 + 53, y0 + 72], fill=(140, 140, 150))
+    d.ellipse([x0 + 57, y0 + 77, x0 + 59, y0 + 80], fill=(140, 140, 150))
+    d.rectangle([x0 + 79, y0 + 72, x0 + 82, y0 + 77], fill="white")  # craft
+    d.text((x0 + 55, y0 + 88), "BEPICOLOMBO SAT", font=F_LABEL,
            fill="white", anchor="ma")
     for n, (lon, lat) in PINS.items():
         px, py = project(lon, lat)
@@ -1652,35 +1671,19 @@ def main():
             k = 3 + r * 5 + c
             small_card(img, d, FRONT[k], 12 + c * 204, 466 + r * 118)
 
-    # ---- map + also 821-967 (v20: moved +4 with the reflow; v19: map 72 tall, also-list 22 items in
-    # 11 rows at pitch 11; legend header dropped — the 4 swatch rows
-    # stay, directly under the caption) ----
+    # ---- map + also 821-967 (v23: map 120 tall, funded by dropping the
+    # caption + the 4-row legend — the map box grows 843-915 -> 843-963,
+    # section end stays 964; also-list 22 items in 11 rows at pitch 11) ----
     map_y = 821
     d.text((12, map_y), "WHERE IT HAPPENED", font=F_SEC, fill=INK)
     d.line([12, map_y + 16, 348, map_y + 16], fill=INK, width=1)
-    d.rectangle([12, map_y + 22, 348, map_y + 94], fill=NAVY_DARK,
+    d.rectangle([12, map_y + 22, 348, map_y + 142], fill=NAVY_DARK,
                 outline=RULE, width=1)
-    draw_map(d, 12, map_y + 22, 336, 72)
-    # v15: caption names the boat callout (320.2px in the 336px column,
-    # probe-measured at F_TTEXT); numbers renumbered for the 44-story
-    # page (BepiColombo 32, Senegal boat 35).
-    d.text((12, map_y + 98), "Red 1–18, dots 19–40. Boat Senegal (18), planet BepiColombo (14).",
-           font=F_TTEXT, fill=GREY)
-    # how-sure-are-we legend under the map, 2x2 (v19: the header is
-    # dropped to fund the heroes — the 4 swatch rows keep every tag
-    # explained in 22px; explanations probe-measured to fit the 168px
-    # columns).
-    _leg = [("CONFIRMED", "2+ sources agree", 0, 0),
-            ("FORECAST", "schedule / draft", 1, 0),
-            ("REPORTED", "1 named source", 0, 1),
-            ("CLAIM", "unverified claim", 1, 1)]
-    for _st, _expl, _col, _row in _leg:
-        _lx = 12 if _col == 0 else 184
-        _ly = map_y + 114 + _row * 11
-        d.rectangle([_lx, _ly, _lx + 8, _ly + 8], fill=PILL_COL[_st])
-        d.text((_lx + 12, _ly - 1), _st, font=F_LEGEND, fill=INK)
-        _ex = _lx + 12 + int(d.textlength(_st, font=F_LEGEND)) + 4
-        d.text((_ex, _ly - 1), _expl, font=F_LEGEND, fill=GREY)
+    draw_map(d, 12, map_y + 22, 336, 120)
+    # v23: the map caption ("Red 1–18, dots 19–40...") and the 4-row
+    # how-sure-are-we legend are DELETED — they fund the 72->120px map
+    # growth (Attack 1, round-4 analysis). The pill tags are still
+    # explained by the pill colours on the cards themselves.
 
     also_x = 364
     d.text((also_x, map_y), "ALSO ON FRIDAY 20 NOVEMBER", font=F_SEC, fill=INK)
